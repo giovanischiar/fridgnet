@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <color name="backgroundColor">#08415C</color> <!--Indigo Dye-->
+  <color name="magnetStrokeColor">#08415C</color> <!--Indigo Dye-->
+  <color name="archColor">#E54B4B</color> <!--Imperial Red-->
+  <color name="leftPoleColor">#C4CBCA</color> <!--Silver-->
+  <color name="rightPoleColor">#C4CBCA</color> <!--Silver-->
+  <color name="freezeDoorStrokeColor">#08415C</color> <!--Indigo Dye-->
+  <color name="freezeDoorColor">#FFFBFF</color> <!--Snow-->
+  <color name="doorStrokeColor">#08415C</color> <!--Indigo Dye-->
+  <color name="doorColor">#FFFBFF</color> <!--Snow-->
+  <color name="handleColor">#08415C</color> <!--Indigo Dye-->
+</resources>

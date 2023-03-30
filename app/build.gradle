@@ -38,6 +38,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.4.4"
     }
+
+    afterEvaluate {
+        packageDebugResources.dependsOn 'generateIcons'
+    }
 }
 
 dependencies {
@@ -59,4 +63,14 @@ dependencies {
     androidTestImplementation "androidx.compose.ui:ui-test-junit4:$compose_version"
     debugImplementation "androidx.compose.ui:ui-tooling:$compose_version"
     debugImplementation "androidx.compose.ui:ui-test-manifest:$compose_version"
+}
+
+task generateIcons(type: Exec) {
+    dependsOn "mergeDebugResources"
+    dependsOn "mapDebugSourceSetPaths"
+    inputs.file 'src/main/res/values/iconpalette.xml'
+    inputs.dir '../scripts/IconCreator/Icon'
+    outputs.file 'src/main/res/drawable/ic_launcher_background.xml'
+    outputs.file 'src/main/res/drawable-v24/ic_launcher_foreground.xml'
+    commandLine 'bash', '../scripts/IconCreator/Library/icon-creator.sh', 'android', '../..', '../Icon'
 }
