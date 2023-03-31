@@ -3,6 +3,10 @@ plugins {
     id 'org.jetbrains.kotlin.android'
 }
 
+def apikeyPropertiesFile = rootProject.file("apikey.properties")
+def apikeyProperties = new Properties()
+apikeyProperties.load(new FileInputStream(apikeyPropertiesFile))
+
 android {
     namespace 'io.schiar.fridgnet'
     compileSdk 33
@@ -15,6 +19,8 @@ android {
         versionName "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        resValue "string", "MAPS_API_KEY", apikeyProperties['MAPS_API_KEY']
     }
 
     buildTypes {
@@ -66,6 +72,10 @@ dependencies {
 
     //navigation
     implementation "androidx.navigation:navigation-compose:$nav_version"
+
+    //google maps
+    implementation 'com.google.maps.android:maps-compose:2.8.0'
+    implementation 'com.google.android.gms:play-services-maps:18.1.0'
 }
 
 task generateIcons(type: Exec) {
