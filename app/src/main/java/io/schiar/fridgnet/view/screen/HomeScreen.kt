@@ -10,15 +10,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 
 @Composable
-fun HomeScreen(onClickMapScreenButton: () -> Unit) {
+fun HomeScreen() {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Hello World")
-        Button(onClick = { onClickMapScreenButton() }) {
-            Text("Map Screen")
-        }
+        Text("Hello world")
     }
 }
