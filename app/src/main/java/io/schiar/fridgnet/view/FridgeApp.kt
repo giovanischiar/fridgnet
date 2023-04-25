@@ -4,8 +4,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
@@ -73,7 +73,7 @@ fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = remem
             Modifier.padding(innerPadding)
         ) {
             composable(route = Screen.Home.route) { HomeScreen(viewModel = viewModel) }
-            composable(route = Screen.Map.route) { MapScreen() }
+            composable(route = Screen.Map.route) { MapScreen(viewModel = viewModel) }
         }
     }
 }
