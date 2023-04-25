@@ -20,9 +20,10 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.schiar.fridgnet.view.screen.HomeScreen
 import io.schiar.fridgnet.view.screen.MapScreen
+import io.schiar.fridgnet.viewmodel.MainViewModel
 
 @Composable
-fun FridgeApp(navController: NavHostController = rememberNavController()) {
+fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = rememberNavController()) {
     val items = listOf(Screen.Home, Screen.Map)
 
     Scaffold(
@@ -71,7 +72,7 @@ fun FridgeApp(navController: NavHostController = rememberNavController()) {
             startDestination = Screen.Home.route,
             Modifier.padding(innerPadding)
         ) {
-            composable(route = Screen.Home.route) { HomeScreen() }
+            composable(route = Screen.Home.route) { HomeScreen(viewModel = viewModel) }
             composable(route = Screen.Map.route) { MapScreen() }
         }
     }

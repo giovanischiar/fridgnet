@@ -1,5 +1,6 @@
 package io.schiar.fridgnet.view.screen
 
+import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.*
@@ -15,53 +16,49 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.exifinterface.media.ExifInterface
 import coil.compose.AsyncImage
 import io.schiar.fridgnet.view.viewdata.ImageViewData
-import io.schiar.fridgnet.view.viewdata.LocationViewData
+import io.schiar.fridgnet.viewmodel.MainViewModel
 
+@SuppressLint("RestrictedApi")
 @Composable
-fun HomeScreen() {
+fun HomeScreen(viewModel: MainViewModel) {
     Column(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text("Hello world")
         val context = LocalContext.current
-        var selectedImageUris by remember { mutableStateOf<List<ImageViewData>>(emptyList()) }
+        val images by viewModel.images.collectAsState()
+
         val multiplePhotoPickerLauncher = rememberLauncherForActivityResult(
             contract = ActivityResultContracts.GetMultipleContents(),
             onResult = { uris ->
-                selectedImageUris = uris.map {
-                    context.contentResolver.openInputStream(it)!!.use { ins ->
+                uris.forEach { uri ->
+                    context.contentResolver.openInputStream(uri)!!.use { ins ->
                         val exifInterface = ExifInterface(ins)
-                        val latLng = exifInterface.latLong
+                        val latLng = exifInterface.latLong ?: doubleArrayOf(0.0, 0.0)
                         val date = exifInterface.dateTime
-                        val locationViewData = latLng?.let { doubleArray ->
-                            LocationViewData(
-                                lat = doubleArray[0].toString(),
-                                lng = doubleArray[1].toString()
-                            )
-                        } ?: LocationViewData(lat = "0", lng = "0")
-                        ImageViewData(
-                            uri = it,
-                            date = date.toString(),
-                            location = locationViewData
+                        viewModel.addImage(
+                            uri = uri.toString(),
+                            date = date ?: 0L,
+                            latitude = latLng[0],
+                            longitude = latLng[1]
                         )
                     }
                 }
             }
         )
-        Button (onClick = { multiplePhotoPickerLauncher.launch("image/*") }){
+        Button(onClick = { multiplePhotoPickerLauncher.launch("image/*") }) {
             Text("Pick Photo")
         }
-        Photos(selectedImageUris = selectedImageUris)
+
+        Photos(images = images)
     }
 }
-
 @Composable
-fun Photos(selectedImageUris: List<ImageViewData>) {
+fun Photos(images: List<ImageViewData>) {
     LazyColumn {
-        items(selectedImageUris) { imageViewData ->
-            val (uri, date, location) = imageViewData
+        items(images) { image ->
+            val (uri, date, location) = image
             val (lat, lng) = location
             Column {
                 AsyncImage(
