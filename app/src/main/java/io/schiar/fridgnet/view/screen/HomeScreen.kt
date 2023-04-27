@@ -21,7 +21,7 @@ fun HomeScreen(viewModel: MainViewModel) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        val images by viewModel.images.collectAsState()
+        val images by viewModel.visibleImages.collectAsState()
         val (photoPickerShowing, isPhotoPickerShowing) = remember { mutableStateOf(false) }
         Button( onClick = { isPhotoPickerShowing.invoke(true) }) {
             Text("Add Photos")

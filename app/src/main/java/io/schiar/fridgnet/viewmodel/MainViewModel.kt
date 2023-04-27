@@ -1,6 +1,8 @@
 package io.schiar.fridgnet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.view.viewdata.ImageViewData
@@ -11,13 +13,20 @@ import kotlinx.coroutines.flow.update
 
 class MainViewModel: ViewModel() {
     private var _images: List<Image> = emptyList()
-    private val _imagesViewData = MutableStateFlow(value = _images.toViewData())
-    val images: StateFlow<List<ImageViewData>> = _imagesViewData.asStateFlow()
+    private val _visibleImages = MutableStateFlow(value = _images.toViewData())
+    val visibleImages: StateFlow<List<ImageViewData>> = _visibleImages.asStateFlow()
 
     fun addImage(uri: String, date: Long, latitude: Double, longitude: Double) {
         val newLocation = Location(latitude = latitude, longitude = longitude)
         val newImage = Image(uri = uri, date = date, location = newLocation)
-        _images = listOf(*_images.toTypedArray(), newImage)
-        _imagesViewData.update { _images.toViewData() }
+        _images = _images + newImage
+    }
+
+    fun visibleAreaChanged(bounds: LatLngBounds?) {
+        val visibleImages = _images.filter { image ->
+            val position = LatLng(image.location.latitude, image.location.longitude)
+            bounds?.contains(position) == true
+        }
+        _visibleImages.update { visibleImages.toViewData() }
     }
 }
