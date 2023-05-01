@@ -1,5 +1,6 @@
 package io.schiar.fridgnet.view.screen
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.ImageDecoder
 import android.net.Uri
@@ -21,6 +22,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import io.schiar.fridgnet.view.PhotoPicker
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import io.schiar.fridgnet.viewmodel.MainViewModel
+import kotlinx.coroutines.*
 
 @Composable
 fun MapScreen(viewModel: MainViewModel) {
@@ -55,6 +57,17 @@ fun MapScreen(viewModel: MainViewModel) {
         }
     }
 }
+fun loadBitmap(uri: Uri, context: Context): BitmapDescriptor {
+    val rawBitmap = if (Build.VERSION.SDK_INT < 28) {
+        @Suppress("DEPRECATION")
+        MediaStore.Images.Media.getBitmap(context.contentResolver, uri)
+    } else {
+        val source = ImageDecoder.createSource(context.contentResolver, uri)
+        ImageDecoder.decodeBitmap(source)
+    }
+    val bitmap = Bitmap.createScaledBitmap(rawBitmap, 150, 150, false)
+    return BitmapDescriptorFactory.fromBitmap(bitmap)
+}
 
 @Composable
 fun Map(
@@ -62,7 +75,10 @@ fun Map(
     visibleImages: List<ImageViewData>,
     onBoundsChange: (LatLngBounds?) -> Unit
 ) {
-    val alreadyExistedBitmaps = remember { mutableMapOf<Uri, BitmapDescriptor>() }
+    val bitmaps by remember { mutableStateOf(mutableMapOf<Uri, BitmapDescriptor>()) }
+    val jobs = remember { mutableMapOf<Uri, Job>() }
+    val coroutineScope = rememberCoroutineScope()
+
     val context = LocalContext.current
     val missionDoloresPark = LatLng(37.759773, -122.427063)
     val cameraPositionState = rememberCameraPositionState {
@@ -74,7 +90,7 @@ fun Map(
             onBoundsChange(cameraPositionState.projection?.visibleRegion?.latLngBounds)
         }
     }
-
+    
     GoogleMap(
         modifier = modifier,
         cameraPositionState = cameraPositionState,
@@ -83,30 +99,20 @@ fun Map(
         }
     ) {
         visibleImages.map {
-            val icon: BitmapDescriptor = if (alreadyExistedBitmaps.contains(it.uri)) {
-                alreadyExistedBitmaps[it.uri] ?: return@map
-            } else {
-                val rawBitmap = if (Build.VERSION.SDK_INT < 28) {
-                    @Suppress("DEPRECATION")
-                    MediaStore.Images.Media.getBitmap(context.contentResolver, it.uri)
-                } else {
-                    val source = ImageDecoder.createSource(context.contentResolver, it.uri)
-                    ImageDecoder.decodeBitmap(source)
+            if (!(bitmaps.containsKey(it.uri) || jobs.containsKey(it.uri))) {
+                jobs[it.uri] = coroutineScope.launch(Dispatchers.IO) {
+                    bitmaps[it.uri] = withContext(Dispatchers.Default) {
+                        loadBitmap(it.uri, context)
+                    }
+                    jobs.remove(it.uri)
                 }
-                val bitmap = Bitmap.createScaledBitmap(
-                    rawBitmap,
-                    150,
-                    150,
-                    false
-                )
-                BitmapDescriptorFactory.fromBitmap(bitmap)
             }
             val position = LatLng(it.location.lat.toDouble(), it.location.lng.toDouble())
             Marker(
                 state = MarkerState(position = position),
-                icon = icon
+                icon = bitmaps[it.uri],
+                visible = bitmaps.containsKey(it.uri)
             )
-            alreadyExistedBitmaps[it.uri] = icon
         }
     }
 }
