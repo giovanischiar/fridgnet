@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view
+package io.schiar.fridgnet.view.util
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

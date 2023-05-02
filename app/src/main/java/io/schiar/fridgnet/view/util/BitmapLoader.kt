@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view
+package io.schiar.fridgnet.view.util
 
 import android.content.ContentResolver
 import android.graphics.Bitmap

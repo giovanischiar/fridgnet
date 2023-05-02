@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view
+package io.schiar.fridgnet.view.util
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons

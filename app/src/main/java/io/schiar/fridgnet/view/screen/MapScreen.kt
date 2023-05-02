@@ -7,8 +7,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import io.schiar.fridgnet.view.Map
 import io.schiar.fridgnet.view.PhotoPicker
+import io.schiar.fridgnet.view.component.Map
 import io.schiar.fridgnet.viewmodel.MainViewModel
 
 @Composable

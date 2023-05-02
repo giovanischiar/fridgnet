@@ -20,6 +20,8 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.schiar.fridgnet.view.screen.HomeScreen
 import io.schiar.fridgnet.view.screen.MapScreen
+import io.schiar.fridgnet.view.util.Screen
+import io.schiar.fridgnet.view.util.chooseWhether
 import io.schiar.fridgnet.viewmodel.MainViewModel
 
 @Composable

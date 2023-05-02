@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view
+package io.schiar.fridgnet.view.component
 
 import android.net.Uri
 import androidx.compose.runtime.*
@@ -12,6 +12,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import io.schiar.fridgnet.view.util.BitmapLoader
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
