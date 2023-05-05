@@ -22,6 +22,10 @@ fun List<Image>.toViewData(): List<ImageViewData> {
     return map { it.toViewData() }
 }
 
-fun Map<String, Image>.toViewData(): Map<Uri, ImageViewData> {
-    return entries.associate { Uri.parse(it.key) to it.value.toViewData() }
+fun Map<String, List<Image>>.toViewData(): Map<String, List<ImageViewData>> {
+    return mapValues { it.value.toViewData() }
+}
+
+fun Map<String, Image>.toListImagesViewData(): List<ImageViewData> {
+    return values.toList().toViewData()
 }

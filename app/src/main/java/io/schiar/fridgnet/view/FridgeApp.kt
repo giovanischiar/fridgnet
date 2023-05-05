@@ -20,6 +20,7 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.schiar.fridgnet.view.screen.HomeScreen
 import io.schiar.fridgnet.view.screen.MapScreen
+import io.schiar.fridgnet.view.screen.PhotosScreen
 import io.schiar.fridgnet.view.util.Screen
 import io.schiar.fridgnet.view.util.chooseWhether
 import io.schiar.fridgnet.viewmodel.MainViewModel
@@ -74,8 +75,11 @@ fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = remem
             startDestination = Screen.Home.route,
             Modifier.padding(innerPadding)
         ) {
-            composable(route = Screen.Home.route) { HomeScreen(viewModel = viewModel) }
+            composable(route = Screen.Home.route) { HomeScreen(viewModel = viewModel, onNavigateImage = {
+                navController.navigate("Photos")
+            }) }
             composable(route = Screen.Map.route) { MapScreen(viewModel = viewModel) }
+            composable(route = "Photos") { PhotosScreen(viewModel = viewModel) }
         }
     }
 }
