@@ -1,6 +1,7 @@
 package io.schiar.fridgnet.viewmodel
 
 import android.net.Uri
+import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import io.schiar.fridgnet.view.viewdata.LocationViewData
@@ -22,7 +23,7 @@ fun List<Image>.toViewData(): List<ImageViewData> {
     return map { it.toViewData() }
 }
 
-fun Map<String, List<Image>>.toViewData(): Map<String, List<ImageViewData>> {
+fun Map<Address, List<Image>>.toViewData(): Map<Address, List<ImageViewData>> {
     return mapValues { it.value.toViewData() }
 }
 

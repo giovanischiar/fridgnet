@@ -84,6 +84,15 @@ dependencies {
 
     //get EXIF data (lat lng, date, etc) from pictures
     implementation "androidx.exifinterface:exifinterface:1.3.6"
+
+    // Retrofit
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+
+    // Gson
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+
+    // Gson to convert raw JSON to pretty JSON
+    implementation 'com.google.code.gson:gson:2.8.9'
 }
 
 task generateIcons(type: Exec) {

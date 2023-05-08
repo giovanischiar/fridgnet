@@ -3,6 +3,7 @@ package io.schiar.fridgnet.viewmodel
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.view.viewdata.ImageViewData
@@ -13,7 +14,7 @@ import kotlinx.coroutines.flow.update
 
 class MainViewModel: ViewModel() {
     private var _images: Map<String, Image> = emptyMap()
-    private var _addressImages: Map<String, List<Image>> = emptyMap()
+    private var _addressImages: Map<Address, List<Image>> = emptyMap()
 
     private val _visibleImages = MutableStateFlow(value = _images.toListImagesViewData())
     val visibleImages: StateFlow<List<ImageViewData>> = _visibleImages.asStateFlow()
@@ -22,9 +23,9 @@ class MainViewModel: ViewModel() {
     val selectedImages: StateFlow<List<ImageViewData>> = _selectedImages.asStateFlow()
 
     private val _imageWithLocations = MutableStateFlow(
-        value = mapOf<String, List<ImageViewData>>()
+        value = mapOf<Address, List<ImageViewData>>()
     )
-    val imagesWithLocation: StateFlow<Map<String, List<ImageViewData>>> =
+    val imagesWithLocation: StateFlow<Map<Address, List<ImageViewData>>> =
         _imageWithLocations.asStateFlow()
 
     fun addImage(uri: String, date: Long, latitude: Double, longitude: Double) {
@@ -33,7 +34,7 @@ class MainViewModel: ViewModel() {
         _images = _images + (uri to newImage)
     }
 
-    fun addLocationToImage(uri: String, address: String) {
+    fun addAddressToImage(uri: String, address: Address) {
         if (_addressImages.containsKey(address) && _images.containsKey(uri)) {
             val newList = _addressImages[address]!! + _images[uri]!!
             _addressImages = _addressImages + (address to newList)
@@ -43,7 +44,7 @@ class MainViewModel: ViewModel() {
         _imageWithLocations.update { _addressImages.toViewData() }
     }
 
-    fun selectImages(address: String) {
+    fun selectImages(address: Address) {
         if (_addressImages.containsKey(address)) {
             _selectedImages.update { _addressImages[address]!!.toViewData() }
         }
