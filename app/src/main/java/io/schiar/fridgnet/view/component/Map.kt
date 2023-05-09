@@ -61,7 +61,7 @@ fun Map(
                     jobs.remove(it.uri)
                 }
             }
-            val position = LatLng(it.location.lat.toDouble(), it.location.lng.toDouble())
+            val position = LatLng(it.coordinate.lat.toDouble(), it.coordinate.lng.toDouble())
             Marker(
                 state = MarkerState(position = position),
                 icon = bitmaps[it.uri],

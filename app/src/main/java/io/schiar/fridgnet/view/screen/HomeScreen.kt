@@ -1,7 +1,5 @@
 package io.schiar.fridgnet.view.screen
 
-import android.graphics.Point
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,17 +16,19 @@ import androidx.compose.ui.unit.Dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
-import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.view.PhotoPicker
-import io.schiar.fridgnet.view.util.*
+import io.schiar.fridgnet.view.util.AddressCreator
+import io.schiar.fridgnet.view.util.toLatLng
+import io.schiar.fridgnet.view.util.toPoint
+import io.schiar.fridgnet.view.viewdata.LineStringLocationViewData
+import io.schiar.fridgnet.view.viewdata.MultiPolygonLocationViewData
+import io.schiar.fridgnet.view.viewdata.PolygonLocationViewData
 import io.schiar.fridgnet.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -40,6 +40,7 @@ fun HomeScreen(viewModel: MainViewModel, onNavigateImage: () -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val imagesWithLocation by viewModel.imagesWithLocation.collectAsState()
+        val allLocationAddress by viewModel.allLocationAddress.collectAsState()
 
         val (photoPickerShowing, isPhotoPickerShowing) = remember { mutableStateOf(false) }
         val coroutineScope = rememberCoroutineScope()
@@ -65,7 +66,7 @@ fun HomeScreen(viewModel: MainViewModel, onNavigateImage: () -> Unit) {
                             longitude = longitude
                         )
                     }
-                    viewModel.addAddressToImage(uri, address.toAddress())
+                    viewModel.addAddressToImage(uri = uri, systemAddress = address)
                 }
                 isPhotoPickerShowing.invoke(false)
             }
@@ -76,7 +77,7 @@ fun HomeScreen(viewModel: MainViewModel, onNavigateImage: () -> Unit) {
                 item {
                     val missionDoloresPark = LatLng(37.759773, -122.427063)
                     val target = if (imagesWithLocation[address]?.isNotEmpty() == true) {
-                        imagesWithLocation[address]!![0].location.toLatLng()
+                        imagesWithLocation[address]!![0].coordinate.toLatLng()
                     } else { missionDoloresPark }
                     val cameraPositionState = rememberCameraPositionState {
                         position = CameraPosition.fromLatLngZoom(target, 10f)
@@ -97,84 +98,32 @@ fun HomeScreen(viewModel: MainViewModel, onNavigateImage: () -> Unit) {
                             onNavigateImage()
                         }
                     ) {
-                        var point by remember { mutableStateOf<LatLng?>(null) }
-                        var lineString by remember { mutableStateOf<List<LatLng>>(emptyList()) }
-                        var polygons by remember { mutableStateOf<List<List<LatLng>>>(emptyList()) }
-                        var multipolygons by remember { mutableStateOf<List<List<List<LatLng>>>>(emptyList()) }
-                        val jobs = remember { mutableMapOf<Address, Job>() }
-                        var latLngBounds: LatLngBounds? by remember { mutableStateOf(null) }
-
-                        SideEffect {
-                            if (!jobs.containsKey(address)) {
-                                jobs[address] = coroutineScope.launch(Dispatchers.IO) {
-                                    val result = withContext(Dispatchers.Default) {
-                                        Log.d("api result", "searching $address")
-                                        PolygonSearcher(address = address).search()
-                                    }
-                                    Log.d("api result", result.body().toString())
-                                    val bodyList = (result.body() ?: emptyList())
-                                    if (bodyList.isNotEmpty()) {
-                                        val body = bodyList[0]
-                                        val geoJson = body.geojson
-                                        when(geoJson.type) {
-                                            "Point" -> {
-                                                val pointDouble = geoJson.coordinates as List<Double>
-                                                point = pointDouble.toLatLng()
-                                            }
-                                            "LineString" -> {
-                                                val polygonDouble = geoJson.coordinates as List<List<Double>>
-                                                lineString = polygonDouble.toListLatLng()
-                                            }
-
-                                            "Polygon" -> {
-                                                val polygonDouble = geoJson.coordinates as List<List<List<Double>>>
-                                                polygons = polygonDouble.toMatrixLatLng()
-                                            }
-
-                                            "MultiPolygon" -> {
-                                                val multipolygonDouble = geoJson.coordinates as List<List<List<List<Double>>>>
-                                                multipolygons = multipolygonDouble.toListOfPolygon()
-                                            }
-                                        }
-
-                                        if (body.boundingbox.size == 4) {
-                                            latLngBounds = body.boundingbox.toLatLngBounds()
-                                        }
-                                    }
-                                }
-                            }
-                        }
-
-                        if (latLngBounds != null) {
-                            val cu = CameraUpdateFactory.newLatLngBounds(latLngBounds!!, 2)
+                        if (allLocationAddress.containsKey(address)) {
+                            val location = allLocationAddress[address] ?: return@GoogleMap
+                            val boundingBox = location.boundingBox
+                            val cu = CameraUpdateFactory.newLatLngBounds(boundingBox, 2)
                             cameraPositionState.move(cu)
-                        }
 
-                        if (point != null) {
-                            Log.d("api result", "$point")
-                            Point(point!!.latitude.toInt(), point!!.longitude.toInt())
-                        }
+                            when (location) {
+                                is LineStringLocationViewData -> {
+                                    val lineStringRegion = location.region
+                                    if (lineStringRegion.size == 1) {
+                                        location.region[0].toPoint()
+                                    } else {
+                                        Polyline(points = location.region)
+                                    }
+                                }
 
-                        if (lineString.isNotEmpty()) {
-                            Log.d("api result", "$lineString")
-                            Polyline(points = lineString)
-                        }
+                                is PolygonLocationViewData -> {
+                                    location.region.map { Polyline(points = it) }
+                                }
 
-                        if (polygons.isNotEmpty()) {
-                            Log.d("api result", "$polygons")
-                            polygons.map {
-                                Polyline(points = it)
-                            }
-                        }
-
-                        if (multipolygons.isNotEmpty()) {
-                            Log.d("api result", "$multipolygons")
-                            multipolygons.map { polygonsLatLng ->
-                                polygonsLatLng.map {
-                                    Polyline(points = it)
+                                is MultiPolygonLocationViewData -> {
+                                    location.region.map { polygonsLatLng ->
+                                        polygonsLatLng.map { Polyline(points = it) }
+                                    }
                                 }
                             }
-
                         }
                     }
                 }
