@@ -5,8 +5,8 @@ import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.name
 import retrofit2.Response
 
-class PolygonSearcher(private val address: Address) {
-    suspend fun search(): Response<List<Result<GeoJsonAttributes>>> {
+class PolygonSearcher() {
+    suspend fun search(address: Address): Response<List<Result<GeoJsonAttributes>>> {
         val quotesApi = RetrofitHelper.getInstance().create(NominatimApi::class.java)
         return if(
             address.locality != null &&
@@ -25,5 +25,25 @@ class PolygonSearcher(private val address: Address) {
             Log.d("api result", "searching $name")
             quotesApi.getResults(q = name)
         }
+    }
+
+    suspend fun searchCity(city: String, state: String, country: String): Response<List<Result<GeoJsonAttributes>>> {
+        val quotesApi = RetrofitHelper.getInstance().create(NominatimApi::class.java)
+        return quotesApi.getResultsCity(city = city, state = state, country = country)
+    }
+
+    suspend fun searchCounty(county: String, state: String, country: String): Response<List<Result<GeoJsonAttributes>>> {
+        val quotesApi = RetrofitHelper.getInstance().create(NominatimApi::class.java)
+        return quotesApi.getResultsCounty(county = county, state = state, country = country)
+    }
+
+    suspend fun searchState(state: String, country: String): Response<List<Result<GeoJsonAttributes>>> {
+        val quotesApi = RetrofitHelper.getInstance().create(NominatimApi::class.java)
+        return quotesApi.getResultsState(state = state, country = country)
+    }
+
+    suspend fun searchCountry(country: String): Response<List<Result<GeoJsonAttributes>>> {
+        val quotesApi = RetrofitHelper.getInstance().create(NominatimApi::class.java)
+        return quotesApi.getResultsCountry(country = country)
     }
 }

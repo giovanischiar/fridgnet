@@ -27,20 +27,26 @@ fun Map<Address, List<Image>>.toAddressImageListViewData(): Map<Address, List<Im
     return mapValues { it.value.toViewData() }
 }
 
-fun Map<Address, Location>.toAddressLocationViewData(): Map<Address, LocationViewData> {
-    return mapValues {
-        when (it.value) {
-            is LineStringLocation -> {
-                (it.value as LineStringLocation).toViewData()
-            }
-            is PolygonLocation -> {
-                (it.value as PolygonLocation).toViewData()
-            }
-            else -> {
-                (it.value as MultiPolygonLocation).toViewData()
-            }
+fun Map<String, List<Image>>.toStringImageListViewData(): Map<String, List<ImageViewData>> {
+    return mapValues { it.value.toViewData() }
+}
+
+fun Location.toLocationViewData(): LocationViewData {
+    return when (this) {
+        is LineStringLocation -> {
+            this.toViewData()
+        }
+        is PolygonLocation -> {
+            this.toViewData()
+        }
+        else -> {
+            (this as MultiPolygonLocation).toViewData()
         }
     }
+}
+
+fun Map<*, Location>.toAnyLocationViewData(): Map<*, LocationViewData> {
+    return mapValues { it.value.toLocationViewData() }
 }
 
 fun Map<String, Image>.toListImagesViewData(): List<ImageViewData> {
@@ -117,4 +123,12 @@ fun android.location.Address.toAddress(): Address {
         adminArea = this.adminArea,
         countryName = this.countryName
     )
+}
+
+fun Map<String, Location>.toStringLocationViewData(): Map<String, LocationViewData> {
+    return this.toAnyLocationViewData() as Map<String, LocationViewData>
+}
+
+fun Map<String, Map<String, Location>>.toStringStringLocationViewData(): Map<String, Map<String, LocationViewData>> {
+    return this.mapValues { it.value.toStringLocationViewData()  }
 }

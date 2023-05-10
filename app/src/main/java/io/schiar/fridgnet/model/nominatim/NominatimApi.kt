@@ -22,4 +22,31 @@ interface NominatimApi {
         @Query("limit") limit: Int = 1,
         @Query("format") format : String = "jsonv2"
     ) : Response<List<Result<GeoJsonAttributes>>>
+
+    @GET("/search?")
+    suspend fun getResultsCounty(
+        @Query("county") county: String,
+        @Query("state") state: String,
+        @Query("country") country: String,
+        @Query("polygon_geojson") polygon_geojson: Int = 1,
+        @Query("limit") limit: Int = 1,
+        @Query("format") format : String = "jsonv2"
+    ) : Response<List<Result<GeoJsonAttributes>>>
+
+    @GET("/search?")
+    suspend fun getResultsState(
+        @Query("state") state: String,
+        @Query("country") country: String,
+        @Query("polygon_geojson") polygon_geojson: Int = 1,
+        @Query("limit") limit: Int = 1,
+        @Query("format") format : String = "jsonv2"
+    ) : Response<List<Result<GeoJsonAttributes>>>
+
+    @GET("/search?")
+    suspend fun getResultsCountry(
+        @Query("country") country: String,
+        @Query("polygon_geojson") polygon_geojson: Int = 1,
+        @Query("limit") limit: Int = 1,
+        @Query("format") format : String = "jsonv2"
+    ) : Response<List<Result<GeoJsonAttributes>>>
 }

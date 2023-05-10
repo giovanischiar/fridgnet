@@ -7,17 +7,35 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import io.schiar.fridgnet.view.PhotoPicker
 import io.schiar.fridgnet.view.component.Map
+import io.schiar.fridgnet.view.util.AddressCreator
 import io.schiar.fridgnet.viewmodel.MainViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun MapScreen(viewModel: MainViewModel) {
     Box(modifier = Modifier.fillMaxSize()) {
+        val coroutineScope = rememberCoroutineScope()
+        val context = LocalContext.current
         val (photoPickerShowing, isPhotoPickerShowing) = remember { mutableStateOf(false) }
         val visibleImages by viewModel.visibleImages.collectAsState()
+        val countries by viewModel.allCountries.collectAsState()
+        val states by viewModel.allStates.collectAsState()
+        val counties by viewModel.allCounties.collectAsState()
+        val cities by viewModel.allCities.collectAsState()
 
-        Map(modifier = Modifier.fillMaxSize(), visibleImages = visibleImages) {
+        Map(
+            modifier = Modifier.fillMaxSize(),
+            visibleImages = visibleImages,
+            countries = countries,
+            states = states,
+            counties = counties,
+            cities = cities
+        ) {
             viewModel.visibleAreaChanged(it)
         }
 
@@ -36,6 +54,16 @@ fun MapScreen(viewModel: MainViewModel) {
                     latitude = latitude,
                     longitude = longitude
                 )
+                coroutineScope.launch(Dispatchers.IO) {
+                    val address = withContext(Dispatchers.Default) {
+                        AddressCreator().addressFromLocation(
+                            context = context,
+                            latitude = latitude,
+                            longitude = longitude
+                        )
+                    }
+                    viewModel.addAddressToImage(uri = uri, systemAddress = address)
+                }
                 isPhotoPickerShowing.invoke(false)
             }
         }

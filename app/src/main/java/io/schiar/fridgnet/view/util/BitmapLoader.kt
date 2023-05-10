@@ -26,8 +26,8 @@ class BitmapLoader(private val contentResolver: ContentResolver, private val uri
     private fun resize(bitmap: Bitmap): Bitmap {
         val width = bitmap.width
         val height = bitmap.height
-        val maxWidth = 150f
-        val maxHeight = 150f
+        val maxWidth = 50f
+        val maxHeight = 50f
         val ratioBitmap = width.toFloat() / height.toFloat()
         val ratioMax = 1
         var finalWidth = maxWidth.roundToInt()
