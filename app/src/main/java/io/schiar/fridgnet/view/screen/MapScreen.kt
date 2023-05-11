@@ -17,7 +17,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun MapScreen(viewModel: MainViewModel) {
+fun MapScreen(viewModel: MainViewModel, onNavigatePolygons: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
         val coroutineScope = rememberCoroutineScope()
         val context = LocalContext.current
@@ -34,7 +34,11 @@ fun MapScreen(viewModel: MainViewModel) {
             countries = countries,
             states = states,
             counties = counties,
-            cities = cities
+            cities = cities,
+            onClickLocation = { location ->
+                viewModel.selectLocation(name = location)
+                onNavigatePolygons()
+            }
         ) {
             viewModel.visibleAreaChanged(it)
         }

@@ -8,10 +8,12 @@ import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import io.schiar.fridgnet.view.util.BitmapLoader
 import io.schiar.fridgnet.view.util.toLatLng
-import io.schiar.fridgnet.view.util.toLatLngList
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import io.schiar.fridgnet.view.viewdata.LocationViewData
 import kotlinx.coroutines.Dispatchers
@@ -27,6 +29,7 @@ fun Map(
     states: Map<String, Map<String, LocationViewData>>,
     counties: Map<String, Map<String, LocationViewData>>,
     cities: Map<String, Map<String, LocationViewData>>,
+    onClickLocation: (locationName: String) -> Unit,
     onBoundsChange: (LatLngBounds?) -> Unit,
 ) {
     val bitmaps by remember { mutableStateOf(mutableMapOf<Uri, BitmapDescriptor>()) }
@@ -58,7 +61,7 @@ fun Map(
 //            cameraPositionState.move(cu)
 //        }
 
-        countries.values.map { location -> LocationDrawer(location) }
+        countries.map { entry -> LocationDrawer(entry.value) { onClickLocation(entry.key) } }
         states.values.map { stringLocation -> stringLocation.values.map { location ->
             LocationDrawer(location)
         } }

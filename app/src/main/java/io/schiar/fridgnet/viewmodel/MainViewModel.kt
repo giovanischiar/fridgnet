@@ -23,6 +23,7 @@ class MainViewModel: ViewModel() {
     private var _images: Map<String, Image> = emptyMap()
     private var _addressImages: Map<String, List<Image>> = emptyMap()
     private var _locationAddress: Map<String, Location> = emptyMap()
+    private var _location: Location? = null
     private var mutex: Mutex = Mutex()
 
     private var fetchingPlaces: Set<String> = emptySet()
@@ -66,6 +67,9 @@ class MainViewModel: ViewModel() {
             = MutableStateFlow(cities.toStringStringLocationViewData())
     val allCities: StateFlow<Map<String, Map<String, LocationViewData>>> = _allCities.asStateFlow()
 
+    private val _currentLocation = MutableStateFlow(_location?.toLocationViewData())
+    val currentLocation: StateFlow<LocationViewData?> = _currentLocation.asStateFlow()
+
     fun addImage(uri: String, date: Long, latitude: Double, longitude: Double) {
         val newCoordinate = Coordinate(latitude = latitude, longitude = longitude)
         val newImage = Image(uri = uri, date = date, coordinate = newCoordinate)
@@ -81,9 +85,9 @@ class MainViewModel: ViewModel() {
 
         viewModelScope.launch(handler) {
             launch { addCityLocation(address = address, uri = uri) }
-            launch { addCountryLocation(address = address) }
-            launch { addStateLocation(address = address) }
             launch { addCountyLocation(address = address) }
+            launch { addStateLocation(address = address) }
+            launch { addCountryLocation(address = address) }
         }
     }
 
@@ -99,6 +103,13 @@ class MainViewModel: ViewModel() {
             bounds?.contains(position) == true
         }
         _visibleImages.update { visibleImages.toImageViewDataList() }
+    }
+
+    fun selectLocation(name: String) {
+        if (countries.containsKey(name)) {
+            _location = countries[name]
+            _currentLocation.update { _location?.toLocationViewData() }
+        }
     }
 
     private suspend fun addCountryLocation(address: Address) {

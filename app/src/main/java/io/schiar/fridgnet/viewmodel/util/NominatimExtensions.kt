@@ -20,7 +20,7 @@ fun List<List<List<List<Double>>>>.toMultiPolygonCoordinates(): List<List<List<C
 }
 
 fun List<String>.toBoundingBox(): BoundingBox {
-    val northeast = Coordinate(latitude = this[0].toDouble(), longitude = this[2].toDouble())
-    val southwest = Coordinate(latitude = this[1].toDouble(), longitude = this[3].toDouble())
-    return BoundingBox(northeast = northeast, southwest = southwest)
+    val southwest = Coordinate(latitude = this[0].toDouble(), longitude = this[2].toDouble())
+    val northeast = Coordinate(latitude = this[1].toDouble(), longitude = this[3].toDouble())
+    return BoundingBox(southwest = southwest, northeast = northeast)
 }

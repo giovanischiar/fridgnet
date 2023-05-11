@@ -1,5 +1,7 @@
 package io.schiar.fridgnet.model
 
+import kotlin.math.abs
+
 fun Address.name(): String {
     return if (this.locality != null) {
         "${this.locality}, ${this.subAdminArea}, ${this.adminArea}, ${this.countryName}"
@@ -10,24 +12,47 @@ fun Address.name(): String {
     } else this.countryName ?: "null"
 }
 
+fun Coordinate.wasAntimeridianCrossed(other: Double): Boolean {
+    val (_, longitude) = this
+    return (longitude > 0 && other < 0 || longitude < 0 && other > 0) &&
+            abs(other - longitude) > 180
+}
+
 fun Polygon.findBoundingBox(): BoundingBox {
-    var maxLatitude = Double.MIN_VALUE
-    var maxLongitude = Double.MIN_VALUE
-    var minLatitude = Double.MAX_VALUE
-    var minLongitude = Double.MAX_VALUE
+    var maxLatitude = Double.NEGATIVE_INFINITY
+    var maxLongitude = Double.NEGATIVE_INFINITY
+    var minLatitude = Double.POSITIVE_INFINITY
+    var minLongitude = Double.POSITIVE_INFINITY
 
-    this.coordinates.forEach {
-        if (it.latitude > maxLatitude) { maxLatitude = it.latitude }
+    var wasAntimeridianEverCrossed = false
 
-        if (it.longitude > maxLongitude) { maxLongitude = it.longitude }
+    for (i in this.coordinates.indices) {
+        val coordinate = this.coordinates[i]
+        val (latitude, longitude) = coordinate
 
-        if (it.latitude < minLatitude) { minLatitude = it.longitude }
+        if (latitude > maxLatitude) { maxLatitude = latitude }
 
-        if (it.longitude < minLongitude) { minLongitude = it.longitude }
+        if (longitude > maxLongitude) { maxLongitude = longitude }
+
+        if (latitude < minLatitude) { minLatitude = latitude }
+
+        if (longitude < minLongitude) { minLongitude = longitude }
+
+        if (i+1 < this.coordinates.size) {
+            val next = this.coordinates[i+1]
+            wasAntimeridianEverCrossed = wasAntimeridianEverCrossed ||
+                    coordinate.wasAntimeridianCrossed(next.longitude)
+        }
     }
 
+
+    val southwestLatitude = minLatitude
+    val southwestLongitude = if (wasAntimeridianEverCrossed) maxLongitude else minLongitude
+    val northeastLatitude = maxLatitude
+    val northeastLongitude = if (wasAntimeridianEverCrossed) minLongitude else maxLongitude
+
     return BoundingBox(
-        northeast = Coordinate(latitude = maxLatitude, longitude = maxLongitude),
-        southwest = Coordinate(latitude = minLatitude, longitude = minLongitude)
+        southwest = Coordinate(latitude = southwestLatitude, longitude = southwestLongitude),
+        northeast = Coordinate(latitude = northeastLatitude, longitude = northeastLongitude)
     )
 }

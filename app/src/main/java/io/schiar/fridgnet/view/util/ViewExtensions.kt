@@ -1,5 +1,6 @@
 package io.schiar.fridgnet.view.util
 
+import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
@@ -16,5 +17,6 @@ fun List<CoordinateViewData>.toLatLngList(): List<LatLng> {
 
 // BoundingBoxViewData
 fun BoundingBoxViewData.toLatLngBounds(): LatLngBounds {
-    return LatLngBounds(this.northeast.toLatLng(), this.southwest.toLatLng())
+    Log.d("boundingBox", "$this")
+    return LatLngBounds(southwest.toLatLng(), northeast.toLatLng())
 }

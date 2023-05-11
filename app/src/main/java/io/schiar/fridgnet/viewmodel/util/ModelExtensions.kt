@@ -7,16 +7,16 @@ import io.schiar.fridgnet.view.viewdata.*
 // BoundingBox
 fun BoundingBox.toBoundingBoxViewData(): BoundingBoxViewData {
     return BoundingBoxViewData(
-        northeast = this.northeast.toCoordinateViewData(),
-        southwest = this.southwest.toCoordinateViewData()
+        southwest = southwest.toCoordinateViewData(),
+        northeast = northeast.toCoordinateViewData()
     )
 }
 
 // Coordinate
 fun Coordinate.toCoordinateViewData(): CoordinateViewData {
     return CoordinateViewData(
-        latitude = this.latitude,
-        longitude = this.longitude
+        latitude = latitude,
+        longitude = longitude
     )
 }
 
@@ -54,20 +54,20 @@ fun Polygon.toPolygonViewData(): PolygonViewData {
 //Region
 fun Region.toRegionViewData(): RegionViewData {
     return RegionViewData(
-        polygon = this.polygon.toPolygonViewData(),
-        holes = this.holes.map { it.toPolygonViewData() },
-        active = this.active,
-        boundingBox = this.boundingBox.toBoundingBoxViewData()
+        polygon = polygon.toPolygonViewData(),
+        holes = holes.map { it.toPolygonViewData() },
+        active = active,
+        boundingBox = boundingBox.toBoundingBoxViewData()
     )
 }
 
 // view.util.AddressCreator
 fun android.location.Address.toAddress(): Address {
     return Address(
-        locality = this.locality,
-        subAdminArea = this.subAdminArea,
-        adminArea = this.adminArea,
-        countryName = this.countryName
+        locality = locality,
+        subAdminArea = subAdminArea,
+        adminArea = adminArea,
+        countryName = countryName
     )
 }
 
@@ -85,5 +85,5 @@ fun Map<String, Location>.toStringLocationViewData(): Map<String, LocationViewDa
 }
 
 fun Map<String, Map<String, Location>>.toStringStringLocationViewData(): Map<String, Map<String, LocationViewData>> {
-    return this.mapValues { it.value.toStringLocationViewData() }
+    return mapValues { it.value.toStringLocationViewData() }
 }
