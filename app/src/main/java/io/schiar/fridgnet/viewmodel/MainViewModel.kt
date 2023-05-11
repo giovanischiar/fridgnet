@@ -11,6 +11,7 @@ import io.schiar.fridgnet.model.nominatim.GeoJsonAttributes
 import io.schiar.fridgnet.model.nominatim.PolygonSearcher
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import io.schiar.fridgnet.view.viewdata.LocationViewData
+import io.schiar.fridgnet.viewmodel.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,14 +32,14 @@ class MainViewModel: ViewModel() {
     private var counties: Map<String, Map<String, Location>> = emptyMap()
     private var cities: Map<String, Map<String, Location>> = emptyMap()
 
-    private val _visibleImages = MutableStateFlow(value = _images.toListImagesViewData())
+    private val _visibleImages = MutableStateFlow(value = _images.toImageViewData())
     val visibleImages: StateFlow<List<ImageViewData>> = _visibleImages.asStateFlow()
 
     private val _selectedImages = MutableStateFlow<List<ImageViewData>>(value = emptyList())
     val selectedImages: StateFlow<List<ImageViewData>> = _selectedImages.asStateFlow()
 
     private val _imageWithLocations = MutableStateFlow(
-        value = _addressImages.toStringImageListViewData()
+        value = _addressImages.toStringImageViewDataList()
     )
     val imagesWithLocation: StateFlow<Map<String, List<ImageViewData>>> =
         _imageWithLocations.asStateFlow()
@@ -88,7 +89,7 @@ class MainViewModel: ViewModel() {
 
     fun selectImages(address: String) {
         if (_addressImages.containsKey(address)) {
-            _selectedImages.update { _addressImages[address]!!.toViewData() }
+            _selectedImages.update { _addressImages[address]!!.toImageViewDataList() }
         }
     }
 
@@ -97,7 +98,7 @@ class MainViewModel: ViewModel() {
             val position = LatLng(image.coordinate.latitude, image.coordinate.longitude)
             bounds?.contains(position) == true
         }
-        _visibleImages.update { visibleImages.toViewData() }
+        _visibleImages.update { visibleImages.toImageViewDataList() }
     }
 
     private suspend fun addCountryLocation(address: Address) {
@@ -105,7 +106,7 @@ class MainViewModel: ViewModel() {
         if (countries.containsKey(country)) return
         if (fetchingPlaces.contains(country)) return
         fetchingPlaces = fetchingPlaces + country
-        val location = fetchLocation(address = address, type = Region.COUNTRY) ?: return
+        val location = fetchLocation(address = address, type = Regions.COUNTRY) ?: return
         countries = countries + (country to location)
         _allCountries.update { countries.toStringLocationViewData() }
     }
@@ -116,7 +117,7 @@ class MainViewModel: ViewModel() {
         if (states.containsKey(country) && states[country]!!.containsKey(state)) return
         if (fetchingPlaces.contains("$state, $country")) return
         fetchingPlaces = fetchingPlaces + "$state, $country"
-        val location = fetchLocation(address = address, type = Region.STATE) ?: return
+        val location = fetchLocation(address = address, type = Regions.STATE) ?: return
         val mutableStates = states.toMutableMap()
         val mutableStatesLocation = (mutableStates[country] ?: mutableMapOf()).toMutableMap()
         mutableStatesLocation[state] = location
@@ -131,7 +132,7 @@ class MainViewModel: ViewModel() {
         if (counties.containsKey(state) && counties[state]!!.containsKey(county)) return
         if (fetchingPlaces.contains("$county, $state")) return
         fetchingPlaces = fetchingPlaces + "$county, $state"
-        val location = fetchLocation(address = address, type = Region.COUNTY) ?: return
+        val location = fetchLocation(address = address, type = Regions.COUNTY) ?: return
         val mutableCounties = counties.toMutableMap()
         val mutableCountiesLocation = (mutableCounties[state] ?: mapOf()).toMutableMap()
         mutableCountiesLocation[county] = location
@@ -165,7 +166,7 @@ class MainViewModel: ViewModel() {
             } else {
                 (addressStr to listOf(_images[uri]!!))
             }
-            _imageWithLocations.update { _addressImages.toStringImageListViewData() }
+            _imageWithLocations.update { _addressImages.toStringImageViewDataList() }
         }
 
         Log.d("API Result", "city: $city, state: $state")
@@ -173,7 +174,7 @@ class MainViewModel: ViewModel() {
         if (fetchingPlaces.contains(addressStr)) return
         fetchingPlaces = fetchingPlaces + addressStr
         val newAddress = Address(locality = city, subAdminArea = "", adminArea = state, countryName = "")
-        val location = fetchLocation(address = newAddress, type = Region.CITY) ?: return
+        val location = fetchLocation(address = newAddress, type = Regions.CITY) ?: return
         val mutableCities = cities.toMutableMap()
         val mutableCitiesLocation = (mutableCities[state] ?: mapOf()).toMutableMap()
         mutableCitiesLocation[city] = location
@@ -183,7 +184,7 @@ class MainViewModel: ViewModel() {
         _locationAddress = _locationAddress + (addressStr to location)
         _allLocationAddress.update { _locationAddress.toStringLocationViewData() }
     }
-    private suspend fun fetchLocation(address: Address, type: Region): Location? {
+    private suspend fun fetchLocation(address: Address, type: Regions): Location? {
         val polygonSearcher = PolygonSearcher()
         val city = address.locality ?: ""
         val county = address.subAdminArea ?: ""
@@ -192,19 +193,19 @@ class MainViewModel: ViewModel() {
         mutex.lock()
         val results = withContext(Dispatchers.Default) {
             when (type) {
-                Region.CITY -> {
+                Regions.CITY -> {
                     polygonSearcher.searchCity(city = city, state = state, country = country)
                 }
 
-                Region.COUNTY -> {
+                Regions.COUNTY -> {
                     polygonSearcher.searchCounty(county = county, state = state, country = country)
                 }
 
-                Region.STATE -> {
+                Regions.STATE -> {
                     polygonSearcher.searchState(state = state, country = country)
                 }
 
-                Region.COUNTRY -> {
+                Regions.COUNTRY -> {
                     polygonSearcher.searchCountry(country = country)
                 }
             }
@@ -223,34 +224,52 @@ class MainViewModel: ViewModel() {
     private fun bodyToLocation(geoJson: GeoJson<GeoJsonAttributes>, boundingBox: BoundingBox): Location? {
         return when (geoJson.type) {
             "Point" -> {
-                val pointDouble = geoJson.coordinates as List<Double>
-                LineStringLocation(
-                    region = listOf(pointDouble.toCoordinate()),
-                    boundingBox = boundingBox
+                val pointDoubleList = geoJson.coordinates as List<Double>
+                val polygon = Polygon(coordinates = listOf(pointDoubleList.toCoordinate()))
+                val region = Region(
+                    polygon = polygon,
+                    holes = emptyList(),
+                    boundingBox = polygon.findBoundingBox()
                 )
+                Location(regions = listOf(region), boundingBox = boundingBox)
             }
             "LineString" -> {
-                val polygonDouble = geoJson.coordinates as List<List<Double>>
-                LineStringLocation(
-                    region = polygonDouble.toLineStringCoordinates(),
-                    boundingBox = boundingBox
+                val pointDoubleList = geoJson.coordinates as List<List<Double>>
+                val polygon = Polygon(coordinates = pointDoubleList.toLineStringCoordinates())
+                val region = Region(
+                    polygon = polygon,
+                    holes = emptyList(),
+                    boundingBox = polygon.findBoundingBox()
                 )
+                Location(regions = listOf(region), boundingBox = boundingBox)
             }
 
             "Polygon" -> {
-                val polygonDouble = geoJson.coordinates as List<List<List<Double>>>
-                PolygonLocation(
-                    region = polygonDouble.toPolygonCoordinates(),
-                    boundingBox = boundingBox
-                )
+                val pointDoubleList = geoJson.coordinates as List<List<List<Double>>>
+                val regions = pointDoubleList.toPolygonCoordinates().map {
+                    val polygon = Polygon(coordinates = it)
+                    Region(
+                        polygon = polygon,
+                        holes = emptyList(),
+                        boundingBox = polygon.findBoundingBox()
+                    )
+                }
+                Location(regions = regions, boundingBox = boundingBox)
             }
 
             "MultiPolygon" -> {
-                val multipolygonDouble = geoJson.coordinates as List<List<List<List<Double>>>>
-                MultiPolygonLocation(
-                    region = multipolygonDouble.toMultiPolygonCoordinates(),
-                    boundingBox = boundingBox
-                )
+                val pointDoubleList = geoJson.coordinates as List<List<List<List<Double>>>>
+                val regions = pointDoubleList.toMultiPolygonCoordinates().map {
+                    val polygon = Polygon(coordinates = it[0])
+                    Region(
+                        polygon = polygon,
+                        holes = it.subList(1, it.size).map { coordinates ->
+                            Polygon(coordinates = coordinates)
+                        },
+                        boundingBox = polygon.findBoundingBox()
+                    )
+                }
+                Location(regions = regions, boundingBox = boundingBox)
             }
 
             else -> return null

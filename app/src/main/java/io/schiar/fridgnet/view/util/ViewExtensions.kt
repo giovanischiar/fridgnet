@@ -1,14 +1,20 @@
 package io.schiar.fridgnet.view.util
 
-import android.graphics.Point
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.CoordinateViewData
-import kotlin.math.roundToInt
 
+// CoordinateViewData
 fun CoordinateViewData.toLatLng(): LatLng {
-    return LatLng(lat.toDouble(), lng.toDouble())
+    return LatLng(latitude, longitude)
 }
 
-fun LatLng.toPoint(): Point {
-    return Point(this.latitude.roundToInt(), this.longitude.roundToInt())
+fun List<CoordinateViewData>.toLatLngList(): List<LatLng> {
+    return map { it.toLatLng() }
+}
+
+// BoundingBoxViewData
+fun BoundingBoxViewData.toLatLngBounds(): LatLngBounds {
+    return LatLngBounds(this.northeast.toLatLng(), this.southwest.toLatLng())
 }

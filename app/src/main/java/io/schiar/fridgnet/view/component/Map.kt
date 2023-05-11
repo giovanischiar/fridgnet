@@ -10,8 +10,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
 import io.schiar.fridgnet.view.util.BitmapLoader
-import io.schiar.fridgnet.view.util.toPoint
-import io.schiar.fridgnet.view.viewdata.*
+import io.schiar.fridgnet.view.util.toLatLng
+import io.schiar.fridgnet.view.util.toLatLngList
+import io.schiar.fridgnet.view.viewdata.ImageViewData
+import io.schiar.fridgnet.view.viewdata.LocationViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -82,37 +84,11 @@ fun Map(
                     jobs.remove(it.uri)
                 }
             }
-            val position = LatLng(it.coordinate.lat.toDouble(), it.coordinate.lng.toDouble())
             Marker(
-                state = MarkerState(position = position),
+                state = MarkerState(position = it.coordinate.toLatLng()),
                 icon = bitmaps[it.uri],
                 visible = bitmaps.containsKey(it.uri)
             )
         }
-    }
-}
-
-@Composable
-fun LocationDrawer(location: LocationViewData) {
-    when (location) {
-        is LineStringLocationViewData -> {
-            val lineStringRegion = location.region
-            if (lineStringRegion.size == 1) {
-                location.region[0].toPoint()
-            } else {
-                Polyline(points = location.region)
-            }
-        }
-
-        is PolygonLocationViewData -> {
-            location.region.map { Polyline(points = it) }
-        }
-
-        is MultiPolygonLocationViewData -> {
-            location.region.map { polygonsLatLng ->
-                polygonsLatLng.map { Polyline(points = it) }
-            }
-        }
-        else -> return
     }
 }

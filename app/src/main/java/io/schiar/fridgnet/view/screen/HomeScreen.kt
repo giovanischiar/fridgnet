@@ -18,15 +18,12 @@ import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.Polyline
 import com.google.maps.android.compose.rememberCameraPositionState
 import io.schiar.fridgnet.view.PhotoPicker
+import io.schiar.fridgnet.view.component.LocationDrawer
 import io.schiar.fridgnet.view.util.AddressCreator
 import io.schiar.fridgnet.view.util.toLatLng
-import io.schiar.fridgnet.view.util.toPoint
-import io.schiar.fridgnet.view.viewdata.LineStringLocationViewData
-import io.schiar.fridgnet.view.viewdata.MultiPolygonLocationViewData
-import io.schiar.fridgnet.view.viewdata.PolygonLocationViewData
+import io.schiar.fridgnet.view.util.toLatLngBounds
 import io.schiar.fridgnet.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -100,30 +97,10 @@ fun HomeScreen(viewModel: MainViewModel, onNavigateImage: () -> Unit) {
                     ) {
                         if (allLocationAddress.containsKey(address)) {
                             val location = allLocationAddress[address] ?: return@GoogleMap
-                            val boundingBox = location.boundingBox
+                            val boundingBox = location.boundingBox.toLatLngBounds()
                             val cu = CameraUpdateFactory.newLatLngBounds(boundingBox, 2)
                             cameraPositionState.move(cu)
-
-                            when (location) {
-                                is LineStringLocationViewData -> {
-                                    val lineStringRegion = location.region
-                                    if (lineStringRegion.size == 1) {
-                                        location.region[0].toPoint()
-                                    } else {
-                                        Polyline(points = location.region)
-                                    }
-                                }
-
-                                is PolygonLocationViewData -> {
-                                    location.region.map { Polyline(points = it) }
-                                }
-
-                                is MultiPolygonLocationViewData -> {
-                                    location.region.map { polygonsLatLng ->
-                                        polygonsLatLng.map { Polyline(points = it) }
-                                    }
-                                }
-                            }
+                            LocationDrawer(location = location)
                         }
                     }
                 }
