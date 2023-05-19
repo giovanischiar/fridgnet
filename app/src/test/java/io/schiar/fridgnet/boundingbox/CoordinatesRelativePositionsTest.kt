@@ -269,4 +269,48 @@ class CoordinatesRelativePositionsTest {
         val longitude = boundingBox.southwest.longitude - 5
         Assert.assertFalse(boundingBox.eastOfLongitude(longitude = longitude))
     }
+
+    @Test
+    fun `South of Bounding box check south`() {
+        val boundingBox = BoundingBox(
+            southwest = Coordinate(latitude = -10.0, longitude = -10.0),
+            northeast = Coordinate(latitude = 10.0, longitude = 10.0)
+        )
+
+        val latitude = boundingBox.southwest.latitude - 5
+        Assert.assertTrue(boundingBox.southOfLatitude(latitude = latitude))
+    }
+
+    @Test
+    fun `South of Bounding box check north`() {
+        val boundingBox = BoundingBox(
+            southwest = Coordinate(latitude = -10.0, longitude = -10.0),
+            northeast = Coordinate(latitude = 10.0, longitude = 10.0)
+        )
+
+        val latitude = boundingBox.northeast.latitude + 5
+        Assert.assertFalse(boundingBox.southOfLatitude(latitude = latitude))
+    }
+
+    @Test
+    fun `North of Bounding box check north`() {
+        val boundingBox = BoundingBox(
+            southwest = Coordinate(latitude = -10.0, longitude = -10.0),
+            northeast = Coordinate(latitude = 10.0, longitude = 10.0)
+        )
+
+        val latitude = boundingBox.northeast.latitude + 5
+        Assert.assertTrue(boundingBox.northOfLatitude(latitude = latitude))
+    }
+
+    @Test
+    fun `North of Bounding box check south`() {
+        val boundingBox = BoundingBox(
+            southwest = Coordinate(latitude = -10.0, longitude = -10.0),
+            northeast = Coordinate(latitude = 10.0, longitude = 10.0)
+        )
+
+        val latitude = boundingBox.southwest.latitude - 5
+        Assert.assertFalse(boundingBox.northOfLatitude(latitude = latitude))
+    }
 }
