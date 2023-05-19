@@ -55,16 +55,16 @@ fun PolygonsScreen(viewModel: MainViewModel) {
                     }
                 }
             }
-        }
 
-        val list = sortedRegions.subList(4, sortedRegions.size)
-        items(list.size) { index ->
-            val region = list[index]
-            Row {
-                MapPolygon(
-                    modifier = Modifier.height(75.dp),
-                    region = region
-                )
+            val list = sortedRegions.subList(4, sortedRegions.size)
+            items(list.size) { index ->
+                val region = list[index]
+                Row {
+                    MapPolygon(
+                        modifier = Modifier.height(75.dp),
+                        region = region
+                    )
+                }
             }
         }
     }

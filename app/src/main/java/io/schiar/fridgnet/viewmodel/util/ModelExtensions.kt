@@ -46,12 +46,12 @@ fun Location.toLocationViewData(): LocationViewData {
     )
 }
 
-//Polygon
+// Polygon
 fun Polygon.toPolygonViewData(): PolygonViewData {
     return PolygonViewData(coordinates = this.coordinates.map { it.toCoordinateViewData() })
 }
 
-//Region
+// Region
 fun Region.toRegionViewData(): RegionViewData {
     return RegionViewData(
         polygon = polygon.toPolygonViewData(),
@@ -61,6 +61,10 @@ fun Region.toRegionViewData(): RegionViewData {
     )
 }
 
+fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
+    return map { it.toRegionViewData() }
+}
+
 // view.util.AddressCreator
 fun android.location.Address.toAddress(): Address {
     return Address(
@@ -68,6 +72,39 @@ fun android.location.Address.toAddress(): Address {
         subAdminArea = subAdminArea,
         adminArea = adminArea,
         countryName = countryName
+    )
+}
+
+//view.viewdata.CoordinateViewData
+fun CoordinateViewData.toCoordinate(): Coordinate {
+    return Coordinate(latitude = latitude, longitude = longitude)
+}
+
+fun List<CoordinateViewData>.toCoordinateList(): List<Coordinate> {
+    return map { it.toCoordinate() }
+}
+
+// view.viewdata.BoundingBoxViewData
+fun BoundingBoxViewData.toBoundingBox(): BoundingBox {
+    return BoundingBox(southwest = southwest.toCoordinate(), northeast = northeast.toCoordinate())
+}
+
+// view.viewdata.PolygonViewData
+fun PolygonViewData.toPolygon(): Polygon {
+    return Polygon(coordinates = coordinates.toCoordinateList())
+}
+
+fun List<PolygonViewData>.toPolygonList(): List<Polygon> {
+    return map { it.toPolygon() }
+}
+
+// view.viewdata.RegionViewData
+fun RegionViewData.toRegion(): Region {
+    return Region(
+        polygon = polygon.toPolygon(),
+        holes = holes.toPolygonList(),
+        active = active,
+        boundingBox = boundingBox.toBoundingBox()
     )
 }
 

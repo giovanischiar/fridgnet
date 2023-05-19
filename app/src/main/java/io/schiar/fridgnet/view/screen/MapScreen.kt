@@ -11,6 +11,7 @@ import androidx.compose.ui.platform.LocalContext
 import io.schiar.fridgnet.view.PhotoPicker
 import io.schiar.fridgnet.view.component.Map
 import io.schiar.fridgnet.view.util.AddressCreator
+import io.schiar.fridgnet.view.util.toBoundingBoxViewData
 import io.schiar.fridgnet.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -23,24 +24,21 @@ fun MapScreen(viewModel: MainViewModel, onNavigatePolygons: () -> Unit) {
         val context = LocalContext.current
         val (photoPickerShowing, isPhotoPickerShowing) = remember { mutableStateOf(false) }
         val visibleImages by viewModel.visibleImages.collectAsState()
-        val countries by viewModel.allCountries.collectAsState()
-        val states by viewModel.allStates.collectAsState()
-        val counties by viewModel.allCounties.collectAsState()
-        val cities by viewModel.allCities.collectAsState()
+        val visibleRegions by viewModel.visibleRegions.collectAsState()
 
         Map(
             modifier = Modifier.fillMaxSize(),
             visibleImages = visibleImages,
-            countries = countries,
-            states = states,
-            counties = counties,
-            cities = cities,
-            onClickLocation = { location ->
-                viewModel.selectLocation(name = location)
+            visibleRegions = visibleRegions,
+            onClickRegion = { region ->
+                viewModel.selectRegion(regionViewData = region)
                 onNavigatePolygons()
             }
         ) {
-            viewModel.visibleAreaChanged(it)
+            if (it != null) {
+                val bounds = it.toBoundingBoxViewData()
+                viewModel.visibleAreaChanged(boundingBoxViewData = bounds)
+            }
         }
 
         Button(

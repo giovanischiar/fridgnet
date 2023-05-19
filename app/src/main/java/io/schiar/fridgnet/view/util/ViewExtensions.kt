@@ -20,3 +20,14 @@ fun BoundingBoxViewData.toLatLngBounds(): LatLngBounds {
     Log.d("boundingBox", "$this")
     return LatLngBounds(southwest.toLatLng(), northeast.toLatLng())
 }
+
+fun LatLng.toCoordinateViewData(): CoordinateViewData {
+    return CoordinateViewData(latitude = latitude, longitude = longitude)
+}
+
+fun LatLngBounds.toBoundingBoxViewData(): BoundingBoxViewData {
+    return BoundingBoxViewData(
+        southwest = southwest.toCoordinateViewData(),
+        northeast = northeast.toCoordinateViewData()
+    )
+}

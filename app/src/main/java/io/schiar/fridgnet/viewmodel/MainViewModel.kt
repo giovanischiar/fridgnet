@@ -3,14 +3,14 @@ package io.schiar.fridgnet.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.LatLngBounds
 import io.schiar.fridgnet.model.*
 import io.schiar.fridgnet.model.nominatim.GeoJson
 import io.schiar.fridgnet.model.nominatim.GeoJsonAttributes
 import io.schiar.fridgnet.model.nominatim.PolygonSearcher
+import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import io.schiar.fridgnet.view.viewdata.LocationViewData
+import io.schiar.fridgnet.view.viewdata.RegionViewData
 import io.schiar.fridgnet.viewmodel.util.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +24,8 @@ class MainViewModel: ViewModel() {
     private var _addressImages: Map<String, List<Image>> = emptyMap()
     private var _locationAddress: Map<String, Location> = emptyMap()
     private var _location: Location? = null
+    private var _regionLocation: Map<Region, Location> = emptyMap()
+    private var _regions: List<Region> = listOf()
     private var mutex: Mutex = Mutex()
 
     private var fetchingPlaces: Set<String> = emptySet()
@@ -51,24 +53,13 @@ class MainViewModel: ViewModel() {
     val allLocationAddress: StateFlow<Map<String, LocationViewData>> =
         _allLocationAddress.asStateFlow()
 
-    private val _allCountries: MutableStateFlow<Map<String, LocationViewData>>
-            = MutableStateFlow(countries.toStringLocationViewData())
-    val allCountries: StateFlow<Map<String, LocationViewData>> = _allCountries.asStateFlow()
-
-    private val _allStates: MutableStateFlow<Map<String, Map<String, LocationViewData>>>
-            = MutableStateFlow(states.toStringStringLocationViewData())
-    val allStates: StateFlow<Map<String, Map<String, LocationViewData>>> = _allStates.asStateFlow()
-
-    private val _allCounties: MutableStateFlow<Map<String, Map<String, LocationViewData>>>
-            = MutableStateFlow(counties.toStringStringLocationViewData())
-    val allCounties: StateFlow<Map<String, Map<String, LocationViewData>>> = _allCounties.asStateFlow()
-
-    private val _allCities: MutableStateFlow<Map<String, Map<String, LocationViewData>>>
-            = MutableStateFlow(cities.toStringStringLocationViewData())
-    val allCities: StateFlow<Map<String, Map<String, LocationViewData>>> = _allCities.asStateFlow()
-
     private val _currentLocation = MutableStateFlow(_location?.toLocationViewData())
     val currentLocation: StateFlow<LocationViewData?> = _currentLocation.asStateFlow()
+
+    private val _visibleRegions: MutableStateFlow<List<RegionViewData>>
+        = MutableStateFlow(emptyList())
+
+    val visibleRegions: StateFlow<List<RegionViewData>> = _visibleRegions.asStateFlow()
 
     fun addImage(uri: String, date: Long, latitude: Double, longitude: Double) {
         val newCoordinate = Coordinate(latitude = latitude, longitude = longitude)
@@ -97,18 +88,31 @@ class MainViewModel: ViewModel() {
         }
     }
 
-    fun visibleAreaChanged(bounds: LatLngBounds?) {
+    fun visibleAreaChanged(boundingBoxViewData: BoundingBoxViewData) {
+        val boundingBox = boundingBoxViewData.toBoundingBox()
         val visibleImages = _images.values.filter { image ->
-            val position = LatLng(image.coordinate.latitude, image.coordinate.longitude)
-            bounds?.contains(position) == true
+            boundingBox.contains(coordinate = image.coordinate)
         }
         _visibleImages.update { visibleImages.toImageViewDataList() }
+        _visibleRegions.update {
+            _regions.filter {
+                region -> boundingBox.contains(other = region.boundingBox)
+            }.toRegionViewDataList()
+        }
     }
 
-    fun selectLocation(name: String) {
-        if (countries.containsKey(name)) {
-            _location = countries[name]
+    fun selectRegion(regionViewData: RegionViewData) {
+        val region = regionViewData.toRegion()
+        if (_regionLocation.containsKey(region)) {
+            _location = _regionLocation[region]
             _currentLocation.update { _location?.toLocationViewData() }
+        }
+    }
+
+    private fun addRegionsWithin(location: Location) {
+        _regions = _regions + location.regions
+        for (region in location.regions) {
+            _regionLocation = _regionLocation + (region to location)
         }
     }
 
@@ -118,8 +122,8 @@ class MainViewModel: ViewModel() {
         if (fetchingPlaces.contains(country)) return
         fetchingPlaces = fetchingPlaces + country
         val location = fetchLocation(address = address, type = Regions.COUNTRY) ?: return
+        addRegionsWithin(location = location)
         countries = countries + (country to location)
-        _allCountries.update { countries.toStringLocationViewData() }
     }
 
     private suspend fun addStateLocation(address: Address) {
@@ -129,12 +133,12 @@ class MainViewModel: ViewModel() {
         if (fetchingPlaces.contains("$state, $country")) return
         fetchingPlaces = fetchingPlaces + "$state, $country"
         val location = fetchLocation(address = address, type = Regions.STATE) ?: return
+        addRegionsWithin(location = location)
         val mutableStates = states.toMutableMap()
         val mutableStatesLocation = (mutableStates[country] ?: mutableMapOf()).toMutableMap()
         mutableStatesLocation[state] = location
         mutableStates[country] = mutableStatesLocation
         states = mutableStates.toMap()
-        _allStates.update { states.toStringStringLocationViewData() }
     }
 
     private suspend fun addCountyLocation(address: Address) {
@@ -144,12 +148,12 @@ class MainViewModel: ViewModel() {
         if (fetchingPlaces.contains("$county, $state")) return
         fetchingPlaces = fetchingPlaces + "$county, $state"
         val location = fetchLocation(address = address, type = Regions.COUNTY) ?: return
+        addRegionsWithin(location = location)
         val mutableCounties = counties.toMutableMap()
         val mutableCountiesLocation = (mutableCounties[state] ?: mapOf()).toMutableMap()
         mutableCountiesLocation[county] = location
         mutableCounties[state] = mutableCountiesLocation
         counties = mutableCounties.toMap()
-        _allCounties.update { counties.toStringStringLocationViewData() }
     }
 
     private fun extractAddress(address: Address): Address {
@@ -186,12 +190,12 @@ class MainViewModel: ViewModel() {
         fetchingPlaces = fetchingPlaces + addressStr
         val newAddress = Address(locality = city, subAdminArea = "", adminArea = state, countryName = "")
         val location = fetchLocation(address = newAddress, type = Regions.CITY) ?: return
+        addRegionsWithin(location = location)
         val mutableCities = cities.toMutableMap()
         val mutableCitiesLocation = (mutableCities[state] ?: mapOf()).toMutableMap()
         mutableCitiesLocation[city] = location
         mutableCities[state] = mutableCitiesLocation
         cities = mutableCities.toMap()
-        _allCities.update { cities.toStringStringLocationViewData() }
         _locationAddress = _locationAddress + (addressStr to location)
         _allLocationAddress.update { _locationAddress.toStringLocationViewData() }
     }

@@ -1,7 +1,9 @@
 package io.schiar.fridgnet.view.component
 
 import android.net.Uri
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.maps.model.BitmapDescriptor
@@ -12,10 +14,14 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import io.schiar.fridgnet.view.component.debug.MapPolygonInfo
 import io.schiar.fridgnet.view.util.BitmapLoader
+import io.schiar.fridgnet.view.util.debug.BoundsTestCreator
+import io.schiar.fridgnet.view.util.debug.generatePolygonsAppCreatedUnitTest
+import io.schiar.fridgnet.view.util.debug.showMapPolygonInfo
 import io.schiar.fridgnet.view.util.toLatLng
 import io.schiar.fridgnet.view.viewdata.ImageViewData
-import io.schiar.fridgnet.view.viewdata.LocationViewData
+import io.schiar.fridgnet.view.viewdata.RegionViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
@@ -25,11 +31,8 @@ import kotlinx.coroutines.withContext
 fun Map(
     modifier: Modifier,
     visibleImages: List<ImageViewData>,
-    countries: Map<String, LocationViewData>,
-    states: Map<String, Map<String, LocationViewData>>,
-    counties: Map<String, Map<String, LocationViewData>>,
-    cities: Map<String, Map<String, LocationViewData>>,
-    onClickLocation: (locationName: String) -> Unit,
+    visibleRegions: List<RegionViewData>,
+    onClickRegion: (region: RegionViewData) -> Unit,
     onBoundsChange: (LatLngBounds?) -> Unit,
 ) {
     val bitmaps by remember { mutableStateOf(mutableMapOf<Uri, BitmapDescriptor>()) }
@@ -42,55 +45,54 @@ fun Map(
         position = CameraPosition.fromLatLngZoom(missionDoloresPark, 10f)
     }
 
+    if (generatePolygonsAppCreatedUnitTest) {
+        BoundsTestCreator().generateTest(
+            cameraPositionState = cameraPositionState,
+            visibleRegions = visibleRegions
+        )
+    }
+
     LaunchedEffect(cameraPositionState.isMoving) {
         if (!cameraPositionState.isMoving) {
             onBoundsChange(cameraPositionState.projection?.visibleRegion?.latLngBounds)
         }
     }
 
-    GoogleMap(
-        modifier = modifier,
-        cameraPositionState = cameraPositionState,
-        onMapLoaded = {
-            onBoundsChange(cameraPositionState.projection?.visibleRegion?.latLngBounds)
-        }
-    ) {
-//        if (states.values.isNotEmpty() && states.values.toList()[0].values.isNotEmpty()) {
-//            val boundingBox = states.values.toList()[0].values.toList()[0].boundingBox
-//            val cu = CameraUpdateFactory.newLatLngBounds(boundingBox, 2)
-//            cameraPositionState.move(cu)
-//        }
-
-        countries.map { entry -> LocationDrawer(entry.value) { onClickLocation(entry.key) } }
-        states.values.map { stringLocation -> stringLocation.values.map { location ->
-            LocationDrawer(location)
-        } }
-
-        counties.values.map { stringLocation -> stringLocation.values.map { location ->
-            LocationDrawer(location)
-        } }
-
-        cities.values.map { stringLocation -> stringLocation.values.map { location ->
-            LocationDrawer(location)
-        } }
-
-        visibleImages.map {
-            if (!(bitmaps.containsKey(it.uri) || jobs.containsKey(it.uri))) {
-                jobs[it.uri] = coroutineScope.launch(Dispatchers.IO) {
-                    bitmaps[it.uri] = withContext(Dispatchers.Default) {
-                        val bitmapLoader = BitmapLoader(
-                            contentResolver = context.contentResolver,
-                            uri = it.uri
-                        )
-                        bitmapLoader.convert()
-                    }
-                    jobs.remove(it.uri)
-                }
+    Box {
+        GoogleMap(
+            modifier = modifier,
+            cameraPositionState = cameraPositionState,
+            onMapLoaded = {
+                onBoundsChange(cameraPositionState.projection?.visibleRegion?.latLngBounds)
             }
-            Marker(
-                state = MarkerState(position = it.coordinate.toLatLng()),
-                icon = bitmaps[it.uri],
-                visible = bitmaps.containsKey(it.uri)
+        ) {
+            visibleRegions.map { RegionDrawer(region = it) { region -> onClickRegion(region) } }
+
+            visibleImages.map {
+                if (!(bitmaps.containsKey(it.uri) || jobs.containsKey(it.uri))) {
+                    jobs[it.uri] = coroutineScope.launch(Dispatchers.IO) {
+                        bitmaps[it.uri] = withContext(Dispatchers.Default) {
+                            val bitmapLoader = BitmapLoader(
+                                contentResolver = context.contentResolver,
+                                uri = it.uri
+                            )
+                            bitmapLoader.convert()
+                        }
+                        jobs.remove(it.uri)
+                    }
+                }
+                Marker(
+                    state = MarkerState(position = it.coordinate.toLatLng()),
+                    icon = bitmaps[it.uri],
+                    visible = bitmaps.containsKey(it.uri)
+                )
+            }
+        }
+
+        if (showMapPolygonInfo) {
+            MapPolygonInfo(
+                modifier = Modifier.align(Alignment.TopEnd),
+                visibleRegions = visibleRegions
             )
         }
     }
