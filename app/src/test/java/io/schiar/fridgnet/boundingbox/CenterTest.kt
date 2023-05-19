@@ -2,7 +2,6 @@ package io.schiar.fridgnet.boundingbox
 
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Coordinate
-import io.schiar.fridgnet.model.centerLongitude
 import org.junit.Assert
 import org.junit.Test
 

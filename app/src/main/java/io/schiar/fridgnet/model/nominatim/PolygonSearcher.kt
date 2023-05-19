@@ -2,7 +2,6 @@ package io.schiar.fridgnet.model.nominatim
 
 import android.util.Log
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.name
 import retrofit2.Response
 
 class PolygonSearcher() {
