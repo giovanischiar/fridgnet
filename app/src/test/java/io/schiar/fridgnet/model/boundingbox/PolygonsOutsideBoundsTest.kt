@@ -1,14 +1,14 @@
-package io.schiar.fridgnet.boundingbox
+package io.schiar.fridgnet.model.boundingbox
 
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Coordinate
 import org.junit.Assert
 import org.junit.Test
 
-class PolygonsOutsideAntimeridianBoundsTest {
+class PolygonsOutsideBoundsTest {
     private val bounds = BoundingBox(
-        southwest = Coordinate(latitude = 0.0,longitude = 160.0),
-        northeast = Coordinate(latitude = 20.0, longitude = -160.0)
+        southwest = Coordinate(latitude = 0.0,longitude = 0.0),
+        northeast = Coordinate(latitude = 20.0, longitude = 20.0)
     )
 
     @Test
@@ -224,11 +224,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
         val polygon = BoundingBox(
             southwest = Coordinate(
                 latitude = bounds.northeast.latitude - 5,
-                longitude = bounds.northeast.longitude + 5
+                longitude = bounds.southwest.longitude - 10
             ),
             northeast = Coordinate(
                 latitude = bounds.northeast.latitude,
-                longitude = bounds.northeast.longitude + 10
+                longitude = bounds.southwest.longitude - 5
             )
         )
 

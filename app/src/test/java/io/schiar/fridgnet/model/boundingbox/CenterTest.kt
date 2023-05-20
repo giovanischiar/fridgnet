@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.boundingbox
+package io.schiar.fridgnet.model.boundingbox
 
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Coordinate
