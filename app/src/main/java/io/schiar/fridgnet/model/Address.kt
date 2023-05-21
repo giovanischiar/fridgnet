@@ -7,13 +7,8 @@ data class Address(
     val countryName: String?
 ) {
     fun name(): String {
-        return if (locality != null) {
-            "$locality, $subAdminArea, $adminArea, $countryName"
-        } else if (subAdminArea != null) {
-            "$subAdminArea, $adminArea, $countryName"
-        } else if (this.adminArea != null) {
-            "$adminArea, $countryName"
-        } else this.countryName ?: "null"
+        return listOfNotNull(
+            locality, subAdminArea, adminArea, countryName
+        ).joinToString(separator = ", ")
     }
 }
-
