@@ -64,7 +64,13 @@ fun MapScreen(viewModel: MainViewModel, onNavigatePolygons: () -> Unit) {
                             longitude = longitude
                         )
                     }
-                    viewModel.addAddressToImage(uri = uri, systemAddress = address)
+                    viewModel.addAddressToImage(
+                        uri = uri,
+                        locality = address.locality,
+                        subAdminArea = address.subAdminArea,
+                        adminArea = address.adminArea,
+                        countryName = address.countryName
+                    )
                 }
                 isPhotoPickerShowing.invoke(false)
             }

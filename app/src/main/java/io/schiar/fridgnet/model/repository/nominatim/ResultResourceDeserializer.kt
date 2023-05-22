@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.model.nominatim
+package io.schiar.fridgnet.model.repository.nominatim
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer

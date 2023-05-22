@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.model.nominatim
+package io.schiar.fridgnet.model.repository.nominatim
 
 open class Result<T>(
     val boundingbox: List<String>,

@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.model.nominatim
+package io.schiar.fridgnet.model.repository.nominatim
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken

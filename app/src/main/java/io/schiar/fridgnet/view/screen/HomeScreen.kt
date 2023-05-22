@@ -36,6 +36,7 @@ fun HomeScreen(viewModel: MainViewModel, onNavigateImage: () -> Unit) {
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
+        LaunchedEffect(Unit) { viewModel.subscribeLocationRepository() }
         val imagesWithLocation by viewModel.imagesWithLocation.collectAsState()
         val allLocationAddress by viewModel.allLocationAddress.collectAsState()
 
@@ -63,7 +64,13 @@ fun HomeScreen(viewModel: MainViewModel, onNavigateImage: () -> Unit) {
                             longitude = longitude
                         )
                     }
-                    viewModel.addAddressToImage(uri = uri, systemAddress = address)
+                    viewModel.addAddressToImage(
+                        uri = uri,
+                        locality = address.locality,
+                        subAdminArea = address.subAdminArea,
+                        adminArea = address.adminArea,
+                        countryName = address.countryName
+                    )
                 }
                 isPhotoPickerShowing.invoke(false)
             }

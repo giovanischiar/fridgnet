@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.model.nominatim
+package io.schiar.fridgnet.model.repository.nominatim
 
 import retrofit2.Response
 import retrofit2.http.GET

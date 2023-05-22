@@ -41,8 +41,9 @@ fun List<Image>.toImageViewDataList(): List<ImageViewData> {
 // Location
 fun Location.toLocationViewData(): LocationViewData {
     return LocationViewData(
-        regions = this.regions.map { it.toRegionViewData() },
-        boundingBox = this.boundingBox.toBoundingBoxViewData()
+        address = address.name(),
+        regions = regions.map { it.toRegionViewData() },
+        boundingBox = boundingBox.toBoundingBoxViewData()
     )
 }
 
@@ -119,8 +120,4 @@ fun Map<String, List<Image>>.toStringImageViewDataList(): Map<String, List<Image
 
 fun Map<String, Location>.toStringLocationViewData(): Map<String, LocationViewData> {
     return mapValues { it.value.toLocationViewData() }
-}
-
-fun Map<String, Map<String, Location>>.toStringStringLocationViewData(): Map<String, Map<String, LocationViewData>> {
-    return mapValues { it.value.toStringLocationViewData() }
 }
