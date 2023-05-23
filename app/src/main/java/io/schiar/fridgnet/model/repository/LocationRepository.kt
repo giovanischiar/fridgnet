@@ -160,7 +160,8 @@ class LocationRepository() {
                 val region = Region(
                     polygon = polygon,
                     holes = emptyList(),
-                    boundingBox = polygon.findBoundingBox()
+                    boundingBox = polygon.findBoundingBox(),
+                    zIndex = administrativeUnit.zIndex()
                 )
                 listOf(region)
             }
@@ -170,7 +171,8 @@ class LocationRepository() {
                 val region = Region(
                     polygon = polygon,
                     holes = emptyList(),
-                    boundingBox = polygon.findBoundingBox()
+                    boundingBox = polygon.findBoundingBox(),
+                    zIndex = administrativeUnit.zIndex()
                 )
                 listOf(region)
             }
@@ -182,7 +184,8 @@ class LocationRepository() {
                     Region(
                         polygon = polygon,
                         holes = emptyList(),
-                        boundingBox = polygon.findBoundingBox()
+                        boundingBox = polygon.findBoundingBox(),
+                        zIndex = administrativeUnit.zIndex()
                     )
                 }
                 regions
@@ -197,7 +200,8 @@ class LocationRepository() {
                         holes = it.subList(1, it.size).map { coordinates ->
                             Polygon(coordinates = coordinates)
                         },
-                        boundingBox = polygon.findBoundingBox()
+                        boundingBox = polygon.findBoundingBox(),
+                        zIndex = administrativeUnit.zIndex()
                     )
                 }
                 regions
@@ -210,7 +214,8 @@ class LocationRepository() {
             address = address,
             administrativeUnit = administrativeUnit,
             regions = regions,
-            boundingBox = boundingBox
+            boundingBox = boundingBox,
+            zIndex = administrativeUnit.zIndex()
         )
     }
 }

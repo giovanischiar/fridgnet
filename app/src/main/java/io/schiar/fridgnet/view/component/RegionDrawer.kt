@@ -16,7 +16,8 @@ fun RegionDrawer(region: RegionViewData, onClick: (region: RegionViewData) -> Un
         visible = region.active,
         holes = region.holes.map { hole -> hole.coordinates.toLatLngList() },
         fillColor = Color.Transparent,
-        clickable = true
+        clickable = true,
+        zIndex = region.zIndex
     )
 
     if (showBoundingBoxPolygon) { BoundingBoxDrawer(boundingBox = region.boundingBox) }

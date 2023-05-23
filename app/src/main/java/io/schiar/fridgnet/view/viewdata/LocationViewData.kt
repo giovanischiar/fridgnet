@@ -4,5 +4,6 @@ data class LocationViewData(
     val address: String,
     val regions: List<RegionViewData>,
     val boundingBox: BoundingBoxViewData,
-    val center: CoordinateViewData
+    val center: CoordinateViewData,
+    val zIndex: Float
 )
