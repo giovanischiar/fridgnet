@@ -3,7 +3,6 @@ package io.schiar.fridgnet.view.screen
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Button
@@ -12,18 +11,9 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
-import com.google.android.gms.maps.CameraUpdateFactory
-import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.MapUiSettings
-import com.google.maps.android.compose.rememberCameraPositionState
 import io.schiar.fridgnet.view.PhotoPicker
-import io.schiar.fridgnet.view.component.LocationDrawer
+import io.schiar.fridgnet.view.component.MapPhotoItem
 import io.schiar.fridgnet.view.util.AddressCreator
-import io.schiar.fridgnet.view.util.toLatLng
-import io.schiar.fridgnet.view.util.toLatLngBounds
 import io.schiar.fridgnet.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -77,38 +67,14 @@ fun HomeScreen(viewModel: MainViewModel, onNavigateImage: () -> Unit) {
         }
 
         LazyVerticalGrid(columns = GridCells.Fixed(4)) {
-            imagesWithLocation.keys.map { address ->
+            imagesWithLocation.entries.map { (address, images) ->
                 item {
-                    val missionDoloresPark = LatLng(37.759773, -122.427063)
-                    val target = if (imagesWithLocation[address]?.isNotEmpty() == true) {
-                        imagesWithLocation[address]!![0].coordinate.toLatLng()
-                    } else { missionDoloresPark }
-                    val cameraPositionState = rememberCameraPositionState {
-                        position = CameraPosition.fromLatLngZoom(target, 10f)
-                    }
-                    GoogleMap(
-                        modifier = Modifier.size(Dp(100f)),
-                        uiSettings = MapUiSettings(
-                            compassEnabled = false,
-                            zoomControlsEnabled = false,
-                            zoomGesturesEnabled = false,
-                            tiltGesturesEnabled = false,
-                            indoorLevelPickerEnabled = false,
-                            rotationGesturesEnabled = false
-                        ),
-                        cameraPositionState = cameraPositionState,
-                        onMapClick = { _ ->
-                            viewModel.selectImages(address = address)
-                            onNavigateImage()
-                        }
+                    MapPhotoItem(
+                        initialLocation = images[0].coordinate,
+                        location = allLocationAddress[address]
                     ) {
-                        if (allLocationAddress.containsKey(address)) {
-                            val location = allLocationAddress[address] ?: return@GoogleMap
-                            val boundingBox = location.boundingBox.toLatLngBounds()
-                            val cu = CameraUpdateFactory.newLatLngBounds(boundingBox, 2)
-                            cameraPositionState.move(cu)
-                            LocationDrawer(location = location)
-                        }
+                        viewModel.selectImages(address)
+                        onNavigateImage()
                     }
                 }
             }

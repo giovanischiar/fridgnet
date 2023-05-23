@@ -3,6 +3,7 @@ package io.schiar.fridgnet.view.util
 import android.util.Log
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.MapUiSettings
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.CoordinateViewData
 
@@ -29,5 +30,20 @@ fun LatLngBounds.toBoundingBoxViewData(): BoundingBoxViewData {
     return BoundingBoxViewData(
         southwest = southwest.toCoordinateViewData(),
         northeast = northeast.toCoordinateViewData()
+    )
+}
+
+fun MapUiSettings.static(): MapUiSettings {
+    return MapUiSettings(
+        compassEnabled = false,
+        indoorLevelPickerEnabled = false,
+        mapToolbarEnabled = false,
+        myLocationButtonEnabled = false,
+        rotationGesturesEnabled = false,
+        scrollGesturesEnabled = false,
+        scrollGesturesEnabledDuringRotateOrZoom = false,
+        tiltGesturesEnabled = false,
+        zoomControlsEnabled = false,
+        zoomGesturesEnabled = false
     )
 }
