@@ -49,6 +49,13 @@ data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
         }
     }
 
+    fun center(): Coordinate {
+        return Coordinate(
+            latitude = (northeast.latitude + southwest.latitude) / 2.0,
+            longitude = centerLongitude()
+        )
+    }
+
     fun centerAntipode(): Double {
         val centerLongitude = centerLongitude()
         return centerLongitude + if (centerLongitude < 0) 180.0 else - 180.0

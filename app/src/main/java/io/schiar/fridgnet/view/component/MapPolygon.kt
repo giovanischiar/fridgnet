@@ -5,21 +5,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
-import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.rememberCameraPositionState
+import io.schiar.fridgnet.view.util.toLatLng
 import io.schiar.fridgnet.view.util.toLatLngBounds
 import io.schiar.fridgnet.view.util.toLatLngList
 import io.schiar.fridgnet.view.viewdata.RegionViewData
 
 @Composable
 fun MapPolygon(modifier: Modifier, region: RegionViewData) {
-    val missionDoloresPark = LatLng(37.759773, -122.427063)
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(missionDoloresPark, 10f)
+        position = CameraPosition.fromLatLngZoom(region.center.toLatLng(), 10f)
     }
+
     GoogleMap(
         modifier = modifier,
         uiSettings = MapUiSettings(

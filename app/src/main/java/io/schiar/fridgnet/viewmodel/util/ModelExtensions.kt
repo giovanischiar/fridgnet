@@ -43,7 +43,8 @@ fun Location.toLocationViewData(): LocationViewData {
     return LocationViewData(
         address = address.name(),
         regions = regions.map { it.toRegionViewData() },
-        boundingBox = boundingBox.toBoundingBoxViewData()
+        boundingBox = boundingBox.toBoundingBoxViewData(),
+        center = boundingBox.center().toCoordinateViewData()
     )
 }
 
@@ -58,7 +59,8 @@ fun Region.toRegionViewData(): RegionViewData {
         polygon = polygon.toPolygonViewData(),
         holes = holes.map { it.toPolygonViewData() },
         active = active,
-        boundingBox = boundingBox.toBoundingBoxViewData()
+        boundingBox = boundingBox.toBoundingBoxViewData(),
+        center = boundingBox.center().toCoordinateViewData()
     )
 }
 
