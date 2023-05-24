@@ -9,6 +9,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Polygon
 import com.google.maps.android.compose.rememberCameraPositionState
+import io.schiar.fridgnet.view.util.static
 import io.schiar.fridgnet.view.util.toLatLng
 import io.schiar.fridgnet.view.util.toLatLngBounds
 import io.schiar.fridgnet.view.util.toLatLngList
@@ -22,14 +23,7 @@ fun MapPolygon(modifier: Modifier, region: RegionViewData) {
 
     GoogleMap(
         modifier = modifier,
-        uiSettings = MapUiSettings(
-            compassEnabled = false,
-            zoomControlsEnabled = false,
-            zoomGesturesEnabled = false,
-            tiltGesturesEnabled = false,
-            indoorLevelPickerEnabled = false,
-            rotationGesturesEnabled = false
-        ),
+        uiSettings = MapUiSettings().static(),
         cameraPositionState = cameraPositionState,
         onMapClick = {},
         onMapLoaded = {
