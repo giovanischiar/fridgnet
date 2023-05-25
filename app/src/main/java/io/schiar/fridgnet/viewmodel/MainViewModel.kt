@@ -110,6 +110,24 @@ class MainViewModel(
         _currentLocation.update { location.toLocationViewData() }
     }
 
+    fun switchRegion(regionViewData: RegionViewData) {
+        val region = regionViewData.toRegion()
+        val mutableRegionLocation = _regionLocation.toMutableMap()
+        val location = mutableRegionLocation.remove(key = region) ?: return
+        val locationUpdated = location.switch(region = region)
+
+        _regionLocation.filter { it.value == location }.keys.forEach {
+            mutableRegionLocation[if (it != region) it else region.switch()] = locationUpdated
+        }
+        _regionLocation = mutableRegionLocation.toMap()
+        _currentLocation.update { locationUpdated.toLocationViewData() }
+
+        if (location.administrativeUnit == AdministrativeUnit.CITY) {
+            _locationAddress = _locationAddress + (location.address.name() to locationUpdated)
+            _allLocationAddress.update { _locationAddress.toStringLocationViewData() }
+        }
+    }
+
     private fun onRegionLocationReady(regionLocation: Map<Region, Location>) {
         _regionLocation = _regionLocation + regionLocation
         regionLocation.values.forEach {

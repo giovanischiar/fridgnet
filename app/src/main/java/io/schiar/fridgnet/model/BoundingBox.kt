@@ -1,6 +1,8 @@
 package io.schiar.fridgnet.model
 
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 
 data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
     fun containsAntimeridian(): Boolean {
@@ -86,6 +88,20 @@ data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
         } else {
             longitude in northeast.longitude..centerAntipode
         }
+    }
+
+    operator fun plus(other: BoundingBox): BoundingBox {
+        return BoundingBox(
+            southwest = Coordinate(
+                latitude = min(southwest.latitude, other.southwest.latitude),
+                longitude = min(southwest.longitude, other.southwest.longitude)
+            ),
+
+            northeast = Coordinate(
+                latitude = max(northeast.latitude, other.northeast.latitude),
+                longitude = max(northeast.longitude, other.northeast.longitude)
+            )
+        )
     }
 
     fun contains(other: BoundingBox): Boolean {

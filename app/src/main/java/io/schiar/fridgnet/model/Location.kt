@@ -6,4 +6,32 @@ data class Location(
     val regions: List<Region>,
     val boundingBox: BoundingBox,
     val zIndex: Float
-)
+) {
+    fun switch(region: Region): Location {
+        val mutableRegions = regions.toMutableList()
+        val index = regions.indexOf(region)
+        mutableRegions[index] = regions[index].switch()
+        return Location(
+            address = address,
+            administrativeUnit = administrativeUnit,
+            regions = mutableRegions.toList(),
+            boundingBox = boundingBox,
+            zIndex = zIndex
+        ).updateBoundingBox()
+    }
+
+    private fun updateBoundingBox(): Location {
+        return Location(
+            address = address,
+            administrativeUnit = administrativeUnit,
+            regions = regions,
+            boundingBox = regions
+                .filter { it.active }
+                .map { it.boundingBox }
+                .reduce { boundingBox, otherBoundingBox ->
+                    boundingBox + otherBoundingBox
+            },
+            zIndex = zIndex
+        )
+    }
+}

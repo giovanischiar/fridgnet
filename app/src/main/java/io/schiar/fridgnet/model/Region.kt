@@ -6,4 +6,8 @@ data class Region(
     val active: Boolean = true,
     val boundingBox: BoundingBox,
     val zIndex: Float
-)
+) {
+    fun switch(): Region {
+        return Region(polygon, holes, !active, boundingBox, zIndex)
+    }
+}
