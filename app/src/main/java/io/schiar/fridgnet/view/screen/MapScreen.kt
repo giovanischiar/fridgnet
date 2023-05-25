@@ -19,17 +19,22 @@ import kotlinx.coroutines.withContext
 
 @Composable
 fun MapScreen(viewModel: MainViewModel, onNavigatePolygons: () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize()) {
-        val coroutineScope = rememberCoroutineScope()
-        val context = LocalContext.current
-        val (photoPickerShowing, isPhotoPickerShowing) = remember { mutableStateOf(false) }
-        val visibleImages by viewModel.visibleImages.collectAsState()
-        val visibleRegions by viewModel.visibleRegions.collectAsState()
+    val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val (photoPickerShowing, isPhotoPickerShowing) = remember { mutableStateOf(false) }
+    var moveCamera by remember { mutableStateOf(false) }
+    val visibleImages by viewModel.visibleImages.collectAsState()
+    val visibleRegions by viewModel.visibleRegions.collectAsState()
+    val allPhotosBoundingBox by viewModel.allPhotosBoundingBox.collectAsState()
 
+    Box(modifier = Modifier.fillMaxSize()) {
         Map(
             modifier = Modifier.fillMaxSize(),
             visibleImages = visibleImages,
             visibleRegions = visibleRegions,
+            boundingBox = allPhotosBoundingBox,
+            moveCamera = moveCamera,
+            onMoveFinished = { moveCamera = false },
             onClickRegion = { region ->
                 viewModel.selectRegion(regionViewData = region)
                 onNavigatePolygons()
@@ -46,6 +51,14 @@ fun MapScreen(viewModel: MainViewModel, onNavigatePolygons: () -> Unit) {
             modifier = Modifier.align(Alignment.BottomCenter)
         ) {
             Text("Add Photos")
+        }
+
+        Button(
+            onClick = { moveCamera = true },
+            modifier = Modifier.align(Alignment.TopEnd),
+            enabled = !moveCamera
+        ) {
+            Text("Zoom to fit")
         }
 
         if (photoPickerShowing) {

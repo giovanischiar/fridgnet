@@ -50,6 +50,9 @@ class MainViewModel(
 
     val visibleRegions: StateFlow<List<RegionViewData>> = _visibleRegions.asStateFlow()
 
+    private var _allPhotosBoundingBox = MutableStateFlow<BoundingBoxViewData?>(value = null)
+    val allPhotosBoundingBox: StateFlow<BoundingBoxViewData?> = _allPhotosBoundingBox
+
     fun subscribeLocationRepository(
         callback: (regionLocation: Map<Region, Location>) -> Unit = this::onRegionLocationReady
     ) {
@@ -120,6 +123,7 @@ class MainViewModel(
             mutableRegionLocation[if (it != region) it else region.switch()] = locationUpdated
         }
         _regionLocation = mutableRegionLocation.toMap()
+        updateBoundingBox()
         _currentLocation.update { locationUpdated.toLocationViewData() }
 
         if (location.administrativeUnit == AdministrativeUnit.CITY) {
@@ -130,11 +134,29 @@ class MainViewModel(
 
     private fun onRegionLocationReady(regionLocation: Map<Region, Location>) {
         _regionLocation = _regionLocation + regionLocation
-        regionLocation.values.forEach {
-            if (it.administrativeUnit == AdministrativeUnit.CITY) {
-                _locationAddress = _locationAddress + (it.address.name() to it)
+
+        regionLocation.values.forEach { location ->
+            if (location.administrativeUnit == AdministrativeUnit.CITY) {
+                _locationAddress = _locationAddress + (location.address.name() to location)
+
+                _allPhotosBoundingBox.update {
+                    val allPhotosBoundingBox = _allPhotosBoundingBox.value
+                    if (allPhotosBoundingBox == null) {
+                        location.boundingBox.toBoundingBoxViewData()
+                    } else {
+                        (allPhotosBoundingBox.toBoundingBox() + location.boundingBox)
+                            .toBoundingBoxViewData()
+                    }
+                }
             }
         }
+
         _allLocationAddress.update { _locationAddress.toStringLocationViewData() }
+    }
+
+    private fun updateBoundingBox() {
+        _allPhotosBoundingBox.update { (_regionLocation.values.filter {
+            it.administrativeUnit == AdministrativeUnit.CITY
+        }.map { it.boundingBox }.reduce{ acc, boundingBox -> acc + boundingBox }).toBoundingBoxViewData()}
     }
 }

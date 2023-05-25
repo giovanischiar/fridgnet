@@ -6,6 +6,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -20,6 +21,8 @@ import io.schiar.fridgnet.view.util.debug.BoundsTestCreator
 import io.schiar.fridgnet.view.util.debug.generatePolygonsAppCreatedUnitTest
 import io.schiar.fridgnet.view.util.debug.showMapPolygonInfo
 import io.schiar.fridgnet.view.util.toLatLng
+import io.schiar.fridgnet.view.util.toLatLngBounds
+import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import io.schiar.fridgnet.view.viewdata.RegionViewData
 import kotlinx.coroutines.Dispatchers
@@ -32,9 +35,13 @@ fun Map(
     modifier: Modifier,
     visibleImages: List<ImageViewData>,
     visibleRegions: List<RegionViewData>,
+    boundingBox: BoundingBoxViewData?,
+    moveCamera: Boolean,
+    onMoveFinished: () -> Unit,
     onClickRegion: (region: RegionViewData) -> Unit,
     onBoundsChange: (LatLngBounds?) -> Unit,
 ) {
+    var mapLoaded by remember { mutableStateOf(value = false) }
     val bitmaps by remember { mutableStateOf(mutableMapOf<Uri, BitmapDescriptor>()) }
     val jobs = remember { mutableMapOf<Uri, Job>() }
     val coroutineScope = rememberCoroutineScope()
@@ -64,8 +71,19 @@ fun Map(
             cameraPositionState = cameraPositionState,
             onMapLoaded = {
                 onBoundsChange(cameraPositionState.projection?.visibleRegion?.latLngBounds)
+                mapLoaded = true
             }
         ) {
+            if (moveCamera && boundingBox != null && mapLoaded) {
+                val cu = CameraUpdateFactory.newLatLngBounds(boundingBox.toLatLngBounds(), 2)
+                coroutineScope.launch(Dispatchers.Main) {
+                    withContext(coroutineContext) {
+                        cameraPositionState.animate(cu, 1000)
+                    }
+                    onMoveFinished()
+                }
+            }
+
             visibleRegions.map { RegionDrawer(region = it) { region -> onClickRegion(region) } }
 
             visibleImages.map {
