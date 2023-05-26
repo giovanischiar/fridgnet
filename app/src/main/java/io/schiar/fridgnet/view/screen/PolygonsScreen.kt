@@ -5,25 +5,48 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults.buttonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.MapPolygon
+import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.viewmodel.MainViewModel
 
 @Composable
-fun PolygonsScreen(viewModel: MainViewModel) {
-    val configuration = LocalConfiguration.current
+fun PolygonsScreen(viewModel: MainViewModel, info: (screenInfo: ScreenInfo) -> Unit) {
     val location by viewModel.currentLocation.collectAsState()
     val sortedRegions = (location ?: return).regions.sortedBy {
         it.polygon.coordinates.size
     }.asReversed()
 
+    info(
+        ScreenInfo(
+            title = stringResource(id = R.string.polygons_screen),
+            actions = {
+                if (sortedRegions.size > 1) {
+                    Button(
+                        colors = buttonColors(containerColor = Color.Transparent),
+                        onClick = {
+                            sortedRegions.subList(1, sortedRegions.size).forEach {
+                                viewModel.switchRegion(regionViewData = it)
+                            }
+                        }) {
+                        Text("SWITCH ALL")
+                    }
+                }
+            }
+        )
+    )
+
+    val configuration = LocalConfiguration.current
     val localDensity = LocalDensity.current
     var height by remember { mutableStateOf(configuration.screenHeightDp.dp) }
 
@@ -128,18 +151,6 @@ fun PolygonsScreen(viewModel: MainViewModel) {
                         }
                     }
                 }
-            }
-        }
-
-        if (sortedRegions.size > 1) {
-            Button(
-                modifier = Modifier.align(alignment = Alignment.TopCenter),
-                onClick = {
-                    sortedRegions.subList(1, sortedRegions.size).forEach {
-                        viewModel.switchRegion(regionViewData = it)
-                    }
-                }) {
-                Text("Switch All")
             }
         }
     }

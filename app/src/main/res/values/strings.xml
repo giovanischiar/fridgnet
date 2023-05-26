@@ -1,5 +1,7 @@
 <resources>
   <string name="app_name">Fridgnet</string>
-  <string name="home">Home</string>
-  <string name="map">Map</string>
+  <string name="home_screen">Home</string>
+  <string name="map_screen">Map</string>
+  <string name="polygons_screen">Polygons</string>
+  <string name="photos_screen">Photos</string>
 </resources>

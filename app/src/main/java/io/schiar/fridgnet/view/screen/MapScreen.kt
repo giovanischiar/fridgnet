@@ -2,13 +2,14 @@ package io.schiar.fridgnet.view.screen
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.Map
 import io.schiar.fridgnet.view.component.TopAppBarActionButton
+import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.toBoundingBoxViewData
 import io.schiar.fridgnet.viewmodel.MainViewModel
 
@@ -16,22 +17,27 @@ import io.schiar.fridgnet.viewmodel.MainViewModel
 fun MapScreen(
     viewModel: MainViewModel,
     onNavigatePolygons: () -> Unit,
-    onActions: (actions: @Composable (RowScope.() -> Unit)) -> Unit
+    info: (screenInfo: ScreenInfo) -> Unit
 ) {
     var moveCamera by remember { mutableStateOf(false) }
     val visibleImages by viewModel.visibleImages.collectAsState()
     val visibleRegions by viewModel.visibleRegions.collectAsState()
     val allPhotosBoundingBox by viewModel.allPhotosBoundingBox.collectAsState()
 
-    onActions {
-        TopAppBarActionButton(
-            iconResId = R.drawable.ic_fit_screen,
-            description = "Zoom to fit",
-            enabled = !moveCamera
-        ) {
-            moveCamera = true
-        }
-    }
+    info(
+        ScreenInfo(
+            title = stringResource(id = R.string.map_screen),
+            actions = {
+                TopAppBarActionButton(
+                    iconResId = R.drawable.ic_fit_screen,
+                    description = "Zoom to fit",
+                    enabled = !moveCamera
+                ) {
+                    moveCamera = true
+                }
+            }
+        )
+    )
 
     Column {
         Box(modifier = Modifier.fillMaxSize()) {
