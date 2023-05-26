@@ -27,8 +27,10 @@ class MainViewModel(
     private val _visibleImages = MutableStateFlow(value = _images.toImageViewData())
     val visibleImages: StateFlow<List<ImageViewData>> = _visibleImages.asStateFlow()
 
-    private val _selectedImages = MutableStateFlow<List<ImageViewData>>(value = emptyList())
-    val selectedImages: StateFlow<List<ImageViewData>> = _selectedImages.asStateFlow()
+    private val _selectedImages = MutableStateFlow<Pair<String, List<ImageViewData>>>(
+        value = Pair("", emptyList())
+    )
+    val selectedImages: StateFlow<Pair<String, List<ImageViewData>>> = _selectedImages.asStateFlow()
 
     private val _imageWithLocations = MutableStateFlow(
         value = _addressImages.toStringImageViewDataList()
@@ -91,7 +93,7 @@ class MainViewModel(
 
     fun selectImages(address: String) {
         val images = _addressImages[address] ?: return
-        _selectedImages.update { images.toImageViewDataList() }
+        _selectedImages.update { address to images.toImageViewDataList() }
     }
 
     fun visibleAreaChanged(boundingBoxViewData: BoundingBoxViewData) {
