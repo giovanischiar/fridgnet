@@ -2,19 +2,18 @@ package io.schiar.fridgnet.view.component
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
+import com.google.maps.android.compose.*
 import io.schiar.fridgnet.view.component.debug.MapPolygonInfo
 import io.schiar.fridgnet.view.util.BitmapLoader
 import io.schiar.fridgnet.view.util.debug.BoundsTestCreator
@@ -65,14 +64,14 @@ fun Map(
         }
     }
 
-    Box {
+    Box(modifier = modifier) {
         GoogleMap(
-            modifier = modifier,
             cameraPositionState = cameraPositionState,
             onMapLoaded = {
                 onBoundsChange(cameraPositionState.projection?.visibleRegion?.latLngBounds)
                 mapLoaded = true
-            }
+            },
+            uiSettings = MapUiSettings(zoomControlsEnabled = false)
         ) {
             if (moveCamera && boundingBox != null && mapLoaded) {
                 val cu = CameraUpdateFactory.newLatLngBounds(boundingBox.toLatLngBounds(), 2)
@@ -106,6 +105,12 @@ fun Map(
                 )
             }
         }
+
+        ZoomControls(
+            modifier = Modifier.align(Alignment.BottomEnd).padding(end = 15.dp, bottom = 85.dp),
+            cameraPositionState = cameraPositionState,
+            enabled = mapLoaded
+        )
 
         if (showMapPolygonInfo) {
             MapPolygonInfo(

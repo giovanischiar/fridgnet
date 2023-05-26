@@ -1,91 +1,56 @@
 package io.schiar.fridgnet.view.screen
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
-import io.schiar.fridgnet.view.PhotoPicker
+import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.Map
-import io.schiar.fridgnet.view.util.AddressCreator
+import io.schiar.fridgnet.view.component.TopAppBarActionButton
 import io.schiar.fridgnet.view.util.toBoundingBoxViewData
 import io.schiar.fridgnet.viewmodel.MainViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 @Composable
-fun MapScreen(viewModel: MainViewModel, onNavigatePolygons: () -> Unit) {
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
-    val (photoPickerShowing, isPhotoPickerShowing) = remember { mutableStateOf(false) }
+fun MapScreen(
+    viewModel: MainViewModel,
+    onNavigatePolygons: () -> Unit,
+    onActions: (actions: @Composable (RowScope.() -> Unit)) -> Unit
+) {
     var moveCamera by remember { mutableStateOf(false) }
     val visibleImages by viewModel.visibleImages.collectAsState()
     val visibleRegions by viewModel.visibleRegions.collectAsState()
     val allPhotosBoundingBox by viewModel.allPhotosBoundingBox.collectAsState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Map(
-            modifier = Modifier.fillMaxSize(),
-            visibleImages = visibleImages,
-            visibleRegions = visibleRegions,
-            boundingBox = allPhotosBoundingBox,
-            moveCamera = moveCamera,
-            onMoveFinished = { moveCamera = false },
-            onClickRegion = { region ->
-                viewModel.selectRegion(regionViewData = region)
-                onNavigatePolygons()
-            }
-        ) {
-            if (it != null) {
-                val bounds = it.toBoundingBoxViewData()
-                viewModel.visibleAreaChanged(boundingBoxViewData = bounds)
-            }
-        }
-
-        Button(
-            onClick = { isPhotoPickerShowing.invoke(true) },
-            modifier = Modifier.align(Alignment.BottomCenter)
-        ) {
-            Text("Add Photos")
-        }
-
-        Button(
-            onClick = { moveCamera = true },
-            modifier = Modifier.align(Alignment.TopEnd),
+    onActions {
+        TopAppBarActionButton(
+            iconResId = R.drawable.ic_fit_screen,
+            description = "Zoom to fit",
             enabled = !moveCamera
         ) {
-            Text("Zoom to fit")
+            moveCamera = true
         }
+    }
 
-        if (photoPickerShowing) {
-            PhotoPicker { uri, date, latitude, longitude ->
-                viewModel.addImage(
-                    uri = uri,
-                    date = date,
-                    latitude = latitude,
-                    longitude = longitude
-                )
-                coroutineScope.launch(Dispatchers.IO) {
-                    val address = withContext(Dispatchers.Default) {
-                        AddressCreator().addressFromLocation(
-                            context = context,
-                            latitude = latitude,
-                            longitude = longitude
-                        )
-                    }
-                    viewModel.addAddressToImage(
-                        uri = uri,
-                        locality = address.locality,
-                        subAdminArea = address.subAdminArea,
-                        adminArea = address.adminArea,
-                        countryName = address.countryName
-                    )
+    Column {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Map(
+                modifier = Modifier.fillMaxSize(),
+                visibleImages = visibleImages,
+                visibleRegions = visibleRegions,
+                boundingBox = allPhotosBoundingBox,
+                moveCamera = moveCamera,
+                onMoveFinished = { moveCamera = false },
+                onClickRegion = { region ->
+                    viewModel.selectRegion(regionViewData = region)
+                    onNavigatePolygons()
                 }
-                isPhotoPickerShowing.invoke(false)
+            ) { latLngBounds ->
+                if (latLngBounds != null) {
+                    val bounds = latLngBounds.toBoundingBoxViewData()
+                    viewModel.visibleAreaChanged(boundingBoxViewData = bounds)
+                }
             }
         }
     }
