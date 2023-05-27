@@ -211,7 +211,7 @@ class LocationRepository() {
         }
 
         return Location(
-            address = address,
+            address = address.addressAccordingTo(administrativeUnit),
             administrativeUnit = administrativeUnit,
             regions = regions,
             boundingBox = boundingBox,
