@@ -48,10 +48,7 @@ class LocationRepository() {
         } else {
             address
         }
-        val (city, state) = newAddress
-        val addressStr = "$city, $state"
-
-        Log.d("API Result", "city: $city, state: $state")
+        val addressStr = newAddress.name()
         if (fetchingPlaces.contains(addressStr)) return
         fetchingPlaces = fetchingPlaces + addressStr
         val location = fetchLocation(
@@ -62,9 +59,12 @@ class LocationRepository() {
     }
 
     private suspend fun addCountryLocation(address: Address) {
-        val country = address.countryName ?: return
-        if (fetchingPlaces.contains(country)) return
-        fetchingPlaces = fetchingPlaces + country
+        address.countryName ?: return
+        val countryAddressName = address.addressAccordingTo(
+            administrativeUnit = AdministrativeUnit.COUNTRY
+        ).name()
+        if (fetchingPlaces.contains(countryAddressName)) return
+        fetchingPlaces = fetchingPlaces + countryAddressName
         val location = fetchLocation(
             address = address,
             administrativeUnit = AdministrativeUnit.COUNTRY
@@ -73,10 +73,13 @@ class LocationRepository() {
     }
 
     private suspend fun addStateLocation(address: Address) {
-        val state = address.adminArea ?: return
-        val country = address.countryName ?: return
-        if (fetchingPlaces.contains("$state, $country")) return
-        fetchingPlaces = fetchingPlaces + "$state, $country"
+        address.adminArea ?: return
+        address.countryName ?: return
+        val stateAddressName = address.addressAccordingTo(
+            administrativeUnit = AdministrativeUnit.STATE
+        ).name()
+        if (fetchingPlaces.contains(stateAddressName)) return
+        fetchingPlaces = fetchingPlaces + stateAddressName
         val location = fetchLocation(
             address = address,
             administrativeUnit = AdministrativeUnit.STATE
@@ -85,10 +88,14 @@ class LocationRepository() {
     }
 
      private suspend fun addCountyLocation(address: Address) {
-        val state = address.adminArea ?: return
-        val county = address.subAdminArea ?: return
-        if (fetchingPlaces.contains("$county, $state")) return
-        fetchingPlaces = fetchingPlaces + "$county, $state"
+        address.adminArea ?: return
+        address.subAdminArea ?: return
+        val countyAddressName = address.addressAccordingTo(
+             administrativeUnit = AdministrativeUnit.COUNTY
+        ).name()
+
+        if (fetchingPlaces.contains(countyAddressName)) return
+        fetchingPlaces = fetchingPlaces + countyAddressName
          val location = fetchLocation(
             address = address,
             administrativeUnit = AdministrativeUnit.COUNTY
