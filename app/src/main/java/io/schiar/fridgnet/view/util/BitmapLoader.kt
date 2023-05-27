@@ -2,23 +2,22 @@ package io.schiar.fridgnet.view.util
 
 import android.content.ContentResolver
 import android.graphics.Bitmap
-import android.graphics.ImageDecoder
+import android.graphics.BitmapFactory
 import android.net.Uri
-import android.os.Build
-import android.provider.MediaStore
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import kotlin.math.roundToInt
 
 class BitmapLoader(private val contentResolver: ContentResolver, private val uri: Uri) {
-    fun convert(): BitmapDescriptor {
-        val rawBitmap = if (Build.VERSION.SDK_INT < 28) {
-            @Suppress("DEPRECATION")
-            MediaStore.Images.Media.getBitmap(contentResolver, uri)
-        } else {
-            val source = ImageDecoder.createSource(contentResolver, uri)
-            ImageDecoder.decodeBitmap(source)
-        }
+    fun convert(): BitmapDescriptor? {
+        val options = BitmapFactory.Options()
+        options.inSampleSize = 4
+        val inputStream = contentResolver.openInputStream(uri)
+        val rawBitmap = BitmapFactory.decodeStream(
+            inputStream,
+            null,
+            options
+        ) ?: return null
         val bitmap = resize(bitmap = rawBitmap)
         return BitmapDescriptorFactory.fromBitmap(bitmap)
     }

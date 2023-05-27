@@ -88,13 +88,14 @@ fun Map(
             visibleImages.map {
                 if (!(bitmaps.containsKey(it.uri) || jobs.containsKey(it.uri))) {
                     jobs[it.uri] = coroutineScope.launch(Dispatchers.IO) {
-                        bitmaps[it.uri] = withContext(Dispatchers.Default) {
+                        val bitmap = withContext(Dispatchers.Default) {
                             val bitmapLoader = BitmapLoader(
                                 contentResolver = context.contentResolver,
                                 uri = it.uri
                             )
                             bitmapLoader.convert()
                         }
+                        if (bitmap != null) bitmaps[it.uri] = bitmap
                         jobs.remove(it.uri)
                     }
                 }
