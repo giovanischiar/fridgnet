@@ -13,7 +13,6 @@ class PolygonSearcher() {
             address.adminArea != null &&
             address.countryName != null
         ) {
-            Log.d("api result", "searching ${address.name()}")
             quotesApi.getResultsCity(
                 city = address.locality,
                 state = address.adminArea,
