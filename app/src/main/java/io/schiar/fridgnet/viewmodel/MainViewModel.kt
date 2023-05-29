@@ -3,6 +3,7 @@ package io.schiar.fridgnet.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.schiar.fridgnet.model.*
+import io.schiar.fridgnet.model.repository.LocationAPIDBRepository
 import io.schiar.fridgnet.model.repository.LocationRepository
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
@@ -17,7 +18,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MainViewModel(
-    private val locationRepository: LocationRepository = LocationRepository()
+    private val locationRepository: LocationRepository = LocationAPIDBRepository()
 ): ViewModel() {
     private var _images: Map<String, Image> = emptyMap()
     private var _addressImages: Map<String, List<Image>> = emptyMap()
@@ -55,14 +56,6 @@ class MainViewModel(
     private var _allPhotosBoundingBox = MutableStateFlow<BoundingBoxViewData?>(value = null)
     val allPhotosBoundingBox: StateFlow<BoundingBoxViewData?> = _allPhotosBoundingBox
 
-    fun subscribeLocationRepository(
-        callback: (regionLocation: Map<Region, Location>) -> Unit = this::onRegionLocationReady
-    ) {
-        locationRepository.subscribeOnRegionLocationReady(
-            onRegionLocationReady = callback
-        )
-    }
-
     fun addImage(uri: String, date: Long, latitude: Double, longitude: Double) {
         val newCoordinate = Coordinate(latitude = latitude, longitude = longitude)
         val newImage = Image(uri = uri, date = date, coordinate = newCoordinate)
@@ -86,8 +79,12 @@ class MainViewModel(
         val images = _addressImages.getOrDefault(address.name(), listOf()) + image
         _addressImages = _addressImages + (address.name() to images)
         _imageWithLocations.update { _addressImages.toStringImageViewDataList() }
+
         viewModelScope.launch(Dispatchers.IO) {
-            locationRepository.fetchLocations(address = address)
+            locationRepository.fetch(
+                address = address,
+                onLocationReady = this@MainViewModel::onLocationReady
+            )
         }
     }
 
@@ -131,6 +128,12 @@ class MainViewModel(
         if (location.administrativeUnit == AdministrativeUnit.CITY) {
             _locationAddress = _locationAddress + (location.address.name() to locationUpdated)
             _allLocationAddress.update { _locationAddress.toStringLocationViewData() }
+        }
+    }
+
+    private fun onLocationReady(location: Location) {
+        for (region in location.regions) {
+            onRegionLocationReady(mapOf(region to location))
         }
     }
 

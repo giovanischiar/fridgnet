@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.model.repository.nominatim
+package io.schiar.fridgnet.model.repository.datasource.nominatim
 
 import android.util.Log
 import io.schiar.fridgnet.model.Address

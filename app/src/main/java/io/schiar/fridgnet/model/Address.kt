@@ -12,6 +12,15 @@ data class Address(
         ).joinToString(separator = ", ")
     }
 
+    fun allAddresses(): List<Address> {
+        return listOf(
+            this,
+            this.addressAccordingTo(administrativeUnit = AdministrativeUnit.COUNTY),
+            this.addressAccordingTo(administrativeUnit = AdministrativeUnit.STATE),
+            this.addressAccordingTo(administrativeUnit = AdministrativeUnit.COUNTRY)
+        )
+    }
+
     fun addressAccordingTo(administrativeUnit: AdministrativeUnit): Address {
         return when(administrativeUnit) {
             AdministrativeUnit.CITY -> this

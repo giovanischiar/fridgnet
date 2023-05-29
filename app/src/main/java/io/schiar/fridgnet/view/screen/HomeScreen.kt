@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -27,7 +26,6 @@ fun HomeScreen(
         ScreenInfo(title = stringResource(id = R.string.home_screen))
     )
 
-    LaunchedEffect(Unit) { viewModel.subscribeLocationRepository() }
     val imagesWithLocation by viewModel.imagesWithLocation.collectAsState()
     val allLocationAddress by viewModel.allLocationAddress.collectAsState()
 
