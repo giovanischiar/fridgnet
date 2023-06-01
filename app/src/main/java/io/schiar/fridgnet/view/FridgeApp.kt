@@ -30,6 +30,7 @@ import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether
 import io.schiar.fridgnet.viewmodel.MainViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -43,7 +44,20 @@ fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = remem
     var currentScreenInfo by remember { mutableStateOf(ScreenInfo(BottomNavScreen.Home.route)) }
     var photoPickerShowing by remember { mutableStateOf(false) }
 
+    LaunchedEffect(Unit) { viewModel.loadDatabase() }
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    LaunchedEffect(Unit) {
+        viewModel.databaseLoaded.collectLatest {
+            if (it) { snackbarHostState.showSnackbar(message = "Database Loaded!") }
+        }
+    }
+
     Scaffold(
+        snackbarHost = {
+            SnackbarHost(hostState = snackbarHostState)
+        },
+
         topBar = {
             TopAppBar(
                 title = { Text(currentScreenInfo.title) },

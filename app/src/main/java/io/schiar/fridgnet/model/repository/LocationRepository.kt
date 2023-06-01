@@ -5,4 +5,5 @@ import io.schiar.fridgnet.model.Location
 
 interface LocationRepository {
     suspend fun fetch(address: Address, onLocationReady: (location: Location) -> Unit)
+    suspend fun setup()
 }

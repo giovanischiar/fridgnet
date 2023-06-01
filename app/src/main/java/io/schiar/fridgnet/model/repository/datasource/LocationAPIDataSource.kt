@@ -12,7 +12,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 
-class LocationNominatimAPIDataSource: LocationDataSource {
+class LocationAPIDataSource: LocationDataSource {
     private var fetchingPlaces: Set<String> = emptySet()
     private var mutex: Mutex = Mutex()
 

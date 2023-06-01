@@ -3,7 +3,6 @@ package io.schiar.fridgnet.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.schiar.fridgnet.model.*
-import io.schiar.fridgnet.model.repository.LocationAPIDBRepository
 import io.schiar.fridgnet.model.repository.LocationRepository
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
@@ -11,14 +10,16 @@ import io.schiar.fridgnet.view.viewdata.LocationViewData
 import io.schiar.fridgnet.view.viewdata.RegionViewData
 import io.schiar.fridgnet.viewmodel.util.*
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class MainViewModel(
-    private val locationRepository: LocationRepository = LocationAPIDBRepository()
+    private val locationRepository: LocationRepository
 ): ViewModel() {
     private var _images: Map<String, Image> = emptyMap()
     private var _addressImages: Map<String, List<Image>> = emptyMap()
@@ -55,6 +56,16 @@ class MainViewModel(
 
     private var _allPhotosBoundingBox = MutableStateFlow<BoundingBoxViewData?>(value = null)
     val allPhotosBoundingBox: StateFlow<BoundingBoxViewData?> = _allPhotosBoundingBox
+
+    private var _databaseLoaded = MutableStateFlow(value = false)
+    val databaseLoaded: StateFlow<Boolean> = _databaseLoaded
+
+    suspend fun loadDatabase() = coroutineScope {
+        launch {
+            withContext(Dispatchers.IO) { locationRepository.setup() }
+            _databaseLoaded.update { true }
+        }
+    }
 
     fun addImage(uri: String, date: Long, latitude: Double, longitude: Double) {
         val newCoordinate = Coordinate(latitude = latitude, longitude = longitude)

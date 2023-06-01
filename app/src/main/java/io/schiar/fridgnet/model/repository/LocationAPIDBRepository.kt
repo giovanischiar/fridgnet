@@ -4,20 +4,23 @@ import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.AdministrativeUnit.*
 import io.schiar.fridgnet.model.Location
+import io.schiar.fridgnet.model.repository.datasource.LocationAPIDataSource
 import io.schiar.fridgnet.model.repository.datasource.LocationDBDataSource
 import io.schiar.fridgnet.model.repository.datasource.LocationDataSource
-import io.schiar.fridgnet.model.repository.datasource.LocationNominatimAPIDataSource
+import io.schiar.fridgnet.model.repository.datasource.room.LocationDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LocationAPIDBRepository : LocationRepository {
-    private val locationAPIDataSource: LocationDataSource = LocationNominatimAPIDataSource()
-    private val locationDBDataSource: LocationDataSource = LocationDBDataSource()
-
+class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepository {
+    private val locationAPIDataSource: LocationDataSource = LocationAPIDataSource()
+    private val locationDBDataSource: LocationDataSource = LocationDBDataSource(
+        locationDatabase = locationDatabase
+    )
     private var onLocationReady: (location: Location) -> Unit = {}
 
+    override suspend fun setup() { (locationDBDataSource as LocationDBDataSource).setup() }
     override suspend fun fetch(address: Address, onLocationReady: (location: Location) -> Unit) {
         this.onLocationReady = onLocationReady
         val addresses = address.allAddresses()
@@ -54,7 +57,7 @@ class LocationAPIDBRepository : LocationRepository {
 
                     launch {
                         (locationDBDataSource as LocationDBDataSource)
-                            .store(address = address, location = location)
+                            .insert(location = location)
                     }
                 }
                 onLocationReady(location)
