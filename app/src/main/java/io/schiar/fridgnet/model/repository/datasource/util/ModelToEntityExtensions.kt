@@ -25,7 +25,7 @@ fun Location.toLocationEntity(): LocationEntity {
         subAdminArea = address.subAdminArea,
         adminArea = address.adminArea,
         countryName = address.countryName,
-        administrativeUnit = administrativeUnit.toString(),
+        administrativeUnit = address.administrativeUnit.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toCoordinateEntity(),
         boundingBoxNortheast = boundingBox.northeast.toCoordinateEntity(),
         zIndex = zIndex

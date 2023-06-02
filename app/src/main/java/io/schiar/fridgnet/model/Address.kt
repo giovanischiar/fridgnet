@@ -1,10 +1,13 @@
 package io.schiar.fridgnet.model
 
+import io.schiar.fridgnet.model.AdministrativeUnit.*
+
 data class Address(
     val locality: String?,
     val subAdminArea: String?,
     val adminArea: String?,
-    val countryName: String?
+    val countryName: String?,
+    val administrativeUnit: AdministrativeUnit = CITY
 ) {
     fun name(): String {
         return listOfNotNull(
@@ -15,35 +18,38 @@ data class Address(
     fun allAddresses(): List<Address> {
         return listOf(
             this,
-            this.addressAccordingTo(administrativeUnit = AdministrativeUnit.COUNTY),
-            this.addressAccordingTo(administrativeUnit = AdministrativeUnit.STATE),
-            this.addressAccordingTo(administrativeUnit = AdministrativeUnit.COUNTRY)
+            this.addressAccordingTo(administrativeUnit = COUNTY),
+            this.addressAccordingTo(administrativeUnit = STATE),
+            this.addressAccordingTo(administrativeUnit = COUNTRY)
         )
     }
 
     fun addressAccordingTo(administrativeUnit: AdministrativeUnit): Address {
         return when(administrativeUnit) {
-            AdministrativeUnit.CITY -> this
+            CITY -> this
 
-            AdministrativeUnit.COUNTY -> Address(
+            COUNTY -> Address(
                 locality = null,
                 subAdminArea = subAdminArea,
                 adminArea = adminArea,
-                countryName = countryName
+                countryName = countryName,
+                administrativeUnit = administrativeUnit
             )
 
-            AdministrativeUnit.STATE -> Address(
+            STATE -> Address(
                 locality = null,
                 subAdminArea = null,
                 adminArea = adminArea,
-                countryName = countryName
+                countryName = countryName,
+                administrativeUnit = administrativeUnit
             )
 
-            AdministrativeUnit.COUNTRY -> Address(
+            COUNTRY -> Address(
                 locality = null,
                 subAdminArea = null,
                 adminArea = null,
-                countryName = countryName
+                countryName = countryName,
+                administrativeUnit = administrativeUnit
             )
         }
     }

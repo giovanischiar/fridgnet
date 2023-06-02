@@ -136,7 +136,7 @@ class MainViewModel(
         updateBoundingBox()
         _currentLocation.update { locationUpdated.toLocationViewData() }
 
-        if (location.administrativeUnit == AdministrativeUnit.CITY) {
+        if (location.address.administrativeUnit == AdministrativeUnit.CITY) {
             _locationAddress = _locationAddress + (location.address.name() to locationUpdated)
             _allLocationAddress.update { _locationAddress.toStringLocationViewData() }
         }
@@ -152,7 +152,7 @@ class MainViewModel(
         _regionLocation = _regionLocation + regionLocation
 
         regionLocation.values.forEach { location ->
-            if (location.administrativeUnit == AdministrativeUnit.CITY) {
+            if (location.address.administrativeUnit == AdministrativeUnit.CITY) {
                 _locationAddress = _locationAddress + (location.address.name() to location)
 
                 _allPhotosBoundingBox.update {
@@ -172,7 +172,7 @@ class MainViewModel(
 
     private fun updateBoundingBox() {
         _allPhotosBoundingBox.update { (_regionLocation.values.filter {
-            it.administrativeUnit == AdministrativeUnit.CITY
+            it.address.administrativeUnit == AdministrativeUnit.CITY
         }.map { it.boundingBox }.reduce{ acc, boundingBox -> acc + boundingBox }).toBoundingBoxViewData()}
     }
 }

@@ -12,9 +12,9 @@ fun LocationWithRegions.toLocation(): Location {
             locality = locationEntity.locality,
             subAdminArea = locationEntity.subAdminArea,
             adminArea = locationEntity.adminArea,
-            countryName = locationEntity.countryName
+            countryName = locationEntity.countryName,
+            administrativeUnit = AdministrativeUnit.valueOf(value = locationEntity.administrativeUnit)
         ),
-        administrativeUnit = AdministrativeUnit.valueOf(value = locationEntity.administrativeUnit),
         regions = regions.map { it.toRegion() },
         boundingBox = BoundingBox(
             southwest = locationEntity.boundingBoxSouthwest.toCoordinate(),

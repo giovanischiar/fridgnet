@@ -2,7 +2,6 @@ package io.schiar.fridgnet.model
 
 data class Location(
     val address: Address,
-    val administrativeUnit: AdministrativeUnit,
     val regions: List<Region>,
     val boundingBox: BoundingBox,
     val zIndex: Float
@@ -13,7 +12,6 @@ data class Location(
         mutableRegions[index] = regions[index].switch()
         return Location(
             address = address,
-            administrativeUnit = administrativeUnit,
             regions = mutableRegions.toList(),
             boundingBox = boundingBox,
             zIndex = zIndex
@@ -23,7 +21,6 @@ data class Location(
     private fun updateBoundingBox(): Location {
         return Location(
             address = address,
-            administrativeUnit = administrativeUnit,
             regions = regions,
             boundingBox = regions
                 .filter { it.active }

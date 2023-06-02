@@ -179,7 +179,6 @@ class LocationAPIDataSource: LocationDataSource {
 
         return Location(
             address = address.addressAccordingTo(administrativeUnit),
-            administrativeUnit = administrativeUnit,
             regions = regions,
             boundingBox = boundingBox,
             zIndex = administrativeUnit.zIndex()

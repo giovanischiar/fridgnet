@@ -72,13 +72,13 @@ class LocationDatabaseTest {
             locality = "Donut Square",
             subAdminArea = "Square County",
             adminArea = "Square State",
-            countryName = "Square Country"
+            countryName = "Square Country",
+            administrativeUnit = AdministrativeUnit.CITY
         )
 
         val location = Location(
             address = address,
             regions = listOf(region),
-            administrativeUnit = AdministrativeUnit.CITY,
             boundingBox = BoundingBox(
                 southwest = Coordinate(latitude = -10, longitude = -10),
                 northeast = Coordinate(latitude = 10, longitude = 10)
