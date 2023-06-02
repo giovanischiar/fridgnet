@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import io.schiar.fridgnet.model.repository.datasource.room.entity.*
-import io.schiar.fridgnet.model.repository.datasource.room.entitywithlist.LocationWithRegions
+import io.schiar.fridgnet.model.repository.datasource.room.relationentity.LocationWithRegions
 
 @Dao
 abstract class LocationDAO {
@@ -22,5 +22,5 @@ abstract class LocationDAO {
     abstract fun insertCoordinates(coordinateEntities: List<CoordinateEntity>): List<Long>
 
     @Query("SELECT * FROM Location")
-    abstract fun getLocationsWithRegions(): List<LocationWithRegions>
+    abstract fun selectLocationsWithRegions(): List<LocationWithRegions>
 }

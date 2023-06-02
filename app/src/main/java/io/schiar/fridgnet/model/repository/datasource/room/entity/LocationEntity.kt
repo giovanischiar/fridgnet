@@ -3,16 +3,16 @@ package io.schiar.fridgnet.model.repository.datasource.room.entity
 import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AdministrativeUnit
 
 @Entity(tableName = "Location")
 data class LocationEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    @Embedded
-    val address: Address,
-    val administrativeUnit: AdministrativeUnit,
+    val locality: String?,
+    val subAdminArea: String?,
+    val adminArea: String?,
+    val countryName: String?,
+    val administrativeUnit: String,
     @Embedded(prefix = "boundingBoxSouthwest_")
     var boundingBoxSouthwest: CoordinateEntity,
     @Embedded(prefix = "boundingBoxNortheast_")

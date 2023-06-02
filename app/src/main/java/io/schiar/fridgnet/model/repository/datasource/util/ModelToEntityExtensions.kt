@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.model.repository.datasource
+package io.schiar.fridgnet.model.repository.datasource.util
 
 import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.Location
@@ -21,8 +21,11 @@ fun Coordinate.toCoordinateEntity(coordinatesID: Long? = null): CoordinateEntity
 
 fun Location.toLocationEntity(): LocationEntity {
     return LocationEntity(
-        address = address,
-        administrativeUnit = administrativeUnit,
+        locality = address.locality,
+        subAdminArea = address.subAdminArea,
+        adminArea = address.adminArea,
+        countryName = address.countryName,
+        administrativeUnit = administrativeUnit.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toCoordinateEntity(),
         boundingBoxNortheast = boundingBox.northeast.toCoordinateEntity(),
         zIndex = zIndex

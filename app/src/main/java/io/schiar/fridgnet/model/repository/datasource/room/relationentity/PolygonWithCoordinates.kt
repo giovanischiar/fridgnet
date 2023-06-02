@@ -1,8 +1,7 @@
-package io.schiar.fridgnet.model.repository.datasource.room.entitywithlist
+package io.schiar.fridgnet.model.repository.datasource.room.relationentity
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.repository.datasource.room.entity.CoordinateEntity
 import io.schiar.fridgnet.model.repository.datasource.room.entity.PolygonEntity
 
@@ -11,8 +10,4 @@ data class PolygonWithCoordinates(
     val polygon: PolygonEntity,
     @Relation(parentColumn = "id", entityColumn = "coordinatesID")
     val coordinates: List<CoordinateEntity>
-) {
-    fun toPolygon(): Polygon {
-        return Polygon(coordinates = coordinates.map { it.toCoordinate() })
-    }
-}
+)

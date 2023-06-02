@@ -3,6 +3,10 @@ package io.schiar.fridgnet.model.repository.datasource
 import io.schiar.fridgnet.model.*
 import io.schiar.fridgnet.model.repository.datasource.room.LocationDatabase
 import io.schiar.fridgnet.model.repository.datasource.room.entity.PolygonEntity
+import io.schiar.fridgnet.model.repository.datasource.util.toCoordinateEntities
+import io.schiar.fridgnet.model.repository.datasource.util.toLocation
+import io.schiar.fridgnet.model.repository.datasource.util.toLocationEntity
+import io.schiar.fridgnet.model.repository.datasource.util.toRegionEntity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -12,11 +16,10 @@ class LocationDBDataSource(locationDatabase: LocationDatabase): LocationDataSour
     private var locationDAO = locationDatabase.locationDAO()
     private var addressLocation: Map<Address, Location> = emptyMap()
 
-
     suspend fun setup() {
         coroutineScope {
             launch {
-                withContext(Dispatchers.IO) { getAllLocations() }.forEach { location ->
+                withContext(Dispatchers.IO) { selectLocations() }.forEach { location ->
                     addressLocation = addressLocation + (location.address to location)
                 }
             }
@@ -26,6 +29,16 @@ class LocationDBDataSource(locationDatabase: LocationDatabase): LocationDataSour
     fun insert(location: Location) {
         addressLocation = addressLocation + (location.address to location)
         insertLocation(location = location)
+    }
+
+    fun selectLocationByAddress(address: Address): Location {
+        val (locality, subAdminArea, adminArea, countryName) = address
+        return locationDAO.selectLocationWithRegionsByAddress(
+            locality = locality,
+            subAdminArea = subAdminArea,
+            adminArea = adminArea,
+            countryName = countryName
+        ).toLocation()
     }
 
     private fun insertLocation(location: Location) {
@@ -65,8 +78,8 @@ class LocationDBDataSource(locationDatabase: LocationDatabase): LocationDataSour
         locationDAO.insertCoordinates(coordinateEntities)
     }
 
-    private fun getAllLocations(): List<Location> {
-        return locationDAO.getLocationsWithRegions().map { it.toLocation() }
+    private fun selectLocations(): List<Location> {
+        return locationDAO.selectLocationsWithRegions().map { it.toLocation() }
     }
 
     override suspend fun fetchCity(address: Address): Location? {
