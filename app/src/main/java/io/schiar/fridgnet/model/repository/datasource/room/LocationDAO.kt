@@ -23,4 +23,18 @@ abstract class LocationDAO {
 
     @Query("SELECT * FROM Location")
     abstract fun selectLocationsWithRegions(): List<LocationWithRegions>
+
+    @Query(
+        "SELECT * FROM Location WHERE " +
+        "Location.locality == :locality AND " +
+        "Location.subAdminArea == :subAdminArea AND " +
+        "Location.adminArea == :adminArea AND " +
+        "Location.countryName == :countryName "
+    )
+    abstract fun selectLocationWithRegionsByAddress(
+        locality: String?,
+        subAdminArea: String?,
+        adminArea: String?,
+        countryName: String?
+    ): LocationWithRegions
 }
