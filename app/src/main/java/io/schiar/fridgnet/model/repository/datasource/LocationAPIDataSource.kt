@@ -79,7 +79,7 @@ class LocationAPIDataSource: LocationDataSource {
         val state = address.adminArea ?: ""
         val country = address.countryName ?: ""
         mutex.lock()
-        val results = withContext(Dispatchers.Default) {
+        val results = withContext(Dispatchers.IO) {
             when (administrativeUnit) {
                 CITY -> {
                     polygonSearcher.searchCity(city = city, state = state, country = country)
