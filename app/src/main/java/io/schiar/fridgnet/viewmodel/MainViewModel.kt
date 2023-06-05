@@ -1,7 +1,7 @@
 package io.schiar.fridgnet.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import io.schiar.fridgnet.model.*
 import io.schiar.fridgnet.model.repository.LocationRepository
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
@@ -15,56 +15,54 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class MainViewModel(
-    private val locationRepository: LocationRepository
-): ViewModel() {
+class MainViewModel(private val locationRepository: LocationRepository): ViewModel() {
+    // MapScreen
     private var _images: Map<String, Image> = emptyMap()
-    private var _addressImages: Map<String, List<Image>> = emptyMap()
-    private var _locationAddress: Map<String, Location> = emptyMap()
-    private var _regionLocation: Map<Region, Location> = emptyMap()
 
     private val _visibleImages = MutableStateFlow(value = _images.toImageViewData())
     val visibleImages: StateFlow<List<ImageViewData>> = _visibleImages.asStateFlow()
 
+    private val _visibleRegions: MutableStateFlow<List<RegionViewData>>
+            = MutableStateFlow(emptyList())
+    val visibleRegions: StateFlow<List<RegionViewData>> = _visibleRegions.asStateFlow()
+
+    // PhotosScreen
     private val _selectedImages = MutableStateFlow<Pair<String, List<ImageViewData>>>(
         value = Pair("", emptyList())
     )
     val selectedImages: StateFlow<Pair<String, List<ImageViewData>>> = _selectedImages.asStateFlow()
 
-    private val _imageWithLocations = MutableStateFlow(
+    // HomeScreen
+    private var _addressImages: Map<String, List<Image>> = emptyMap()
+
+    private val _cityNameImages = MutableStateFlow(
         value = _addressImages.toStringImageViewDataList()
     )
-    val imagesWithLocation: StateFlow<Map<String, List<ImageViewData>>> =
-        _imageWithLocations.asStateFlow()
+    val cityNameImages: StateFlow<Map<String, List<ImageViewData>>> =
+        _cityNameImages.asStateFlow()
 
-    private val _allLocationAddress = MutableStateFlow(
-        value = _locationAddress.toStringLocationViewData()
+    private val _cityNameLocation = MutableStateFlow<Map<String, LocationViewData>>(
+        value = emptyMap()
     )
-    val allLocationAddress: StateFlow<Map<String, LocationViewData>> =
-        _allLocationAddress.asStateFlow()
+    val cityNameLocation: StateFlow<Map<String, LocationViewData>> = _cityNameLocation.asStateFlow()
 
+    // PolygonsScreen
     private val _currentLocation = MutableStateFlow<LocationViewData?>(null)
     val currentLocation: StateFlow<LocationViewData?> = _currentLocation.asStateFlow()
-
-    private val _visibleRegions: MutableStateFlow<List<RegionViewData>>
-        = MutableStateFlow(emptyList())
-
-    val visibleRegions: StateFlow<List<RegionViewData>> = _visibleRegions.asStateFlow()
 
     private var _allPhotosBoundingBox = MutableStateFlow<BoundingBoxViewData?>(value = null)
     val allPhotosBoundingBox: StateFlow<BoundingBoxViewData?> = _allPhotosBoundingBox
 
+    // FridgeApp
     private var _databaseLoaded = MutableStateFlow(value = false)
     val databaseLoaded: StateFlow<Boolean> = _databaseLoaded
 
+    // FridgeApp
     suspend fun loadDatabase() = coroutineScope {
-        launch {
-            withContext(Dispatchers.IO) { locationRepository.setup() }
-            _databaseLoaded.update { true }
-        }
+        withContext(Dispatchers.IO) { locationRepository.setup() }
+        _databaseLoaded.update { true }
     }
 
     fun addImage(uri: String, date: Long, latitude: Double, longitude: Double) {
@@ -73,7 +71,7 @@ class MainViewModel(
         _images = _images + (uri to newImage)
     }
 
-    fun addAddressToImage(
+    suspend fun addAddressToImage(
         uri: String,
         locality: String?,
         subAdminArea: String?,
@@ -89,21 +87,18 @@ class MainViewModel(
         val image = _images[uri] ?: return
         val images = _addressImages.getOrDefault(address.name(), listOf()) + image
         _addressImages = _addressImages + (address.name() to images)
-        _imageWithLocations.update { _addressImages.toStringImageViewDataList() }
-
-        viewModelScope.launch(Dispatchers.IO) {
-            locationRepository.fetch(
-                address = address,
-                onLocationReady = this@MainViewModel::onLocationReady
-            )
-        }
+        _cityNameImages.update { _addressImages.toStringImageViewDataList() }
+        Log.d("MainViewModel", "${Thread.currentThread().name}|${address.name()}|loading regions")
+        locationRepository.loadRegions(address = address, ::onLocationReady)
     }
 
+    // HomeScreen
     fun selectImages(address: String) {
         val images = _addressImages[address] ?: return
         _selectedImages.update { address to images.toImageViewDataList() }
     }
 
+    // MapScreen
     fun visibleAreaChanged(boundingBoxViewData: BoundingBoxViewData) {
         val boundingBox = boundingBoxViewData.toBoundingBox()
         val visibleImages = _images.values.filter { image ->
@@ -111,68 +106,40 @@ class MainViewModel(
         }
         _visibleImages.update { visibleImages.toImageViewDataList() }
         _visibleRegions.update {
-            _regionLocation.keys.filter {
-                region -> boundingBox.contains(other = region.boundingBox)
-            }.toRegionViewDataList()
+            val regions = locationRepository.regionsThatIntersect(boundingBox = boundingBox)
+            regions.toRegionViewDataList()
+        }
+    }
+
+    fun zoomToFitAllCities() {
+        _allPhotosBoundingBox.update {
+            locationRepository.allCitiesBoundingBox?.toBoundingBoxViewData()
         }
     }
 
     fun selectRegion(regionViewData: RegionViewData) {
         val region = regionViewData.toRegion()
-        val location = _regionLocation[region] ?: return
+        val location = locationRepository.locationFrom(region = region) ?: return
         _currentLocation.update { location.toLocationViewData() }
     }
 
-    fun switchRegion(regionViewData: RegionViewData) {
-        val region = regionViewData.toRegion()
-        val mutableRegionLocation = _regionLocation.toMutableMap()
-        val location = mutableRegionLocation.remove(key = region) ?: return
-        val locationUpdated = location.switch(region = region)
-
-        _regionLocation.filter { it.value == location }.keys.forEach {
-            mutableRegionLocation[if (it != region) it else region.switch()] = locationUpdated
-        }
-        _regionLocation = mutableRegionLocation.toMap()
-        updateBoundingBox()
-        _currentLocation.update { locationUpdated.toLocationViewData() }
-
-        if (location.address.administrativeUnit == AdministrativeUnit.CITY) {
-            _locationAddress = _locationAddress + (location.address.name() to locationUpdated)
-            _allLocationAddress.update { _locationAddress.toStringLocationViewData() }
+    // PolygonsScreen
+    suspend fun switchRegions(regionsViewData: List<RegionViewData>) = coroutineScope {
+        if (regionsViewData.isEmpty()) return@coroutineScope
+        regionsViewData.forEach { regionViewData ->
+            val locationUpdated = withContext(Dispatchers.Default) {
+                locationRepository.switchRegion(region = regionViewData.toRegion())
+            } ?: return@coroutineScope
+            _currentLocation.update { locationUpdated.toLocationViewData() }
+            onLocationReady(location = locationUpdated)
         }
     }
 
     private fun onLocationReady(location: Location) {
-        for (region in location.regions) {
-            onRegionLocationReady(mapOf(region to location))
-        }
-    }
-
-    private fun onRegionLocationReady(regionLocation: Map<Region, Location>) {
-        _regionLocation = _regionLocation + regionLocation
-
-        regionLocation.values.forEach { location ->
-            if (location.address.administrativeUnit == AdministrativeUnit.CITY) {
-                _locationAddress = _locationAddress + (location.address.name() to location)
-
-                _allPhotosBoundingBox.update {
-                    val allPhotosBoundingBox = _allPhotosBoundingBox.value
-                    if (allPhotosBoundingBox == null) {
-                        location.boundingBox.toBoundingBoxViewData()
-                    } else {
-                        (allPhotosBoundingBox.toBoundingBox() + location.boundingBox)
-                            .toBoundingBoxViewData()
-                    }
-                }
+        if (location.address.administrativeUnit == AdministrativeUnit.CITY) {
+            _cityNameLocation.update {
+                it + (location.address.name() to location.toLocationViewData())
             }
         }
-
-        _allLocationAddress.update { _locationAddress.toStringLocationViewData() }
-    }
-
-    private fun updateBoundingBox() {
-        _allPhotosBoundingBox.update { (_regionLocation.values.filter {
-            it.address.administrativeUnit == AdministrativeUnit.CITY
-        }.map { it.boundingBox }.reduce{ acc, boundingBox -> acc + boundingBox }).toBoundingBoxViewData()}
     }
 }

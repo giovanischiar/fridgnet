@@ -16,7 +16,16 @@ class LocationAPIDataSource: LocationDataSource {
     private var fetchingPlaces: Set<String> = emptySet()
     private var mutex: Mutex = Mutex()
 
-    override suspend fun fetchCity(address: Address): Location? {
+    override suspend fun fetchLocationBy(address: Address): Location? {
+        return when (address.administrativeUnit) {
+            CITY -> fetchCity(address = address)
+            COUNTY -> fetchCounty(address = address)
+            STATE -> fetchState(address = address)
+            COUNTRY -> fetchCountry(address = address)
+        }
+    }
+
+    private suspend fun fetchCity(address: Address): Location? {
         val newAddress = if (address.locality == null) {
             extractAddress(address = address)
         } else {
@@ -28,7 +37,7 @@ class LocationAPIDataSource: LocationDataSource {
         return fetchLocation(address = newAddress, administrativeUnit = CITY)
     }
 
-    override suspend fun fetchCounty(address: Address): Location? {
+    private suspend fun fetchCounty(address: Address): Location? {
         address.subAdminArea ?: return null
         address.adminArea ?: return null
         address.countryName ?: return null
@@ -38,7 +47,7 @@ class LocationAPIDataSource: LocationDataSource {
         return fetchLocation(address = address, administrativeUnit = COUNTY)
     }
 
-    override suspend fun fetchState(address: Address): Location? {
+    private suspend fun fetchState(address: Address): Location? {
         address.adminArea ?: return null
         address.countryName ?: return null
         val stateAddressName = address.name()
@@ -47,7 +56,7 @@ class LocationAPIDataSource: LocationDataSource {
         return fetchLocation(address = address, administrativeUnit = STATE)
     }
 
-    override suspend fun fetchCountry(address: Address): Location? {
+    private suspend fun fetchCountry(address: Address): Location? {
         address.countryName ?: return null
         val countryAddressName = address.name()
         if (fetchingPlaces.contains(countryAddressName)) return null

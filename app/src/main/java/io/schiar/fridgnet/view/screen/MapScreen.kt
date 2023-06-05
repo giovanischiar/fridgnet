@@ -33,6 +33,7 @@ fun MapScreen(
                     description = "Zoom to fit",
                     enabled = !moveCamera
                 ) {
+                    viewModel.zoomToFitAllCities()
                     moveCamera = true
                 }
             }

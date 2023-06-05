@@ -26,8 +26,8 @@ fun HomeScreen(
         ScreenInfo(title = stringResource(id = R.string.home_screen))
     )
 
-    val imagesWithLocation by viewModel.imagesWithLocation.collectAsState()
-    val allLocationAddress by viewModel.allLocationAddress.collectAsState()
+    val cityNameImages by viewModel.cityNameImages.collectAsState()
+    val cityNameLocation by viewModel.cityNameLocation.collectAsState()
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -35,11 +35,11 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyVerticalGrid(columns = GridCells.Fixed(4)) {
-            imagesWithLocation.entries.map { (address, images) ->
+            cityNameImages.entries.map { (address, images) ->
                 item {
                     MapPhotoItem(
                         initialLocation = images[0].coordinate,
-                        location = allLocationAddress[address]
+                        location = cityNameLocation[address]
                     ) {
                         viewModel.selectImages(address)
                         onNavigateImage()

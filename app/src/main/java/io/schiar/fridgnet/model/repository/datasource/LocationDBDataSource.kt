@@ -14,34 +14,36 @@ import kotlinx.coroutines.withContext
 
 class LocationDBDataSource(locationDatabase: LocationDatabase): LocationDataSource {
     private var locationDAO = locationDatabase.locationDAO()
-    private var addressLocation: Map<Address, Location> = emptyMap()
 
-    suspend fun setup() {
-        coroutineScope {
-            launch {
-                withContext(Dispatchers.IO) { selectLocations() }.forEach { location ->
-                    addressLocation = addressLocation + (location.address to location)
-                }
+    suspend fun setup(onLoaded: (location: Location) -> Unit) = coroutineScope {
+        launch {
+            withContext(Dispatchers.IO) { selectLocations() }.forEach { location ->
+                onLoaded(location)
             }
         }
     }
 
-    fun insert(location: Location) {
-        addressLocation = addressLocation + (location.address to location)
-        insertLocation(location = location)
+    private fun selectLocations(): List<Location> {
+        return locationDAO.selectLocationsWithRegions().map { locationWithRegion ->
+            locationWithRegion.toLocation()
+        }
     }
 
-    fun selectLocationByAddress(address: Address): Location {
+    override suspend fun fetchLocationBy(address: Address): Location? {
+        return selectLocationByAddress(address = address)
+    }
+
+    fun selectLocationByAddress(address: Address): Location? {
         val (locality, subAdminArea, adminArea, countryName) = address
         return locationDAO.selectLocationWithRegionsByAddress(
             locality = locality,
             subAdminArea = subAdminArea,
             adminArea = adminArea,
             countryName = countryName
-        ).toLocation()
+        )?.toLocation()
     }
 
-    private fun insertLocation(location: Location) {
+    fun insert(location: Location) {
         val locationID = locationDAO.insert(locationEntity = location.toLocationEntity())
         insertRegions(locationID = locationID, regions = location.regions)
     }
@@ -76,25 +78,5 @@ class LocationDBDataSource(locationDatabase: LocationDatabase): LocationDataSour
     private fun insertCoordinates(coordinatesID: Long, coordinates: List<Coordinate>) {
         val coordinateEntities = coordinates.toCoordinateEntities(coordinatesID = coordinatesID)
         locationDAO.insertCoordinates(coordinateEntities)
-    }
-
-    private fun selectLocations(): List<Location> {
-        return locationDAO.selectLocationsWithRegions().map { it.toLocation() }
-    }
-
-    override suspend fun fetchCity(address: Address): Location? {
-        return addressLocation[address]
-    }
-
-    override suspend fun fetchCounty(address: Address): Location? {
-        return addressLocation[address]
-    }
-
-    override suspend fun fetchState(address: Address): Location? {
-        return addressLocation[address]
-    }
-
-    override suspend fun fetchCountry(address: Address): Location? {
-        return addressLocation[address]
     }
 }

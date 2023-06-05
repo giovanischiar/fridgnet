@@ -36,5 +36,5 @@ abstract class LocationDAO {
         subAdminArea: String?,
         adminArea: String?,
         countryName: String?
-    ): LocationWithRegions
+    ): LocationWithRegions?
 }
