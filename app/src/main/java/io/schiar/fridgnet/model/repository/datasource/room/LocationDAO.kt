@@ -26,10 +26,10 @@ abstract class LocationDAO {
 
     @Query(
         "SELECT * FROM Location WHERE " +
-        "Location.locality == :locality AND " +
-        "Location.subAdminArea == :subAdminArea AND " +
-        "Location.adminArea == :adminArea AND " +
-        "Location.countryName == :countryName "
+        "Location.locality is :locality AND " +
+        "Location.subAdminArea is :subAdminArea AND " +
+        "Location.adminArea is :adminArea AND " +
+        "Location.countryName is :countryName "
     )
     abstract fun selectLocationWithRegionsByAddress(
         locality: String?,
