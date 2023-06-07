@@ -155,16 +155,17 @@ class LocationAPIDataSource: LocationDataSource {
 
             "Polygon" -> {
                 val pointDoubleList = geoJson.coordinates as List<List<List<Double>>>
-                val regions = pointDoubleList.toPolygonCoordinates().map {
-                    val polygon = Polygon(coordinates = it)
-                    Region(
-                        polygon = polygon,
-                        holes = emptyList(),
-                        boundingBox = polygon.findBoundingBox(),
-                        zIndex = administrativeUnit.zIndex()
-                    )
-                }
-                regions
+                val polygonCoordinates = pointDoubleList.toPolygonCoordinates()
+                val polygon = Polygon(coordinates = polygonCoordinates[0])
+                val region = Region(
+                    polygon = polygon,
+                    holes = polygonCoordinates.subList(1, polygonCoordinates.size).map {
+                        Polygon(coordinates = it)
+                    },
+                    boundingBox = polygon.findBoundingBox(),
+                    zIndex = administrativeUnit.zIndex()
+                )
+                listOf(region)
             }
 
             "MultiPolygon" -> {
