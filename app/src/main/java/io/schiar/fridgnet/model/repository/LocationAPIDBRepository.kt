@@ -14,12 +14,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.*
 
 class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepository {
     override var allCitiesBoundingBox: BoundingBox? = null
-    private val regionLocation: MutableMap<Region, Location> = mutableMapOf()
-    private val cityAddressLocation: MutableMap<Address, Location> = mutableMapOf()
-    private var locationsBeingFetched: Set<Address> = mutableSetOf()
+    private val regionLocation: MutableMap<Region, Location> = Collections.synchronizedMap(
+        mutableMapOf()
+    )
+    private val cityAddressLocation: MutableMap<Address, Location> = Collections.synchronizedMap(
+        mutableMapOf()
+    )
+    private var locationsBeingFetched: Set<Address> = emptySet()
     private var addressLocation: Map<Address, Location> = emptyMap()
 
     private val locationAPIDataSource: LocationDataSource = LocationAPIDataSource()
