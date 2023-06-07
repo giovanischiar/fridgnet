@@ -119,20 +119,23 @@ class MainViewModel(private val locationRepository: LocationRepository): ViewMod
 
     fun selectRegion(regionViewData: RegionViewData) {
         val region = regionViewData.toRegion()
-        val location = locationRepository.locationFrom(region = region) ?: return
-        _currentLocation.update { location.toLocationViewData() }
+        locationRepository.selectNewLocationFrom(region = region)
+        updateCurrentLocation()
     }
 
     // PolygonsScreen
-    suspend fun switchRegions(regionsViewData: List<RegionViewData>) = coroutineScope {
-        if (regionsViewData.isEmpty()) return@coroutineScope
-        regionsViewData.forEach { regionViewData ->
-            val locationUpdated = withContext(Dispatchers.Default) {
-                locationRepository.switchRegion(region = regionViewData.toRegion())
-            } ?: return@coroutineScope
-            _currentLocation.update { locationUpdated.toLocationViewData() }
-            onLocationReady(location = locationUpdated)
-        }
+    suspend fun switchRegion(regionViewData: RegionViewData) {
+        locationRepository.switchRegion(region = regionViewData.toRegion())
+        updateCurrentLocation()
+    }
+
+    suspend fun switchAll() {
+        locationRepository.switchAll()
+        updateCurrentLocation()
+    }
+
+    private fun updateCurrentLocation() {
+        _currentLocation.update { locationRepository.currentLocation?.toLocationViewData() }
     }
 
     private fun onLocationReady(location: Location) {

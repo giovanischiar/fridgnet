@@ -1,12 +1,11 @@
 package io.schiar.fridgnet.model.repository.datasource
 
+import android.util.Log
 import io.schiar.fridgnet.model.*
 import io.schiar.fridgnet.model.repository.datasource.room.LocationDatabase
 import io.schiar.fridgnet.model.repository.datasource.room.entity.PolygonEntity
-import io.schiar.fridgnet.model.repository.datasource.util.toCoordinateEntities
-import io.schiar.fridgnet.model.repository.datasource.util.toLocation
-import io.schiar.fridgnet.model.repository.datasource.util.toLocationEntity
-import io.schiar.fridgnet.model.repository.datasource.util.toRegionEntity
+import io.schiar.fridgnet.model.repository.datasource.room.relationentity.RegionWithPolygonAndHoles
+import io.schiar.fridgnet.model.repository.datasource.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -46,6 +45,49 @@ class LocationDBDataSource(locationDatabase: LocationDatabase): LocationDataSour
     fun insert(location: Location) {
         val locationID = locationDAO.insert(locationEntity = location.toLocationEntity())
         insertRegions(locationID = locationID, regions = location.regions)
+    }
+
+    private fun update(location: Location): List<RegionWithPolygonAndHoles>? {
+        val (locality, subAdminArea, adminArea, countryName) = location.address
+        val locationWithRegions = synchronized(this) {
+            locationDAO.selectLocationWithRegionsByAddress(
+                locality = locality,
+                subAdminArea = subAdminArea,
+                adminArea = adminArea,
+                countryName = countryName
+            ) ?: return null
+        }
+        val locationEntity = locationWithRegions.locationEntity
+        locationDAO.update(locationEntity.boundingBoxUpdated(
+            southwestLatitude = location.boundingBox.southwest.latitude,
+            southwestLongitude = location.boundingBox.southwest.longitude,
+            northeastLatitude = location.boundingBox.northeast.latitude,
+            northeastLongitude = location.boundingBox.northeast.longitude
+        ))
+        return locationWithRegions.regions
+    }
+
+    fun updateLocationWithRegionSwitched(location: Location, region: Region) {
+        val regionsWithPolygonAndHoles = update(location = location) ?: return
+        val regionEntity = regionsWithPolygonAndHoles.find {
+            it.toRegion().polygon == region.polygon
+        }?.regionEntity ?: return
+        locationDAO.update(regionEntity = regionEntity.switch())
+    }
+
+    suspend fun updateLocationWithAllRegionsSwitched(location: Location) = coroutineScope {
+        val regionsWithPolygonAndHoles = update(location = location) ?: return@coroutineScope
+        val regionEntities = regionsWithPolygonAndHoles.sortedByDescending {
+            it.polygon.coordinates.size
+        }.map { it.regionEntity }
+
+        regionEntities.subList(1, regionEntities.size).forEach { regionEntity ->
+            launch(Dispatchers.IO) {
+                Log.d("LocationDBDataSource", "|${Thread.currentThread().name}|Updating Region")
+                locationDAO.update(regionEntity = regionEntity.switch())
+                Log.d("LocationDBDataSource", "|${Thread.currentThread().name}|Region Updated!")
+            }
+        }
     }
 
     private fun insertRegions(locationID: Long, regions: List<Region>) {

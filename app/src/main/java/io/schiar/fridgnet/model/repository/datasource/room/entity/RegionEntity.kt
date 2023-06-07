@@ -16,4 +16,16 @@ data class RegionEntity(
     @Embedded(prefix = "boundingBoxNortheast_")
     var boundingBoxNortheast: CoordinateEntity,
     val zIndex: Float
-)
+) {
+    fun switch(): RegionEntity {
+        return RegionEntity(
+            id = id,
+            regionsID = regionsID,
+            polygonID = polygonID,
+            active = !active,
+            boundingBoxNortheast = boundingBoxNortheast,
+            boundingBoxSouthwest = boundingBoxSouthwest,
+            zIndex = zIndex
+        )
+    }
+}

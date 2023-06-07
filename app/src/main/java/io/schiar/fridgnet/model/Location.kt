@@ -6,6 +6,18 @@ data class Location(
     val boundingBox: BoundingBox,
     val zIndex: Float
 ) {
+    fun switchAll(): Location {
+        return Location(
+            address = address,
+            regions = regions
+                .sortedBy { region -> region.polygon.coordinates.size }
+                .asReversed()
+                .mapIndexed { index, region -> if (index == 0) region else region.switch()
+            },
+            boundingBox = boundingBox,
+            zIndex = zIndex
+        ).updateBoundingBox()
+    }
     fun switch(region: Region): Location {
         val mutableRegions = regions.toMutableList()
         val index = regions.indexOf(region)

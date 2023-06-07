@@ -18,6 +18,7 @@ import java.util.*
 
 class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepository {
     override var allCitiesBoundingBox: BoundingBox? = null
+    override var currentLocation: Location? = null
     private val regionLocation: MutableMap<Region, Location> = Collections.synchronizedMap(
         mutableMapOf()
     )
@@ -31,6 +32,8 @@ class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepo
     private val locationDBDataSource: LocationDataSource = LocationDBDataSource(
         locationDatabase = locationDatabase
     )
+
+    private var onLocationReady: (location: Location) -> Unit = {}
 
     override suspend fun setup() {
         (locationDBDataSource as LocationDBDataSource).setup(onLoaded = ::onLoaded)
@@ -46,21 +49,38 @@ class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepo
         }
     }
 
-    override fun locationFrom(region: Region): Location? {
-        return regionLocation[region]
-    }
+    override fun selectNewLocationFrom(region: Region) { currentLocation = regionLocation[region] }
     override fun cityAddressNameLocation(): Map<String, Location> {
         return cityAddressLocation.mapKeys { it.key.name() }
     }
 
-    override suspend fun switchRegion(region: Region): Location? {
-        val location = regionLocation[region] ?: return null
+    override suspend fun switchAll() {
+        val currentLocation = this.currentLocation ?: return
+        val locationUpdated = currentLocation.switchAll()
+        with (regionLocation.iterator()) {
+            forEach { if (currentLocation.regions.contains(it.key)) remove() }
+        }
+        addRegionLocation(location = locationUpdated)
+        (locationDBDataSource as LocationDBDataSource).updateLocationWithAllRegionsSwitched(
+            location = locationUpdated
+        )
+        this.currentLocation = locationUpdated
+        onLocationReady(locationUpdated)
+    }
+
+    override suspend fun switchRegion(region: Region) {
+        val location = regionLocation[region] ?: return
         log(location.address, "Switching region")
         val locationUpdated = location.switch(region = region)
         addRegionLocation(location = locationUpdated)
         regionLocation.remove(region)
         regionLocation[region.switch()] = locationUpdated
-        return locationUpdated
+        (locationDBDataSource as LocationDBDataSource).updateLocationWithRegionSwitched(
+            location = locationUpdated,
+            region = region
+        )
+        currentLocation = locationUpdated
+        onLocationReady(locationUpdated)
     }
 
     private fun onLoaded(location: Location) {
@@ -68,7 +88,8 @@ class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepo
         addressLocation = addressLocation + (location.address to location)
     }
 
-    override suspend fun loadRegions(address: Address,  onLocationReady: (location: Location) -> Unit) {
+    override suspend fun loadRegions(address: Address, onLocationReady: (location: Location) -> Unit) {
+        this.onLocationReady = onLocationReady
         val administrativeUnitAddresses = address.allAddresses()
         administrativeUnitAddresses.forEach { administrativeUnitAddress ->
             val locationAlreadyBeingFetched = synchronized(lock = this) {

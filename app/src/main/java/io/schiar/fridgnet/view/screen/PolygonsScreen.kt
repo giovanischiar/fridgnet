@@ -32,15 +32,11 @@ fun PolygonsScreen(viewModel: MainViewModel, info: (screenInfo: ScreenInfo) -> U
     }.asReversed()
 
     fun switchAllOtherRegions() = runBlocking {
-        withContext(Dispatchers.IO) {
-            viewModel.switchRegions(regionsViewData = sortedRegions.subList(1, sortedRegions.size))
-        }
+        withContext(Dispatchers.IO) { viewModel.switchAll() }
     }
 
     fun switchRegion(regionViewData: RegionViewData) = runBlocking {
-        withContext(Dispatchers.IO) {
-            viewModel.switchRegions(regionsViewData = listOf(regionViewData))
-        }
+        withContext(Dispatchers.IO) { viewModel.switchRegion(regionViewData = regionViewData) }
     }
 
     info(

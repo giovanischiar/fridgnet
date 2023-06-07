@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
+import androidx.room.Update
 import io.schiar.fridgnet.model.repository.datasource.room.entity.*
 import io.schiar.fridgnet.model.repository.datasource.room.relationentity.LocationWithRegions
 
@@ -23,6 +24,12 @@ abstract class LocationDAO {
 
     @Query("SELECT * FROM Location")
     abstract fun selectLocationsWithRegions(): List<LocationWithRegions>
+
+    @Update
+    abstract fun update(locationEntity: LocationEntity)
+
+    @Update
+    abstract fun update(regionEntity: RegionEntity)
 
     @Query(
         "SELECT * FROM Location WHERE " +

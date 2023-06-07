@@ -32,6 +32,20 @@ fun Location.toLocationEntity(): LocationEntity {
     )
 }
 
+fun Location.toLocationEntity(locationID: Long): LocationEntity {
+    return LocationEntity(
+        id = locationID,
+        locality = address.locality,
+        subAdminArea = address.subAdminArea,
+        adminArea = address.adminArea,
+        countryName = address.countryName,
+        administrativeUnit = address.administrativeUnit.toString(),
+        boundingBoxSouthwest = boundingBox.southwest.toCoordinateEntity(),
+        boundingBoxNortheast = boundingBox.northeast.toCoordinateEntity(),
+        zIndex = zIndex
+    )
+}
+
 fun Region.toRegionEntity(regionsID: Long, polygonID: Long): RegionEntity {
     return RegionEntity(
         regionsID = regionsID,
