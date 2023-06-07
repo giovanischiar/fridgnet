@@ -81,8 +81,7 @@ fun PolygonsScreen(viewModel: MainViewModel, info: (screenInfo: ScreenInfo) -> U
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(0.75f),
-                        region = sortedRegions[0],
-                        onRegionCheckedChange = ::switchRegion
+                        region = sortedRegions[0]
                     )
 
                     MapPolygon(
@@ -101,8 +100,7 @@ fun PolygonsScreen(viewModel: MainViewModel, info: (screenInfo: ScreenInfo) -> U
                         modifier = Modifier
                             .fillMaxWidth()
                             .weight(0.75f),
-                        region = sortedRegions[0],
-                        onRegionCheckedChange = ::switchRegion
+                        region = sortedRegions[0]
                     )
 
                     Row(
