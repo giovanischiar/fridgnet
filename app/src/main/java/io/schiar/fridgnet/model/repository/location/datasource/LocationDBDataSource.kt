@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.model.repository.location.datasource
 
-import android.util.Log
+import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.*
 import io.schiar.fridgnet.model.repository.location.datasource.room.LocationDatabase
 import io.schiar.fridgnet.model.repository.location.datasource.room.entity.PolygonEntity

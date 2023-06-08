@@ -9,7 +9,7 @@ import kotlinx.coroutines.launch
 class AddressGeocoderRepository(private val dataSource: AddressDataSource): AddressRepository {
     override suspend fun getAddressFrom(
         coordinate: Coordinate,
-        onReady: (address: Address) -> Unit)
+        onReady: suspend (address: Address) -> Unit)
     {
         coroutineScope {
             launch(Dispatchers.IO) {

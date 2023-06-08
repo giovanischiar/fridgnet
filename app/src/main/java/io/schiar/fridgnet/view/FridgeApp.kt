@@ -29,7 +29,7 @@ import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether
 import io.schiar.fridgnet.viewmodel.MainViewModel
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -171,15 +171,12 @@ fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = remem
         }
     }
 
-    fun onPhotoReady(uri: String, date: Long, latitude: Double, longitude: Double) = runBlocking {
-        viewModel.addImage(
-            uri = uri,
-            date = date,
-            latitude = latitude,
-            longitude = longitude
-        )
+    val coroutineScope = rememberCoroutineScope()
+
+    fun onURIsReady(uris: List<String>) {
+        coroutineScope.launch { viewModel.addURIs(uris = uris) }
         photoPickerShowing = false
     }
 
-    if (photoPickerShowing) { PhotoPicker(onPhotosPicked = ::onPhotoReady) }
+    if (photoPickerShowing) { PhotoPicker { uris -> onURIsReady(uris = uris) } }
 }

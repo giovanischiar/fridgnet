@@ -8,6 +8,9 @@ import androidx.lifecycle.ViewModelProvider
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderDataSource
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderRepository
 import io.schiar.fridgnet.model.repository.address.AddressRepository
+import io.schiar.fridgnet.model.repository.image.ImageAndroidDataSource
+import io.schiar.fridgnet.model.repository.image.ImageRepository
+import io.schiar.fridgnet.model.repository.image.ImageURIRepository
 import io.schiar.fridgnet.model.repository.location.LocationAPIDBRepository
 import io.schiar.fridgnet.model.repository.location.LocationRepository
 import io.schiar.fridgnet.model.repository.location.datasource.room.LocationDatabase
@@ -19,9 +22,11 @@ import java.util.*
 class MainActivity: ComponentActivity() {
     override fun onCreate(saveBundleInstance: Bundle?) {
         super.onCreate(saveBundleInstance)
+        Log.fromAndroid = true
         val viewModelProvider = ViewModelProvider(this, MainViewModelFactory(
                 locationRepository = createLocationRepository(),
-                addressRepository = createAddressRepository()
+                addressRepository = createAddressRepository(),
+                imageRepository = createImageRepository()
             )
         )
         val viewModel = viewModelProvider[MainViewModel::class.java]
@@ -40,6 +45,13 @@ class MainActivity: ComponentActivity() {
         val geocoder = Geocoder(applicationContext, Locale.US)
         return AddressGeocoderRepository(
             dataSource = AddressGeocoderDataSource(geocoder = geocoder)
+        )
+    }
+
+    private fun createImageRepository(): ImageRepository {
+        val contentResolver = applicationContext.contentResolver
+        return ImageURIRepository(
+            dataSource = ImageAndroidDataSource(contentResolver = contentResolver)
         )
     }
 }

@@ -10,17 +10,17 @@ import android.location.Address as AndroidAddress
 class AddressGeocoderDataSource(private val geocoder: Geocoder): AddressDataSource {
     override fun convertToAddress(coordinate: Coordinate): Address? {
         val (latitude, longitude) = coordinate
-        Log.d("AddressGeocoderDataSource", "Getting address for ($latitude, $longitude)")
+        Log.d("Add Image Feature", "Getting address for ($latitude, $longitude)")
         val androidAddress = getAndroidAddress(latitude = latitude, longitude = longitude)
         val address = androidAddress?.toModelAddress()
         if (address != null) {
             Log.d(
-                "AddressGeocoderDataSource",
+                "Add Image Feature",
                 "($latitude, $longitude) is ${address.name()}"
             )
         } else {
             Log.d(
-                "AddressGeocoderDataSource",
+                "Add Image Feature",
                 "Couldn't find address of ($latitude, $longitude) }"
             )
         }
@@ -40,7 +40,7 @@ class AddressGeocoderDataSource(private val geocoder: Geocoder): AddressDataSour
                 return androidAddresses?.firstOrNull()
             } catch (e: Exception) {
                 Log.d(
-                    "AddressGeocoderDataSource",
+                    "Add Image Feature",
                     "Error fetching address $e tries: $tries"
                 )
                 tries++

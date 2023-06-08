@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.model.repository.location
 
-import android.util.Log
+import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.AdministrativeUnit.CITY
 import io.schiar.fridgnet.model.BoundingBox
@@ -40,7 +40,7 @@ class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepo
     }
 
     private fun log(address: Address, msg: String) {
-        Log.d("LocationRepository", "${Thread.currentThread().name}|${address.name()}|$msg")
+        Log.d("Add Regions Feature", "Fetching ${address.name()}: $msg")
     }
 
     override fun regionsThatIntersect(boundingBox: BoundingBox): List<Region> {

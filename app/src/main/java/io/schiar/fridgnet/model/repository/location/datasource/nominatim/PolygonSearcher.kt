@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.model.repository.location.datasource.nominatim
 
-import android.util.Log
+import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Address
 import retrofit2.Response
 
