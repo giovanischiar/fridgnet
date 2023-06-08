@@ -5,6 +5,8 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
+import io.schiar.fridgnet.model.repository.MainRepository
+import io.schiar.fridgnet.model.repository.Repository
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderDataSource
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderRepository
 import io.schiar.fridgnet.model.repository.address.AddressRepository
@@ -24,16 +26,21 @@ class MainActivity: ComponentActivity() {
         super.onCreate(saveBundleInstance)
         Log.fromAndroid = true
         val viewModelProvider = ViewModelProvider(this, MainViewModelFactory(
-                locationRepository = createLocationRepository(),
-                addressRepository = createAddressRepository(),
-                imageRepository = createImageRepository()
-            )
-        )
+            repository = createRepository()
+        ))
         val viewModel = viewModelProvider[MainViewModel::class.java]
 
         setContent {
             FridgeApp(viewModel = viewModel)
         }
+    }
+
+    private fun createRepository(): Repository {
+        return MainRepository(
+            locationRepository = createLocationRepository(),
+            addressRepository = createAddressRepository(),
+            imageRepository = createImageRepository()
+        )
     }
 
     private fun createLocationRepository(): LocationRepository {
