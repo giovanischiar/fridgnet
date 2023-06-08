@@ -19,13 +19,13 @@ import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.MapPolygon
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.viewdata.RegionViewData
-import io.schiar.fridgnet.viewmodel.MainViewModel
+import io.schiar.fridgnet.viewmodel.MapViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 
 @Composable
-fun PolygonsScreen(viewModel: MainViewModel, info: (screenInfo: ScreenInfo) -> Unit) {
+fun PolygonsScreen(viewModel: MapViewModel, info: (screenInfo: ScreenInfo) -> Unit) {
     val location by viewModel.currentLocation.collectAsState()
     val sortedRegions = (location ?: return).regions.sortedBy {
         it.polygon.coordinates.size

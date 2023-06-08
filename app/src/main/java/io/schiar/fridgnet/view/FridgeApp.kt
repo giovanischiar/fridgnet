@@ -27,23 +27,30 @@ import io.schiar.fridgnet.view.screen.PolygonsScreen
 import io.schiar.fridgnet.view.util.BottomNavScreen
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether
+import io.schiar.fridgnet.viewmodel.HomeViewModel
 import io.schiar.fridgnet.viewmodel.MainViewModel
+import io.schiar.fridgnet.viewmodel.MapViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = rememberNavController()) {
+fun FridgeApp(
+    mainViewModel: MainViewModel,
+    homeViewModel: HomeViewModel,
+    mapViewModel: MapViewModel,
+    navController: NavHostController = rememberNavController()
+) {
     val items = listOf(BottomNavScreen.Home, BottomNavScreen.Map)
 
     var currentScreenInfo by remember { mutableStateOf(ScreenInfo(BottomNavScreen.Home.route)) }
     var photoPickerShowing by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) { viewModel.loadDatabase() }
+    LaunchedEffect(Unit) { mainViewModel.loadDatabase() }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        viewModel.databaseLoaded.collectLatest {
+        mainViewModel.databaseLoaded.collectLatest {
             if (it) { snackbarHostState.showSnackbar(message = "Database Loaded!") }
         }
     }
@@ -141,7 +148,7 @@ fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = remem
         ) {
             composable(route = BottomNavScreen.Home.route) {
                 HomeScreen(
-                    viewModel = viewModel,
+                    viewModel = homeViewModel,
                     onNavigateImage = { navController.navigate("Photos") },
                     info = { screenInfo ->  currentScreenInfo = screenInfo }
                 )
@@ -149,7 +156,7 @@ fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = remem
 
             composable(route = BottomNavScreen.Map.route) {
                 MapScreen(
-                    viewModel = viewModel,
+                    viewModel = mapViewModel,
                     onNavigatePolygons = { navController.navigate("Polygons") },
                     info = { screenInfo ->  currentScreenInfo = screenInfo }
                 )
@@ -157,14 +164,14 @@ fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = remem
 
             composable(route = "Photos") {
                 PhotosScreen(
-                    viewModel = viewModel,
+                    viewModel = homeViewModel,
                     info = { screenInfo ->  currentScreenInfo = screenInfo }
                 )
             }
 
             composable(route = "Polygons") {
                 PolygonsScreen(
-                    viewModel = viewModel,
+                    viewModel = mapViewModel,
                     info = { screenInfo ->  currentScreenInfo = screenInfo }
                 )
             }
@@ -174,7 +181,7 @@ fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = remem
     val coroutineScope = rememberCoroutineScope()
 
     fun onURIsReady(uris: List<String>) {
-        coroutineScope.launch { viewModel.addURIs(uris = uris) }
+        coroutineScope.launch { mainViewModel.addURIs(uris = uris) }
         photoPickerShowing = false
     }
 

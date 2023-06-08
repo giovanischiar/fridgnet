@@ -17,21 +17,29 @@ import io.schiar.fridgnet.model.repository.location.LocationAPIDBRepository
 import io.schiar.fridgnet.model.repository.location.LocationRepository
 import io.schiar.fridgnet.model.repository.location.datasource.room.LocationDatabase
 import io.schiar.fridgnet.view.FridgeApp
+import io.schiar.fridgnet.viewmodel.HomeViewModel
 import io.schiar.fridgnet.viewmodel.MainViewModel
-import io.schiar.fridgnet.viewmodel.util.MainViewModelFactory
+import io.schiar.fridgnet.viewmodel.MapViewModel
+import io.schiar.fridgnet.viewmodel.util.ViewModelFactory
 import java.util.*
 
 class MainActivity: ComponentActivity() {
     override fun onCreate(saveBundleInstance: Bundle?) {
         super.onCreate(saveBundleInstance)
         Log.fromAndroid = true
-        val viewModelProvider = ViewModelProvider(this, MainViewModelFactory(
+        val viewModelProvider = ViewModelProvider(this, ViewModelFactory(
             repository = createRepository()
         ))
-        val viewModel = viewModelProvider[MainViewModel::class.java]
+        val mainViewModel = viewModelProvider[MainViewModel::class.java]
+        val homeViewModel = viewModelProvider[HomeViewModel::class.java]
+        val mapViewModel = viewModelProvider[MapViewModel::class.java]
 
         setContent {
-            FridgeApp(viewModel = viewModel)
+            FridgeApp(
+                mainViewModel = mainViewModel,
+                homeViewModel = homeViewModel,
+                mapViewModel = mapViewModel
+            )
         }
     }
 

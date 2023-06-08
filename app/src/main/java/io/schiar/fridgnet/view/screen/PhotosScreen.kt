@@ -5,11 +5,11 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import io.schiar.fridgnet.view.component.PhotoGrid
 import io.schiar.fridgnet.view.util.ScreenInfo
-import io.schiar.fridgnet.viewmodel.MainViewModel
+import io.schiar.fridgnet.viewmodel.HomeViewModel
 
 @Composable
 fun PhotosScreen(
-    viewModel: MainViewModel,
+    viewModel: HomeViewModel,
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
     val selectedImages by viewModel.selectedImages.collectAsState()

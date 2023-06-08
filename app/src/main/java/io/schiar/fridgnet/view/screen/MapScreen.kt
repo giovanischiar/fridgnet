@@ -11,11 +11,11 @@ import io.schiar.fridgnet.view.component.Map
 import io.schiar.fridgnet.view.component.TopAppBarActionButton
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.toBoundingBoxViewData
-import io.schiar.fridgnet.viewmodel.MainViewModel
+import io.schiar.fridgnet.viewmodel.MapViewModel
 
 @Composable
 fun MapScreen(
-    viewModel: MainViewModel,
+    viewModel: MapViewModel,
     onNavigatePolygons: () -> Unit,
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
