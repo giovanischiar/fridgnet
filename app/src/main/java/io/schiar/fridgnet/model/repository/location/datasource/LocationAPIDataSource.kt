@@ -6,7 +6,7 @@ import io.schiar.fridgnet.model.AdministrativeUnit.*
 import io.schiar.fridgnet.model.repository.location.datasource.nominatim.GeoJson
 import io.schiar.fridgnet.model.repository.location.datasource.nominatim.GeoJsonAttributes
 import io.schiar.fridgnet.model.repository.location.datasource.nominatim.PolygonSearcher
-import io.schiar.fridgnet.viewmodel.util.*
+import io.schiar.fridgnet.model.repository.location.datasource.util.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex

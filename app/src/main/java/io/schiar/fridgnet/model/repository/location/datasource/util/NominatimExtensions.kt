@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.viewmodel.util
+package io.schiar.fridgnet.model.repository.location.datasource.util
 
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Coordinate
