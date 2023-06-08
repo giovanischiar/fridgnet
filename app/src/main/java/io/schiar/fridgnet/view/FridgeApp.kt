@@ -8,7 +8,6 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -20,25 +19,21 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.schiar.fridgnet.R
+import io.schiar.fridgnet.view.component.PhotoPicker
 import io.schiar.fridgnet.view.screen.HomeScreen
 import io.schiar.fridgnet.view.screen.MapScreen
 import io.schiar.fridgnet.view.screen.PhotosScreen
 import io.schiar.fridgnet.view.screen.PolygonsScreen
-import io.schiar.fridgnet.view.util.AddressCreator
 import io.schiar.fridgnet.view.util.BottomNavScreen
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether
 import io.schiar.fridgnet.viewmodel.MainViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.runBlocking
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = rememberNavController()) {
-    val coroutineScope = rememberCoroutineScope()
-    val context = LocalContext.current
     val items = listOf(BottomNavScreen.Home, BottomNavScreen.Map)
 
     var currentScreenInfo by remember { mutableStateOf(ScreenInfo(BottomNavScreen.Home.route)) }
@@ -176,34 +171,15 @@ fun FridgeApp(viewModel: MainViewModel, navController: NavHostController = remem
         }
     }
 
-    if (photoPickerShowing) {
-        PhotoPicker { uri, date, latitude, longitude ->
-            viewModel.addImage(
-                uri = uri,
-                date = date,
-                latitude = latitude,
-                longitude = longitude
-            )
-
-            coroutineScope.launch(Dispatchers.IO) {
-                val address = withContext(Dispatchers.Default) {
-                    AddressCreator().addressFromLocation(
-                        context = context,
-                        latitude = latitude,
-                        longitude = longitude
-                    )
-                }
-
-                viewModel.addAddressToImage(
-                    uri = uri,
-                    locality = address.locality,
-                    subAdminArea = address.subAdminArea,
-                    adminArea = address.adminArea,
-                    countryName = address.countryName
-                )
-            }
-
-            photoPickerShowing = false
-        }
+    fun onPhotoReady(uri: String, date: Long, latitude: Double, longitude: Double) = runBlocking {
+        viewModel.addImage(
+            uri = uri,
+            date = date,
+            latitude = latitude,
+            longitude = longitude
+        )
+        photoPickerShowing = false
     }
+
+    if (photoPickerShowing) { PhotoPicker(onPhotosPicked = ::onPhotoReady) }
 }

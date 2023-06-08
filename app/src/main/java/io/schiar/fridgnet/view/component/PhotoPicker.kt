@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view
+package io.schiar.fridgnet.view.component
 
 import android.annotation.SuppressLint
 import androidx.activity.compose.rememberLauncherForActivityResult

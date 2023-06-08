@@ -1,9 +1,9 @@
 package io.schiar.fridgnet.viewmodel
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import io.schiar.fridgnet.model.*
-import io.schiar.fridgnet.model.repository.LocationRepository
+import io.schiar.fridgnet.model.repository.address.AddressRepository
+import io.schiar.fridgnet.model.repository.location.LocationRepository
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import io.schiar.fridgnet.view.viewdata.LocationViewData
@@ -15,11 +15,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
+import java.util.*
 
-class MainViewModel(private val locationRepository: LocationRepository): ViewModel() {
+class MainViewModel(
+    private val locationRepository: LocationRepository,
+    private val addressRepository: AddressRepository
+): ViewModel() {
     // MapScreen
-    private var _images: Map<String, Image> = emptyMap()
+    private val _images: MutableMap<String, Image> = Collections.synchronizedMap(mutableMapOf())
 
     private val _visibleImages = MutableStateFlow(value = _images.toImageViewData())
     val visibleImages: StateFlow<List<ImageViewData>> = _visibleImages.asStateFlow()
@@ -65,31 +70,25 @@ class MainViewModel(private val locationRepository: LocationRepository): ViewMod
         _databaseLoaded.update { true }
     }
 
-    fun addImage(uri: String, date: Long, latitude: Double, longitude: Double) {
-        val newCoordinate = Coordinate(latitude = latitude, longitude = longitude)
-        val newImage = Image(uri = uri, date = date, coordinate = newCoordinate)
-        _images = _images + (uri to newImage)
+    suspend fun addImage(uri: String, date: Long, latitude: Double, longitude: Double) {
+        val coordinate = Coordinate(latitude = latitude, longitude = longitude)
+        _images[uri] = Image(uri = uri, date = date, coordinate = coordinate)
+        addressRepository.getAddressFrom(
+            coordinate = coordinate,
+            onReady = { onAddressReady(uri = uri, address = it) }
+        )
     }
 
-    suspend fun addAddressToImage(
-        uri: String,
-        locality: String?,
-        subAdminArea: String?,
-        adminArea: String?,
-        countryName: String?
-    ) {
-        val address = Address(
-            locality = locality,
-            subAdminArea = subAdminArea,
-            adminArea = adminArea,
-            countryName = countryName
-        )
+    private fun onAddressReady(uri: String, address: Address) = runBlocking {
+        addAddressToImage(uri = uri, address = address)
+        locationRepository.loadRegions(address = address, ::onLocationReady)
+    }
+
+    private fun addAddressToImage(uri: String, address: Address) {
         val image = _images[uri] ?: return
         val images = _addressImages.getOrDefault(address.name(), listOf()) + image
         _addressImages = _addressImages + (address.name() to images)
         _cityNameImages.update { _addressImages.toStringImageViewDataList() }
-        Log.d("MainViewModel", "${Thread.currentThread().name}|${address.name()}|loading regions")
-        locationRepository.loadRegions(address = address, ::onLocationReady)
     }
 
     // HomeScreen
