@@ -18,12 +18,12 @@ import io.schiar.fridgnet.view.viewdata.LocationViewData
 
 @Composable
 fun MapPhotoItem(
-    initialLocation: CoordinateViewData,
+    initialCoordinate: CoordinateViewData,
     location: LocationViewData?,
     onMapClick: (latLng: LatLng) -> Unit
 ) {
     val cameraPositionState = rememberCameraPositionState {
-        position = CameraPosition.fromLatLngZoom(initialLocation.toLatLng(), 10f)
+        position = CameraPosition.fromLatLngZoom(initialCoordinate.toLatLng(), 10f)
     }
     var mapLoaded by remember { mutableStateOf(value = false) }
 

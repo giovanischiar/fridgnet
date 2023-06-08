@@ -15,11 +15,30 @@ class MainRepository(
     private val addressRepository: AddressRepository,
     private val imageRepository: ImageRepository
 ) : Repository {
+    private var onAddressOnImageAdded: () -> Unit = {}
+    private var onLocationReady: () -> Unit = {}
+    private val locationAddress: MutableMap<Address, Location> =
+        Collections.synchronizedMap(mutableMapOf())
 
-    private var onAddressOnImageAdded: (address: String, images: List<Image>) -> Unit = { _, _ ->
-    }
-    private var onLocationReady: (location: Location) -> Unit = {}
-    private val addressImages: MutableMap<String, List<Image>> = Collections.synchronizedMap(
+    private val nameAddress: MutableMap<String, Address> = Collections.synchronizedMap(
+        mutableMapOf()
+    )
+
+    private var currentAdministrativeUnit = AdministrativeUnit.CITY
+
+    private var cityImages: MutableMap<Address, List<Image>> = Collections.synchronizedMap(
+        mutableMapOf()
+    )
+
+    private var countyImages: MutableMap<Address, List<Image>> = Collections.synchronizedMap(
+        mutableMapOf()
+    )
+
+    private var stateImages: MutableMap<Address, List<Image>> = Collections.synchronizedMap(
+        mutableMapOf()
+    )
+
+    private var countryImages: MutableMap<Address, List<Image>> = Collections.synchronizedMap(
         mutableMapOf()
     )
 
@@ -32,11 +51,11 @@ class MainRepository(
         imageRepository.addImages(uris = uris, onReady = ::onImageAdded)
     }
 
-    override fun subscribeForAddressImageAdded(callback: (address: String, images: List<Image>) -> Unit) {
+    override fun subscribeForAddressImageAdded(callback: () -> Unit) {
         onAddressOnImageAdded = callback
     }
 
-    override fun subscribeForLocationsReady(callback: (location: Location) -> Unit) {
+    override fun subscribeForLocationsReady(callback: () -> Unit) {
         onLocationReady = callback
     }
 
@@ -57,7 +76,28 @@ class MainRepository(
     }
 
     override fun selectImagesFrom(addressName: String): List<Image>? {
-        return addressImages[addressName]
+        return when (currentAdministrativeUnit) {
+            AdministrativeUnit.CITY -> cityImages[nameAddress[addressName]]
+            AdministrativeUnit.COUNTY -> countyImages[nameAddress[addressName]]
+            AdministrativeUnit.STATE -> stateImages[nameAddress[addressName]]
+            AdministrativeUnit.COUNTRY -> stateImages[nameAddress[addressName]]
+        }
+    }
+
+    override fun locationImages(): List<AddressLocationImages> {
+        Log.d("Add Image Feature", "Updating Location Images")
+        return when (currentAdministrativeUnit) {
+            AdministrativeUnit.CITY -> cityImages
+            AdministrativeUnit.COUNTY -> countyImages
+            AdministrativeUnit.STATE -> stateImages
+            AdministrativeUnit.COUNTRY -> countryImages
+        }.map { (address, images) ->
+            AddressLocationImages(
+                address = address,
+                location = locationAddress[address],
+                initialCoordinate = images[0].coordinate
+            )
+        }
     }
 
     override suspend fun switchRegion(
@@ -87,13 +127,47 @@ class MainRepository(
     private suspend fun onAddressReady(image: Image, address: Address) {
         addAddressToImage(image = image, address = address)
         locationRepository.loadRegions(address = address) { location ->
-            onLocationReady(location)
+            addLocationToAddress(location = location)
+            onLocationReady()
         }
     }
 
-    private fun addAddressToImage(image: Image, address: Address) {
-        val images = addressImages.getOrDefault(address.name(), listOf()) + image
-        addressImages[address.name()] = images
-        onAddressOnImageAdded(address.name(), images)
+    private fun addLocationToAddress(location: Location) {
+        Log.d("Add Image Feature", "add ${location.address} to $location")
+        locationAddress[location.address] = location
+    }
+
+    private fun addAddressToImage(address: Address, image: Image) {
+        Log.d("Add Image Feature", "add $image to $address")
+        val images = addImagesToEachAddress(address = address, image = image)
+        if (images.size == 1 && address.administrativeUnit == currentAdministrativeUnit) {
+            nameAddress[address.name()] = address
+            onAddressOnImageAdded()
+        }
+    }
+
+    private fun addImagesToEachAddress(address: Address, image: Image): List<Image> {
+        return when (address.administrativeUnit) {
+            AdministrativeUnit.CITY -> {
+                val images = cityImages.getOrDefault(address, listOf()) + image
+                cityImages[address] = images
+                images
+            }
+            AdministrativeUnit.COUNTY -> {
+                val images = countyImages.getOrDefault(address, listOf()) + image
+                countyImages[address] = images
+                images
+            }
+            AdministrativeUnit.STATE -> {
+                val images = stateImages.getOrDefault(address, listOf()) + image
+                stateImages.getOrDefault(address, listOf()) + image
+                images
+            }
+            AdministrativeUnit.COUNTRY -> {
+                val images = countryImages.getOrDefault(address, listOf()) + image
+                countryImages.getOrDefault(address, listOf()) + image
+                images
+            }
+        }
     }
 }

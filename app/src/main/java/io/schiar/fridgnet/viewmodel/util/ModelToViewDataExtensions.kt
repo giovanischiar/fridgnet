@@ -70,59 +70,16 @@ fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
     return map { it.toRegionViewData() }
 }
 
-// view.util.AddressCreator
-fun android.location.Address.toAddress(): Address {
-    return Address(
-        locality = locality,
-        subAdminArea = subAdminArea,
-        adminArea = adminArea,
-        countryName = countryName
+// AddressLocationImages
+fun AddressLocationImages.toAddressLocationImagesViewData(): AddressLocationImagesViewData {
+    return AddressLocationImagesViewData(
+        addressName = address.name(),
+        location = location?.toLocationViewData(),
+        initialCoordinate = initialCoordinate.toCoordinateViewData()
     )
 }
 
-//view.viewdata.CoordinateViewData
-fun CoordinateViewData.toCoordinate(): Coordinate {
-    return Coordinate(latitude = latitude, longitude = longitude)
-}
-
-fun List<CoordinateViewData>.toCoordinateList(): List<Coordinate> {
-    return map { it.toCoordinate() }
-}
-
-// view.viewdata.BoundingBoxViewData
-fun BoundingBoxViewData.toBoundingBox(): BoundingBox {
-    return BoundingBox(southwest = southwest.toCoordinate(), northeast = northeast.toCoordinate())
-}
-
-// view.viewdata.PolygonViewData
-fun PolygonViewData.toPolygon(): Polygon {
-    return Polygon(coordinates = coordinates.toCoordinateList())
-}
-
-fun List<PolygonViewData>.toPolygonList(): List<Polygon> {
-    return map { it.toPolygon() }
-}
-
-// view.viewdata.RegionViewData
-fun RegionViewData.toRegion(): Region {
-    return Region(
-        polygon = polygon.toPolygon(),
-        holes = holes.toPolygonList(),
-        active = active,
-        boundingBox = boundingBox.toBoundingBox(),
-        zIndex = zIndex
-    )
-}
-
-// view
-fun Map<String, Image>.toImageViewData(): List<ImageViewData> {
-    return values.toList().toImageViewDataList()
-}
-
-fun Map<String, List<Image>>.toStringImageViewDataList(): Map<String, List<ImageViewData>> {
-    return mapValues { it.value.toImageViewDataList() }
-}
-
-fun Map<String, Location>.toStringLocationViewData(): Map<String, LocationViewData> {
-    return mapValues { it.value.toLocationViewData() }
+fun List<AddressLocationImages>.toAddressLocationImagesViewDataList()
+        : List<AddressLocationImagesViewData> {
+    return map { it.toAddressLocationImagesViewData() }
 }

@@ -1,14 +1,9 @@
 package io.schiar.fridgnet.viewmodel
 
 import androidx.lifecycle.ViewModel
-import io.schiar.fridgnet.model.AdministrativeUnit
-import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.repository.Repository
-import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
-import io.schiar.fridgnet.view.viewdata.ImageViewData
-import io.schiar.fridgnet.view.viewdata.LocationViewData
-import io.schiar.fridgnet.view.viewdata.RegionViewData
+import io.schiar.fridgnet.view.viewdata.*
 import io.schiar.fridgnet.viewmodel.util.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,16 +26,9 @@ class MainViewModel(private val repository: Repository): ViewModel() {
     val selectedImages: StateFlow<Pair<String, List<ImageViewData>>> = _selectedImages.asStateFlow()
 
     // HomeScreen
-    private val _cityNameImages = MutableStateFlow<Map<String, List<ImageViewData>>>(
-        value = emptyMap()
-    )
-    val cityNameImages: StateFlow<Map<String, List<ImageViewData>>> =
-        _cityNameImages.asStateFlow()
-
-    private val _cityNameLocation = MutableStateFlow<Map<String, LocationViewData>>(
-        value = emptyMap()
-    )
-    val cityNameLocation: StateFlow<Map<String, LocationViewData>> = _cityNameLocation.asStateFlow()
+    private val _addressLocationImages = MutableStateFlow<List<AddressLocationImagesViewData>>(emptyList())
+    val addressLocationImages: StateFlow<List<AddressLocationImagesViewData>> =
+        _addressLocationImages.asStateFlow()
 
     // PolygonsScreen
     private val _currentLocation = MutableStateFlow<LocationViewData?>(null)
@@ -63,13 +51,9 @@ class MainViewModel(private val repository: Repository): ViewModel() {
     }
 
     suspend fun addURIs(uris: List<String>) {
-        repository.subscribeForAddressImageAdded(callback = ::onAddressAddedOnImage)
+        repository.subscribeForAddressImageAdded(callback = ::onAddressReady)
         repository.subscribeForLocationsReady(callback = ::onLocationReady)
         repository.addURIs(uris = uris)
-    }
-
-    private fun onAddressAddedOnImage(address: String, images: List<Image>) {
-        _cityNameImages.update { it + (address to images.toImageViewDataList()) }
     }
 
     // HomeScreen
@@ -114,11 +98,15 @@ class MainViewModel(private val repository: Repository): ViewModel() {
         _currentLocation.update { location?.toLocationViewData() }
     }
 
-    private fun onLocationReady(location: Location) {
-        if (location.address.administrativeUnit == AdministrativeUnit.CITY) {
-            _cityNameLocation.update {
-                it + (location.address.name() to location.toLocationViewData())
-            }
+    private fun onAddressReady() {
+        _addressLocationImages.update {
+            repository.locationImages().toAddressLocationImagesViewDataList()
+        }
+    }
+
+    private fun onLocationReady() {
+        _addressLocationImages.update {
+            repository.locationImages().toAddressLocationImagesViewDataList()
         }
     }
 }
