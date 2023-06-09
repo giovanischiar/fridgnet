@@ -1,11 +1,9 @@
 package io.schiar.fridgnet.viewmodel
 
 import androidx.lifecycle.ViewModel
-import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.repository.Repository
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
-import io.schiar.fridgnet.view.viewdata.LocationViewData
 import io.schiar.fridgnet.view.viewdata.RegionViewData
 import io.schiar.fridgnet.viewmodel.util.*
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +12,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 class MapViewModel(private val repository: Repository): ViewModel() {
-    // MapScreen
     private val _visibleImages = MutableStateFlow<List<ImageViewData>>(value = emptyList())
     val visibleImages: StateFlow<List<ImageViewData>> = _visibleImages.asStateFlow()
 
@@ -22,16 +19,12 @@ class MapViewModel(private val repository: Repository): ViewModel() {
             = MutableStateFlow(emptyList())
     val visibleRegions: StateFlow<List<RegionViewData>> = _visibleRegions.asStateFlow()
 
-    // PolygonsScreen
-    private val _currentLocation = MutableStateFlow<LocationViewData?>(null)
-    val currentLocation: StateFlow<LocationViewData?> = _currentLocation.asStateFlow()
-
     private var _allPhotosBoundingBox = MutableStateFlow<BoundingBoxViewData?>(value = null)
     val allPhotosBoundingBox: StateFlow<BoundingBoxViewData?> = _allPhotosBoundingBox
 
     fun selectRegion(regionViewData: RegionViewData) {
         val region = regionViewData.toRegion()
-        updateCurrentLocation(location = repository.selectNewLocationFrom(region = region))
+        repository.selectNewLocationFrom(region = region)
     }
 
     fun visibleAreaChanged(boundingBoxViewData: BoundingBoxViewData) {
@@ -47,20 +40,5 @@ class MapViewModel(private val repository: Repository): ViewModel() {
 
     fun zoomToFitAllCities() {
         _allPhotosBoundingBox.update { repository.boundingBoxCities()?.toBoundingBoxViewData() }
-    }
-
-    suspend fun switchRegion(regionViewData: RegionViewData) {
-        repository.switchRegion(
-            region = regionViewData.toRegion(),
-            onCurrentLocationChanged = ::updateCurrentLocation
-        )
-    }
-
-    suspend fun switchAll() {
-        repository.switchAll(onCurrentLocationChanged = ::updateCurrentLocation)
-    }
-
-    private fun updateCurrentLocation(location: Location?) {
-        _currentLocation.update { location?.toLocationViewData() }
     }
 }

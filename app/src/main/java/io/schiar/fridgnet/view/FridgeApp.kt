@@ -30,6 +30,7 @@ import io.schiar.fridgnet.view.util.chooseWhether
 import io.schiar.fridgnet.viewmodel.HomeViewModel
 import io.schiar.fridgnet.viewmodel.MainViewModel
 import io.schiar.fridgnet.viewmodel.MapViewModel
+import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
@@ -39,6 +40,7 @@ fun FridgeApp(
     mainViewModel: MainViewModel,
     homeViewModel: HomeViewModel,
     mapViewModel: MapViewModel,
+    polygonsViewModel: PolygonsViewModel,
     navController: NavHostController = rememberNavController()
 ) {
     val items = listOf(BottomNavScreen.Home, BottomNavScreen.Map)
@@ -157,7 +159,10 @@ fun FridgeApp(
             composable(route = BottomNavScreen.Map.route) {
                 MapScreen(
                     viewModel = mapViewModel,
-                    onNavigatePolygons = { navController.navigate("Polygons") },
+                    onNavigatePolygons = {
+                        polygonsViewModel.updateCurrentLocation()
+                        navController.navigate("Polygons")
+                    },
                     info = { screenInfo ->  currentScreenInfo = screenInfo }
                 )
             }
@@ -171,7 +176,7 @@ fun FridgeApp(
 
             composable(route = "Polygons") {
                 PolygonsScreen(
-                    viewModel = mapViewModel,
+                    viewModel = polygonsViewModel,
                     info = { screenInfo ->  currentScreenInfo = screenInfo }
                 )
             }

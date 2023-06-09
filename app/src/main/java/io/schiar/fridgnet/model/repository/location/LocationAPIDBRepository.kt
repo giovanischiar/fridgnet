@@ -49,10 +49,10 @@ class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepo
         }
     }
 
-    override fun selectNewLocationFrom(region: Region): Location? {
+    override fun selectNewLocationFrom(region: Region) {
         currentLocation = regionLocation[region]
-        return currentLocation
     }
+
     override fun cityAddressNameLocation(): Map<String, Location> {
         return cityAddressLocation.mapKeys { it.key.name() }
     }

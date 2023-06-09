@@ -13,7 +13,7 @@ import java.util.*
 class MainRepository(
     private val locationRepository: LocationRepository,
     private val addressRepository: AddressRepository,
-    private val imageRepository: ImageRepository
+    private val imageRepository: ImageRepository,
 ) : Repository {
     private var onAddressOnImageAdded: () -> Unit = {}
     private var onLocationReady: () -> Unit = {}
@@ -71,8 +71,12 @@ class MainRepository(
         return locationRepository.allCitiesBoundingBox
     }
 
-    override fun selectNewLocationFrom(region: Region): Location? {
-        return locationRepository.selectNewLocationFrom(region = region)
+    override fun selectNewLocationFrom(region: Region) {
+        locationRepository.selectNewLocationFrom(region = region)
+    }
+
+    override fun currentLocation(): Location? {
+        return locationRepository.currentLocation
     }
 
     override fun selectImagesFrom(addressName: String): List<Image>? {
@@ -100,17 +104,14 @@ class MainRepository(
         }
     }
 
-    override suspend fun switchRegion(
-        region: Region,
-        onCurrentLocationChanged: (location: Location?) -> Unit)
-    {
+    override suspend fun switchRegion(region: Region, onCurrentLocationChanged: () -> Unit) {
         withContext(Dispatchers.IO) { locationRepository.switchRegion(region = region) }
-        onCurrentLocationChanged(locationRepository.currentLocation)
+        onCurrentLocationChanged()
     }
 
-    override suspend fun switchAll(onCurrentLocationChanged: (location: Location?) -> Unit) {
+    override suspend fun switchAll(onCurrentLocationChanged: () -> Unit) {
         withContext(Dispatchers.IO) { locationRepository.switchAll() }
-        onCurrentLocationChanged(locationRepository.currentLocation)
+        onCurrentLocationChanged()
     }
 
     private suspend fun onImageAdded(image: Image) {
