@@ -17,6 +17,8 @@ class MainRepository(
 ) : Repository {
     private var onAddressOnImageAdded: () -> Unit = {}
     private var onLocationReady: () -> Unit = {}
+    private var onImageAdded: () -> Unit = {}
+
     private val locationAddress: MutableMap<Address, Location> =
         Collections.synchronizedMap(mutableMapOf())
 
@@ -41,6 +43,8 @@ class MainRepository(
     private var countryImages: MutableMap<Address, List<Image>> = Collections.synchronizedMap(
         mutableMapOf()
     )
+
+    private var currentImages: Pair<Address, List<Image>>? = null
 
     override suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) = coroutineScope {
         withContext(Dispatchers.IO) { locationRepository.setup() }
@@ -79,13 +83,23 @@ class MainRepository(
         return locationRepository.currentLocation
     }
 
-    override fun selectImagesFrom(addressName: String): List<Image>? {
-        return when (currentAdministrativeUnit) {
-            AdministrativeUnit.CITY -> cityImages[nameAddress[addressName]]
-            AdministrativeUnit.COUNTY -> countyImages[nameAddress[addressName]]
-            AdministrativeUnit.STATE -> stateImages[nameAddress[addressName]]
-            AdministrativeUnit.COUNTRY -> stateImages[nameAddress[addressName]]
-        }
+    override fun subscribeForNewImages(callback: () -> Unit) {
+        onImageAdded = callback
+    }
+
+    override fun currentImages(): Pair<Address, List<Image>>? {
+        return currentImages
+    }
+
+    override fun selectImagesFrom(addressName: String) {
+        val address = nameAddress[addressName] ?: return
+        val images =  when (currentAdministrativeUnit) {
+            AdministrativeUnit.CITY -> cityImages[address]
+            AdministrativeUnit.COUNTY -> countyImages[address]
+            AdministrativeUnit.STATE -> stateImages[address]
+            AdministrativeUnit.COUNTRY -> stateImages[address]
+        } ?: return
+        currentImages = address to images
     }
 
     override fun locationImages(): List<AddressLocationImages> {
@@ -148,7 +162,7 @@ class MainRepository(
     }
 
     private fun addImagesToEachAddress(address: Address, image: Image): List<Image> {
-        return when (address.administrativeUnit) {
+        val images = when (address.administrativeUnit) {
             AdministrativeUnit.CITY -> {
                 val images = cityImages.getOrDefault(address, listOf()) + image
                 cityImages[address] = images
@@ -170,5 +184,12 @@ class MainRepository(
                 images
             }
         }
+
+        if (currentImages?.first == address) {
+            selectImagesFrom(address.name())
+            onImageAdded()
+        }
+
+        return images
     }
 }

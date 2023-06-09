@@ -10,11 +10,13 @@ interface Repository {
 
     fun subscribeForAddressImageAdded(callback: () -> Unit)
     fun subscribeForLocationsReady(callback: () -> Unit)
+    fun subscribeForNewImages(callback: () -> Unit)
     fun visibleImages(boundingBox: BoundingBox): List<Image>
     fun visibleRegions(boundingBox: BoundingBox): List<Region>
     fun boundingBoxCities(): BoundingBox?
     fun selectNewLocationFrom(region: Region)
     fun currentLocation(): Location?
-    fun selectImagesFrom(addressName: String): List<Image>?
+    fun currentImages(): Pair<Address, List<Image>>?
+    fun selectImagesFrom(addressName: String)
     fun locationImages(): List<AddressLocationImages>
 }

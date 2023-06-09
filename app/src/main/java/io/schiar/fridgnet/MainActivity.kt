@@ -17,10 +17,7 @@ import io.schiar.fridgnet.model.repository.location.LocationAPIDBRepository
 import io.schiar.fridgnet.model.repository.location.LocationRepository
 import io.schiar.fridgnet.model.repository.location.datasource.room.LocationDatabase
 import io.schiar.fridgnet.view.FridgeApp
-import io.schiar.fridgnet.viewmodel.HomeViewModel
-import io.schiar.fridgnet.viewmodel.MainViewModel
-import io.schiar.fridgnet.viewmodel.MapViewModel
-import io.schiar.fridgnet.viewmodel.PolygonsViewModel
+import io.schiar.fridgnet.viewmodel.*
 import io.schiar.fridgnet.viewmodel.util.ViewModelFactory
 import java.util.*
 
@@ -35,13 +32,15 @@ class MainActivity: ComponentActivity() {
         val homeViewModel = viewModelProvider[HomeViewModel::class.java]
         val mapViewModel = viewModelProvider[MapViewModel::class.java]
         val polygonsViewModel = viewModelProvider[PolygonsViewModel::class.java]
+        val photosViewModel = viewModelProvider[PhotosViewModel::class.java]
 
         setContent {
             FridgeApp(
                 mainViewModel = mainViewModel,
                 homeViewModel = homeViewModel,
                 mapViewModel = mapViewModel,
-                polygonsViewModel = polygonsViewModel
+                polygonsViewModel = polygonsViewModel,
+                photosViewModel = photosViewModel
             )
         }
     }

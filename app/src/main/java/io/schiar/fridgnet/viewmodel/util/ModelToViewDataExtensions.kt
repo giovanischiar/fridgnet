@@ -83,3 +83,7 @@ fun List<AddressLocationImages>.toAddressLocationImagesViewDataList()
         : List<AddressLocationImagesViewData> {
     return map { it.toAddressLocationImagesViewData() }
 }
+
+fun Pair<Address, List<Image>>.toAddressImagesViewData(): Pair<String, List<ImageViewData>> {
+    return this.first.name() to this.second.toImageViewDataList()
+}
