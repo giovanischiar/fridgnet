@@ -9,34 +9,27 @@ import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.repository.location.datasource.LocationAPIDataSource
 import io.schiar.fridgnet.model.repository.location.datasource.LocationDBDataSource
 import io.schiar.fridgnet.model.repository.location.datasource.LocationDataSource
-import io.schiar.fridgnet.model.repository.location.datasource.room.LocationDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Collections.synchronizedMap as SyncMap
 
-class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepository {
+class LocationAPIDBRepository(
+    private val locationAPIDataSource: LocationDataSource = LocationAPIDataSource(),
+    private val locationDBDataSource: LocationDBDataSource
+) : LocationRepository {
     override var allCitiesBoundingBox: BoundingBox? = null
     override var currentLocation: Location? = null
-    private val regionLocation: MutableMap<Region, Location> = Collections.synchronizedMap(
-        mutableMapOf()
-    )
-    private val cityAddressLocation: MutableMap<Address, Location> = Collections.synchronizedMap(
-        mutableMapOf()
-    )
+    private val regionLocation: MutableMap<Region, Location> = SyncMap(mutableMapOf())
+    private val cityAddressLocation: MutableMap<Address, Location> = SyncMap(mutableMapOf())
     private var locationsBeingFetched: Set<Address> = emptySet()
     private var addressLocation: Map<Address, Location> = emptyMap()
-
-    private val locationAPIDataSource: LocationDataSource = LocationAPIDataSource()
-    private val locationDBDataSource: LocationDataSource = LocationDBDataSource(
-        locationDatabase = locationDatabase
-    )
 
     private var onLocationReady: (location: Location) -> Unit = {}
 
     override suspend fun setup() {
-        (locationDBDataSource as LocationDBDataSource).setup(onLoaded = ::onLoaded)
+        locationDBDataSource.setup(onLoaded = ::onLoaded)
     }
 
     private fun log(address: Address, msg: String) {
@@ -163,8 +156,7 @@ class LocationAPIDBRepository(locationDatabase: LocationDatabase) : LocationRepo
                     onLoaded(location = locationFromAPI)
                     coroutineScope {
                         launch(Dispatchers.IO) {
-                            (locationDBDataSource as LocationDBDataSource)
-                                .insert(location = locationFromAPI)
+                            locationDBDataSource.insert(location = locationFromAPI)
                         }
                     }
                 }

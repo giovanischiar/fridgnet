@@ -14,6 +14,7 @@ import io.schiar.fridgnet.model.repository.image.ImageRepository
 import io.schiar.fridgnet.model.repository.image.ImageURIRepository
 import io.schiar.fridgnet.model.repository.location.LocationAPIDBRepository
 import io.schiar.fridgnet.model.repository.location.LocationRepository
+import io.schiar.fridgnet.model.repository.location.datasource.LocationDBDataSource
 import io.schiar.fridgnet.model.repository.location.datasource.room.LocationDatabase
 import io.schiar.fridgnet.view.AppScreen
 import io.schiar.fridgnet.viewmodel.*
@@ -54,7 +55,9 @@ class MainActivity: ComponentActivity() {
 
     private fun createLocationRepository(): LocationRepository {
         val locationDatabase = LocationDatabase.getDatabase(context = applicationContext)
-        return LocationAPIDBRepository(locationDatabase = locationDatabase)
+        return LocationAPIDBRepository(
+            locationDBDataSource = LocationDBDataSource(locationDatabase)
+        )
     }
 
     private fun createAddressRepository(): AddressRepository {
