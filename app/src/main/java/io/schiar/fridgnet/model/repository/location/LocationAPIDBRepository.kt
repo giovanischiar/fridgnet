@@ -13,7 +13,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Collections.synchronizedMap as SyncMap
+import java.util.Collections.synchronizedMap as syncMapOf
 
 class LocationAPIDBRepository(
     private val locationAPIDataSource: LocationDataSource = LocationAPIDataSource(),
@@ -21,8 +21,8 @@ class LocationAPIDBRepository(
 ) : LocationRepository {
     override var allCitiesBoundingBox: BoundingBox? = null
     override var currentLocation: Location? = null
-    private val regionLocation: MutableMap<Region, Location> = SyncMap(mutableMapOf())
-    private val cityAddressLocation: MutableMap<Address, Location> = SyncMap(mutableMapOf())
+    private val regionLocation: MutableMap<Region, Location> = syncMapOf(mutableMapOf())
+    private val cityAddressLocation: MutableMap<Address, Location> = syncMapOf(mutableMapOf())
     private var locationsBeingFetched: Set<Address> = emptySet()
     private var addressLocation: Map<Address, Location> = emptyMap()
 

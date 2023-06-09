@@ -28,6 +28,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Collections.synchronizedMap as syncMapOf
 
 @Composable
 fun Map(
@@ -41,8 +42,8 @@ fun Map(
     onBoundsChange: (LatLngBounds?) -> Unit,
 ) {
     var mapLoaded by remember { mutableStateOf(value = false) }
-    val bitmaps by remember { mutableStateOf(mutableMapOf<Uri, BitmapDescriptor>()) }
-    val jobs = remember { mutableMapOf<Uri, Job>() }
+    val bitmaps by remember { mutableStateOf(syncMapOf(mutableMapOf<Uri, BitmapDescriptor>())) }
+    val jobs = remember { syncMapOf(mutableMapOf<Uri, Job>()) }
     val coroutineScope = rememberCoroutineScope()
 
     val context = LocalContext.current
@@ -88,7 +89,7 @@ fun Map(
             visibleImages.map {
                 if (!(bitmaps.containsKey(it.uri) || jobs.containsKey(it.uri))) {
                     jobs[it.uri] = coroutineScope.launch(Dispatchers.IO) {
-                        val bitmap = withContext(Dispatchers.Default) {
+                        val bitmap = withContext(Dispatchers.IO) {
                             val bitmapLoader = BitmapLoader(
                                 contentResolver = context.contentResolver,
                                 uri = it.uri

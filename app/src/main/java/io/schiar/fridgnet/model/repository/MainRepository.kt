@@ -8,7 +8,7 @@ import io.schiar.fridgnet.model.repository.location.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import java.util.Collections.synchronizedMap as SyncMap
+import java.util.Collections.synchronizedMap as syncMapOf
 
 class MainRepository(
     private val locationRepository: LocationRepository,
@@ -20,12 +20,12 @@ class MainRepository(
     private var onImageAdded: () -> Unit = {}
     private var currentAdministrativeUnit = AdministrativeUnit.CITY
     private var currentImages: Pair<Address, List<Image>>? = null
-    private val locationAddress: MutableMap<Address, Location> = SyncMap(mutableMapOf())
-    private val nameAddress: MutableMap<String, Address> = SyncMap(mutableMapOf())
-    private val cityImages: MutableMap<Address, List<Image>> = SyncMap(mutableMapOf())
-    private val countyImages: MutableMap<Address, List<Image>> = SyncMap(mutableMapOf())
-    private val stateImages: MutableMap<Address, List<Image>> = SyncMap(mutableMapOf())
-    private val countryImages: MutableMap<Address, List<Image>> = SyncMap(mutableMapOf())
+    private val locationAddress: MutableMap<Address, Location> = syncMapOf(mutableMapOf())
+    private val nameAddress: MutableMap<String, Address> = syncMapOf(mutableMapOf())
+    private val cityImages: MutableMap<Address, List<Image>> = syncMapOf(mutableMapOf())
+    private val countyImages: MutableMap<Address, List<Image>> = syncMapOf(mutableMapOf())
+    private val stateImages: MutableMap<Address, List<Image>> = syncMapOf(mutableMapOf())
+    private val countryImages: MutableMap<Address, List<Image>> = syncMapOf(mutableMapOf())
 
     // AppViewModel
     override suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) = coroutineScope {
