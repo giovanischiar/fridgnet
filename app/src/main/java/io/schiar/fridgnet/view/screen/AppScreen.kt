@@ -33,8 +33,8 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FridgeApp(
-    mainViewModel: MainViewModel,
+fun AppScreen(
+    appViewModel: AppViewModel,
     homeViewModel: HomeViewModel,
     mapViewModel: MapViewModel,
     polygonsViewModel: PolygonsViewModel,
@@ -46,11 +46,11 @@ fun FridgeApp(
     var currentScreenInfo by remember { mutableStateOf(ScreenInfo(BottomNavScreen.Home.route)) }
     var photoPickerShowing by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) { mainViewModel.loadDatabase() }
+    LaunchedEffect(Unit) { appViewModel.loadDatabase() }
     val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(Unit) {
-        mainViewModel.databaseLoaded.collectLatest {
+        appViewModel.databaseLoaded.collectLatest {
             if (it) { snackbarHostState.showSnackbar(message = "Database Loaded!") }
         }
     }
@@ -187,7 +187,7 @@ fun FridgeApp(
     val coroutineScope = rememberCoroutineScope()
 
     fun onURIsReady(uris: List<String>) {
-        coroutineScope.launch { mainViewModel.addURIs(uris = uris) }
+        coroutineScope.launch { appViewModel.addURIs(uris = uris) }
         photoPickerShowing = false
     }
 

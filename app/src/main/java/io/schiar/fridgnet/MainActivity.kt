@@ -6,7 +6,6 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import io.schiar.fridgnet.model.repository.MainRepository
-import io.schiar.fridgnet.model.repository.Repository
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderDataSource
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderRepository
 import io.schiar.fridgnet.model.repository.address.AddressRepository
@@ -16,7 +15,7 @@ import io.schiar.fridgnet.model.repository.image.ImageURIRepository
 import io.schiar.fridgnet.model.repository.location.LocationAPIDBRepository
 import io.schiar.fridgnet.model.repository.location.LocationRepository
 import io.schiar.fridgnet.model.repository.location.datasource.room.LocationDatabase
-import io.schiar.fridgnet.view.FridgeApp
+import io.schiar.fridgnet.view.AppScreen
 import io.schiar.fridgnet.viewmodel.*
 import io.schiar.fridgnet.viewmodel.util.ViewModelFactory
 import java.util.*
@@ -28,15 +27,15 @@ class MainActivity: ComponentActivity() {
         val viewModelProvider = ViewModelProvider(this, ViewModelFactory(
             repository = createRepository()
         ))
-        val mainViewModel = viewModelProvider[MainViewModel::class.java]
+        val appViewModel = viewModelProvider[AppViewModel::class.java]
         val homeViewModel = viewModelProvider[HomeViewModel::class.java]
         val mapViewModel = viewModelProvider[MapViewModel::class.java]
         val polygonsViewModel = viewModelProvider[PolygonsViewModel::class.java]
         val photosViewModel = viewModelProvider[PhotosViewModel::class.java]
 
         setContent {
-            FridgeApp(
-                mainViewModel = mainViewModel,
+            AppScreen(
+                appViewModel = appViewModel,
                 homeViewModel = homeViewModel,
                 mapViewModel = mapViewModel,
                 polygonsViewModel = polygonsViewModel,
@@ -45,7 +44,7 @@ class MainActivity: ComponentActivity() {
         }
     }
 
-    private fun createRepository(): Repository {
+    private fun createRepository(): MainRepository {
         return MainRepository(
             locationRepository = createLocationRepository(),
             addressRepository = createAddressRepository(),

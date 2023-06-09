@@ -1,7 +1,7 @@
 package io.schiar.fridgnet.viewmodel
 
 import androidx.lifecycle.ViewModel
-import io.schiar.fridgnet.model.repository.Repository
+import io.schiar.fridgnet.model.repository.MapRepository
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import io.schiar.fridgnet.view.viewdata.RegionViewData
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class MapViewModel(private val repository: Repository): ViewModel() {
+class MapViewModel(private val repository: MapRepository): ViewModel() {
     private val _visibleImages = MutableStateFlow<List<ImageViewData>>(value = emptyList())
     val visibleImages: StateFlow<List<ImageViewData>> = _visibleImages.asStateFlow()
 

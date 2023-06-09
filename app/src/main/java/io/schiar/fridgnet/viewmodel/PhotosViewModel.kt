@@ -1,7 +1,7 @@
 package io.schiar.fridgnet.viewmodel
 
 import androidx.lifecycle.ViewModel
-import io.schiar.fridgnet.model.repository.Repository
+import io.schiar.fridgnet.model.repository.PhotosRepository
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 import io.schiar.fridgnet.viewmodel.util.toAddressImagesViewData
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class PhotosViewModel(private val repository: Repository): ViewModel() {
+class PhotosViewModel(private val repository: PhotosRepository): ViewModel() {
     private val _selectedImages = MutableStateFlow<Pair<String, List<ImageViewData>>?>(
         value = null
     )

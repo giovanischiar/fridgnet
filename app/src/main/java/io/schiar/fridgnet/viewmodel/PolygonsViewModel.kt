@@ -1,7 +1,7 @@
 package io.schiar.fridgnet.viewmodel
 
 import androidx.lifecycle.ViewModel
-import io.schiar.fridgnet.model.repository.Repository
+import io.schiar.fridgnet.model.repository.PolygonsRepository
 import io.schiar.fridgnet.view.viewdata.LocationViewData
 import io.schiar.fridgnet.view.viewdata.RegionViewData
 import io.schiar.fridgnet.viewmodel.util.toLocationViewData
@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class PolygonsViewModel(private val repository: Repository): ViewModel() {
+class PolygonsViewModel(private val repository: PolygonsRepository): ViewModel() {
     private val _currentLocation = MutableStateFlow<LocationViewData?>(null)
     val currentLocation: StateFlow<LocationViewData?> = _currentLocation.asStateFlow()
 

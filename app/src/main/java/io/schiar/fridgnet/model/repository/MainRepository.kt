@@ -8,44 +8,26 @@ import io.schiar.fridgnet.model.repository.location.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import java.util.*
+import java.util.Collections.synchronizedMap as SyncMap
 
 class MainRepository(
     private val locationRepository: LocationRepository,
     private val addressRepository: AddressRepository,
     private val imageRepository: ImageRepository,
-) : Repository {
+) : AppRepository, HomeRepository, MapRepository, PhotosRepository, PolygonsRepository {
     private var onAddressOnImageAdded: () -> Unit = {}
     private var onLocationReady: () -> Unit = {}
     private var onImageAdded: () -> Unit = {}
-
-    private val locationAddress: MutableMap<Address, Location> =
-        Collections.synchronizedMap(mutableMapOf())
-
-    private val nameAddress: MutableMap<String, Address> = Collections.synchronizedMap(
-        mutableMapOf()
-    )
-
     private var currentAdministrativeUnit = AdministrativeUnit.CITY
-
-    private var cityImages: MutableMap<Address, List<Image>> = Collections.synchronizedMap(
-        mutableMapOf()
-    )
-
-    private var countyImages: MutableMap<Address, List<Image>> = Collections.synchronizedMap(
-        mutableMapOf()
-    )
-
-    private var stateImages: MutableMap<Address, List<Image>> = Collections.synchronizedMap(
-        mutableMapOf()
-    )
-
-    private var countryImages: MutableMap<Address, List<Image>> = Collections.synchronizedMap(
-        mutableMapOf()
-    )
-
     private var currentImages: Pair<Address, List<Image>>? = null
+    private val locationAddress: MutableMap<Address, Location> = SyncMap(mutableMapOf())
+    private val nameAddress: MutableMap<String, Address> = SyncMap(mutableMapOf())
+    private val cityImages: MutableMap<Address, List<Image>> = SyncMap(mutableMapOf())
+    private val countyImages: MutableMap<Address, List<Image>> = SyncMap(mutableMapOf())
+    private val stateImages: MutableMap<Address, List<Image>> = SyncMap(mutableMapOf())
+    private val countryImages: MutableMap<Address, List<Image>> = SyncMap(mutableMapOf())
 
+    // AppViewModel
     override suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) = coroutineScope {
         withContext(Dispatchers.IO) { locationRepository.setup() }
         onDatabaseLoaded()
@@ -55,40 +37,13 @@ class MainRepository(
         imageRepository.addImages(uris = uris, onReady = ::onImageAdded)
     }
 
+    // HomeViewModel
     override fun subscribeForAddressImageAdded(callback: () -> Unit) {
         onAddressOnImageAdded = callback
     }
 
     override fun subscribeForLocationsReady(callback: () -> Unit) {
         onLocationReady = callback
-    }
-
-    override fun visibleImages(boundingBox: BoundingBox): List<Image> {
-        return imageRepository.imagesThatIntersect(boundingBox = boundingBox)
-    }
-
-    override fun visibleRegions(boundingBox: BoundingBox): List<Region> {
-        return locationRepository.regionsThatIntersect(boundingBox = boundingBox)
-    }
-
-    override fun boundingBoxCities(): BoundingBox? {
-        return locationRepository.allCitiesBoundingBox
-    }
-
-    override fun selectNewLocationFrom(region: Region) {
-        locationRepository.selectNewLocationFrom(region = region)
-    }
-
-    override fun currentLocation(): Location? {
-        return locationRepository.currentLocation
-    }
-
-    override fun subscribeForNewImages(callback: () -> Unit) {
-        onImageAdded = callback
-    }
-
-    override fun currentImages(): Pair<Address, List<Image>>? {
-        return currentImages
     }
 
     override fun selectImagesFrom(addressName: String) {
@@ -118,6 +73,28 @@ class MainRepository(
         }
     }
 
+    // MapViewModel
+    override fun selectNewLocationFrom(region: Region) {
+        locationRepository.selectNewLocationFrom(region = region)
+    }
+
+    override fun visibleImages(boundingBox: BoundingBox): List<Image> {
+        return imageRepository.imagesThatIntersect(boundingBox = boundingBox)
+    }
+
+    override fun visibleRegions(boundingBox: BoundingBox): List<Region> {
+        return locationRepository.regionsThatIntersect(boundingBox = boundingBox)
+    }
+
+    override fun boundingBoxCities(): BoundingBox? {
+        return locationRepository.allCitiesBoundingBox
+    }
+
+    // PolygonsViewModel
+    override fun currentLocation(): Location? {
+        return locationRepository.currentLocation
+    }
+
     override suspend fun switchRegion(region: Region, onCurrentLocationChanged: () -> Unit) {
         withContext(Dispatchers.IO) { locationRepository.switchRegion(region = region) }
         onCurrentLocationChanged()
@@ -126,6 +103,15 @@ class MainRepository(
     override suspend fun switchAll(onCurrentLocationChanged: () -> Unit) {
         withContext(Dispatchers.IO) { locationRepository.switchAll() }
         onCurrentLocationChanged()
+    }
+
+    // PhotosViewModel
+    override fun subscribeForNewImages(callback: () -> Unit) {
+        onImageAdded = callback
+    }
+
+    override fun currentImages(): Pair<Address, List<Image>>? {
+        return currentImages
     }
 
     private suspend fun onImageAdded(image: Image) {
@@ -159,10 +145,15 @@ class MainRepository(
             nameAddress[address.name()] = address
             onAddressOnImageAdded()
         }
+
+        if (currentImages?.first == address) {
+            selectImagesFrom(address.name())
+            onImageAdded()
+        }
     }
 
     private fun addImagesToEachAddress(address: Address, image: Image): List<Image> {
-        val images = when (address.administrativeUnit) {
+        return when (address.administrativeUnit) {
             AdministrativeUnit.CITY -> {
                 val images = cityImages.getOrDefault(address, listOf()) + image
                 cityImages[address] = images
@@ -184,12 +175,5 @@ class MainRepository(
                 images
             }
         }
-
-        if (currentImages?.first == address) {
-            selectImagesFrom(address.name())
-            onImageAdded()
-        }
-
-        return images
     }
 }

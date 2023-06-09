@@ -1,12 +1,12 @@
 package io.schiar.fridgnet.viewmodel
 
 import androidx.lifecycle.ViewModel
-import io.schiar.fridgnet.model.repository.Repository
+import io.schiar.fridgnet.model.repository.AppRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class MainViewModel(private val repository: Repository): ViewModel() {
+class AppViewModel(private val repository: AppRepository): ViewModel() {
     private var _databaseLoaded = MutableStateFlow(value = false)
     val databaseLoaded: StateFlow<Boolean> = _databaseLoaded
 
