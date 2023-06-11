@@ -47,12 +47,14 @@ class MainRepository(
     }
 
     override fun selectImagesFrom(addressName: String) {
+        Log.d("Select Image Feature", "Searching Images for $addressName")
         val address = nameAddress[addressName] ?: return
+        Log.d("Select Image Feature", "address = nameAddress[$addressName] result in $address")
         val images =  when (currentAdministrativeUnit) {
             AdministrativeUnit.CITY -> cityImages[address]
             AdministrativeUnit.COUNTY -> countyImages[address]
             AdministrativeUnit.STATE -> stateImages[address]
-            AdministrativeUnit.COUNTRY -> stateImages[address]
+            AdministrativeUnit.COUNTRY -> countryImages[address]
         } ?: return
         currentImages = address to images
     }
@@ -71,6 +73,10 @@ class MainRepository(
                 initialCoordinate = images[0].coordinate
             )
         }
+    }
+
+    override fun changeCurrent(administrativeUnit: AdministrativeUnit) {
+        currentAdministrativeUnit = administrativeUnit
     }
 
     // MapViewModel
@@ -141,8 +147,8 @@ class MainRepository(
     private fun addAddressToImage(address: Address, image: Image) {
         Log.d("Add Image Feature", "add $image to $address")
         val images = addImagesToEachAddress(address = address, image = image)
+        nameAddress[address.name()] = address
         if (images.size == 1 && address.administrativeUnit == currentAdministrativeUnit) {
-            nameAddress[address.name()] = address
             onAddressOnImageAdded()
         }
 
@@ -166,12 +172,12 @@ class MainRepository(
             }
             AdministrativeUnit.STATE -> {
                 val images = stateImages.getOrDefault(address, listOf()) + image
-                stateImages.getOrDefault(address, listOf()) + image
+                stateImages[address] = images
                 images
             }
             AdministrativeUnit.COUNTRY -> {
                 val images = countryImages.getOrDefault(address, listOf()) + image
-                countryImages.getOrDefault(address, listOf()) + image
+                countryImages[address] = images
                 images
             }
         }

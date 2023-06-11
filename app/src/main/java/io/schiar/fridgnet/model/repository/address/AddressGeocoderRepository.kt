@@ -14,7 +14,7 @@ class AddressGeocoderRepository(private val dataSource: AddressDataSource): Addr
         coroutineScope {
             launch(Dispatchers.IO) {
                 val address = dataSource.convertToAddress(coordinate) ?: return@launch
-                onReady(address)
+                address.allAddresses().forEach { onReady(it) }
             }
         }
     }

@@ -86,24 +86,21 @@ class LocationAPIDBRepository(
 
     override suspend fun loadRegions(address: Address, onLocationReady: (location: Location) -> Unit) {
         this.onLocationReady = onLocationReady
-        val administrativeUnitAddresses = address.allAddresses()
-        administrativeUnitAddresses.forEach { administrativeUnitAddress ->
-            val locationAlreadyBeingFetched = synchronized(lock = this) {
-                locationsBeingFetched.contains(administrativeUnitAddress)
-            }
+        val locationAlreadyBeingFetched = synchronized(lock = this) {
+            locationsBeingFetched.contains(address)
+        }
 
-            if (!locationAlreadyBeingFetched) {
-                locationsBeingFetched = locationsBeingFetched + administrativeUnitAddress
-                coroutineScope {
-                    launch(Dispatchers.IO) {
-                        log(administrativeUnitAddress,"Job started")
-                        val location = withContext(Dispatchers.IO) {
-                            fetchLocationBy(address = administrativeUnitAddress)
-                        }
-                        if (location != null) {
-                            onLocationReady(location)
-                            addRegionLocation(location = location)
-                        }
+        if (!locationAlreadyBeingFetched) {
+            locationsBeingFetched = locationsBeingFetched + address
+            coroutineScope {
+                launch(Dispatchers.IO) {
+                    log(address,"Job started")
+                    val location = withContext(Dispatchers.IO) {
+                        fetchLocationBy(address = address)
+                    }
+                    if (location != null) {
+                        onLocationReady(location)
+                        addRegionLocation(location = location)
                     }
                 }
             }

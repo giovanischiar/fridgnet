@@ -20,6 +20,7 @@ import io.schiar.fridgnet.view.viewdata.LocationViewData
 fun MapPhotoItem(
     initialCoordinate: CoordinateViewData,
     location: LocationViewData?,
+    columnCount: Int,
     onMapClick: (latLng: LatLng) -> Unit
 ) {
     val cameraPositionState = rememberCameraPositionState {
@@ -28,7 +29,7 @@ fun MapPhotoItem(
     var mapLoaded by remember { mutableStateOf(value = false) }
 
     GoogleMap(
-        modifier = Modifier.size(Dp(100f)),
+        modifier = Modifier.size(Dp(100f * 4 / columnCount)),
         uiSettings = MapUiSettings().static(),
         cameraPositionState = cameraPositionState,
         onMapClick = onMapClick,
