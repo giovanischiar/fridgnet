@@ -69,6 +69,8 @@ class MainRepository(
             AdministrativeUnit.COUNTY -> countyImages
             AdministrativeUnit.STATE -> stateImages
             AdministrativeUnit.COUNTRY -> countryImages
+        }.filterKeys {
+            nameAddress.containsKey(it.name()) && nameAddress[it.name()]?.administrativeUnit == currentAdministrativeUnit
         }.map { (address, images) ->
             AddressLocationImages(
                 address = address,
