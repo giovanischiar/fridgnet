@@ -29,7 +29,10 @@ class MainRepository(
 
     // AppViewModel
     override suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) = coroutineScope {
-        withContext(Dispatchers.IO) { locationRepository.setup() }
+        withContext(Dispatchers.IO) {
+            addressRepository.setup()
+            locationRepository.setup()
+        }
         onDatabaseLoaded()
     }
 
@@ -126,8 +129,12 @@ class MainRepository(
             "Add Image Feature",
             "Image added! getting the address of the image located at $coordinate"
         )
-        addressRepository.getAddressFrom(coordinate = coordinate) { address ->
-            onAddressReady(image = image, address = address)
+        val address = withContext(Dispatchers.IO) {
+            addressRepository.fetchAddressBy(coordinate = coordinate)
+        } ?: return
+
+        address.allAddresses().forEach { subAddress ->
+            onAddressReady(image = image, address = subAddress)
         }
     }
 

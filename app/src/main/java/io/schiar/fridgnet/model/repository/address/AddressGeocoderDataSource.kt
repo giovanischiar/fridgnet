@@ -8,7 +8,7 @@ import java.util.*
 import android.location.Address as AndroidAddress
 
 class AddressGeocoderDataSource(private val geocoder: Geocoder): AddressDataSource {
-    override fun convertToAddress(coordinate: Coordinate): Address? {
+    override fun fetchAddressBy(coordinate: Coordinate): Address? {
         val (latitude, longitude) = coordinate
         Log.d("Add Image Feature", "Getting address for ($latitude, $longitude)")
         val androidAddress = getAndroidAddress(latitude = latitude, longitude = longitude)

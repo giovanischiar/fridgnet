@@ -8,34 +8,37 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.*
+import kotlin.system.measureTimeMillis
 
 class ImageURIRepository(private val dataSource: ImageDataSource): ImageRepository {
     private val images: MutableList<Image> = Collections.synchronizedList(mutableListOf())
 
     override suspend fun addImages(uris: List<String>, onReady: suspend (image: Image) -> Unit) {
         Log.d("Add Image Feature", "Adding images")
-        withContext(Dispatchers.IO) {
-            coroutineScope {
-                launch(Dispatchers.IO) {
-                    uris.forEach { uri ->
-                        Log.d("Add Image Feature", "Adding $uri")
-                        val coordinate = dataSource.extractCoordinate(uri = uri)
-                        Log.d("Add Image Feature", "of Coordinate $coordinate")
-                        val date = dataSource.extractDate(uri = uri)
-                        Log.d("Add Image Feature", "and date $date")
-                        val image = Image(
-                            uri = uri,
-                            coordinate = coordinate,
-                            date = date
-                        )
-                        images.add(image)
-                        Log.d("Add Image Feature", "Image $image added")
-                        onReady(image)
+        val elapsed = measureTimeMillis {
+            withContext(Dispatchers.IO) {
+                coroutineScope {
+                    launch(Dispatchers.IO) {
+                        uris.forEach { uri ->
+                            Log.d("Add Image Feature", "Adding $uri")
+                            val coordinate = dataSource.extractCoordinate(uri = uri)
+                            Log.d("Add Image Feature", "of Coordinate $coordinate")
+                            val date = dataSource.extractDate(uri = uri)
+                            Log.d("Add Image Feature", "and date $date")
+                            val image = Image(
+                                uri = uri,
+                                coordinate = coordinate,
+                                date = date
+                            )
+                            images.add(image)
+                            Log.d("Add Image Feature", "Image $image added")
+                            onReady(image)
+                        }
                     }
                 }
             }
         }
-        Log.d("Add Image Feature", "All Images Added!")
+        Log.d("Add Image Feature", "All Images Added! time elapsed: $elapsed")
     }
 
     override fun imagesThatIntersect(boundingBox: BoundingBox): List<Image> {

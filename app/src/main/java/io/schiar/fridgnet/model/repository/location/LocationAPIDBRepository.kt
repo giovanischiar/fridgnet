@@ -6,9 +6,6 @@ import io.schiar.fridgnet.model.AdministrativeUnit.CITY
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Region
-import io.schiar.fridgnet.model.repository.location.datasource.LocationAPIDataSource
-import io.schiar.fridgnet.model.repository.location.datasource.LocationDBDataSource
-import io.schiar.fridgnet.model.repository.location.datasource.LocationDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch

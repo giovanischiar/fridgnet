@@ -4,5 +4,5 @@ import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.Coordinate
 
 interface AddressDataSource {
-    fun convertToAddress(coordinate: Coordinate): Address?
+    fun fetchAddressBy(coordinate: Coordinate): Address?
 }

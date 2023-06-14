@@ -4,5 +4,6 @@ import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.Coordinate
 
 interface AddressRepository {
-    suspend fun getAddressFrom(coordinate: Coordinate, onReady: suspend (address: Address) -> Unit)
+    suspend fun setup()
+    suspend fun fetchAddressBy(coordinate: Coordinate): Address?
 }

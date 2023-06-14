@@ -5,17 +5,18 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
+import io.schiar.fridgnet.model.datasource.room.FridgnetDatabase
 import io.schiar.fridgnet.model.repository.MainRepository
+import io.schiar.fridgnet.model.repository.address.AddressDBDataSource
+import io.schiar.fridgnet.model.repository.address.AddressGeocoderDBRepository
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderDataSource
-import io.schiar.fridgnet.model.repository.address.AddressGeocoderRepository
 import io.schiar.fridgnet.model.repository.address.AddressRepository
 import io.schiar.fridgnet.model.repository.image.ImageAndroidDataSource
 import io.schiar.fridgnet.model.repository.image.ImageRepository
 import io.schiar.fridgnet.model.repository.image.ImageURIRepository
 import io.schiar.fridgnet.model.repository.location.LocationAPIDBRepository
+import io.schiar.fridgnet.model.repository.location.LocationDBDataSource
 import io.schiar.fridgnet.model.repository.location.LocationRepository
-import io.schiar.fridgnet.model.repository.location.datasource.LocationDBDataSource
-import io.schiar.fridgnet.model.repository.location.datasource.room.LocationDatabase
 import io.schiar.fridgnet.view.AppScreen
 import io.schiar.fridgnet.viewmodel.*
 import io.schiar.fridgnet.viewmodel.util.ViewModelFactory
@@ -54,16 +55,20 @@ class MainActivity: ComponentActivity() {
     }
 
     private fun createLocationRepository(): LocationRepository {
-        val locationDatabase = LocationDatabase.getDatabase(context = applicationContext)
+        val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
+        val locationDAO = fridgnetDatabase.locationDAO()
         return LocationAPIDBRepository(
-            locationDBDataSource = LocationDBDataSource(locationDatabase)
+            locationDBDataSource = LocationDBDataSource(locationDAO = locationDAO)
         )
     }
 
     private fun createAddressRepository(): AddressRepository {
         val geocoder = Geocoder(applicationContext, Locale.US)
-        return AddressGeocoderRepository(
-            dataSource = AddressGeocoderDataSource(geocoder = geocoder)
+        val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
+        val addressDAO = fridgnetDatabase.addressDAO()
+        return AddressGeocoderDBRepository(
+            addressGeocoderDataSource = AddressGeocoderDataSource(geocoder = geocoder),
+            addressDBDataSource = AddressDBDataSource(addressDAO = addressDAO)
         )
     }
 
