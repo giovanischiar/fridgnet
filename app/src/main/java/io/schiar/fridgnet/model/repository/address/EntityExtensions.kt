@@ -16,14 +16,24 @@ fun AddressEntity.toAddress(): Address {
     )
 }
 
+fun AddressEntity.updateSubAdminArea(subAdminArea: String?): AddressEntity {
+    return AddressEntity(
+        id = id,
+        locality = locality,
+        subAdminArea = this.subAdminArea ?: subAdminArea,
+        adminArea = adminArea,
+        countryName = countryName,
+        administrativeUnit = administrativeUnit
+    )
+}
+
 fun Address.toAddressEntity(): AddressEntity {
     return AddressEntity(
         locality = locality,
         subAdminArea = subAdminArea,
         adminArea = adminArea,
         countryName = countryName,
-        administrativeUnit = administrativeUnit.toString(),
-        name = name()
+        administrativeUnit = administrativeUnit.toString()
     )
 }
 

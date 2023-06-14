@@ -1,9 +1,6 @@
 package io.schiar.fridgnet.model.datasource.room
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import io.schiar.fridgnet.model.datasource.room.entity.AddressEntity
 import io.schiar.fridgnet.model.datasource.room.entity.CoordinateEntity
 import io.schiar.fridgnet.model.datasource.room.relationentity.AddressWithCoordinates
@@ -16,6 +13,9 @@ interface AddressDAO {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     fun insert(coordinateEntity: CoordinateEntity): Long
 
+    @Update
+    fun update(addressEntity: AddressEntity)
+
     @Query("SELECT * FROM Address")
     fun selectAddressesWithCoordinates(): List<AddressWithCoordinates>
 
@@ -25,6 +25,9 @@ interface AddressDAO {
     )
     fun selectAddressEntityBy(latitude: Double, longitude: Double): AddressEntity?
 
-    @Query("SELECT id FROM Address WHERE Address.name == :name")
-    fun selectAddressIDBy(name: String): Long?
+    @Query(
+        "SELECT * FROM Address WHERE " +
+        "Address.locality is :locality AND Address.adminArea = :adminArea"
+    )
+    fun selectAddressBy(locality: String, adminArea: String): AddressEntity?
 }
