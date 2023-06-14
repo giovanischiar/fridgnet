@@ -27,7 +27,37 @@ class PolygonSearcher() {
 
     suspend fun searchCity(city: String, state: String, country: String): Response<List<Result<GeoJsonAttributes>>> {
         val quotesApi = RetrofitHelper.getInstance().create(NominatimApi::class.java)
-        return quotesApi.getResultsCity(city = city, state = state, country = country)
+        val result = quotesApi.getResultsCity(city = city, state = state, country = country)
+        val bodies = result.body() ?: return result
+        val body = if (bodies.isEmpty()) return result else bodies[0]
+        val geojson = body.geojson
+        val type = geojson.type
+
+        if (type == "Polygon") {
+            if (bodies.size == 1) return result
+            val secondBody = bodies[1]
+            if (secondBody.display_name == body.display_name && secondBody.type == "administrative") {
+                if (secondBody.geojson.type == "MultiPolygon") {
+                    return Response.success(listOf(secondBody))
+                }
+            }
+        }
+
+        if (type == "Point") {
+            if (bodies.size == 1) {
+                Log.d("Search for API Polygon", "Trying to using the q")
+                return quotesApi.getResults(q = "$city, $state, $country")
+            }
+            val secondBody =  bodies[1]
+            Log.d("Search for API Polygon", "Second Result name: {$secondBody.name} type: {$secondBody.type}")
+            if (secondBody.display_name == body.display_name && secondBody.type == "administrative") {
+                Log.d("Search for API Polygon", "Second body is the administrative")
+                return Response.success(listOf(secondBody))
+            }
+            return quotesApi.getResults(q = "$city, $state, $country")
+        }
+
+        return result
     }
 
     suspend fun searchCounty(county: String, state: String, country: String): Response<List<Result<GeoJsonAttributes>>> {

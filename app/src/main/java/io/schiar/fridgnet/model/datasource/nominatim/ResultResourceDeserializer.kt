@@ -6,7 +6,7 @@ import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
-class ResultResourceDeserializer : JsonDeserializer<Result<io.schiar.fridgnet.model.datasource.nominatim.GeoJsonAttributes>> {
+class ResultResourceDeserializer : JsonDeserializer<Result<GeoJsonAttributes>> {
     private val pointResource = object : TypeToken<Result<List<Double>>?>() {}.type
     private val lineStringResource = object : TypeToken<Result<List<List<Double>>>?>() {}.type
     private val polygonResource = object : TypeToken<Result<List<List<List<Double>>>>?>() {}.type

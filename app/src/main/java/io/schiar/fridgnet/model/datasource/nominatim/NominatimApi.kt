@@ -19,7 +19,7 @@ interface NominatimApi {
         @Query("state") state: String,
         @Query("country") country: String,
         @Query("polygon_geojson") polygon_geojson: Int = 1,
-        @Query("limit") limit: Int = 1,
+        @Query("limit") limit: Int = 2,
         @Query("format") format : String = "jsonv2"
     ) : Response<List<Result<GeoJsonAttributes>>>
 
