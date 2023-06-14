@@ -30,6 +30,7 @@ class MainRepository(
     // AppViewModel
     override suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) = coroutineScope {
         withContext(Dispatchers.IO) {
+            imageRepository.setup()
             addressRepository.setup()
             locationRepository.setup()
         }

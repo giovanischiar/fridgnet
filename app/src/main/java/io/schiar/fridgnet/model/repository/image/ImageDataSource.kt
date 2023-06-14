@@ -1,8 +1,7 @@
 package io.schiar.fridgnet.model.repository.image
 
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.Image
 
 interface ImageDataSource {
-    fun extractCoordinate(uri: String): Coordinate
-    fun extractDate(uri: String): Long
+    suspend fun fetchImageBy(uri: String): Image?
 }

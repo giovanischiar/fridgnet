@@ -8,6 +8,7 @@ import io.schiar.fridgnet.model.datasource.room.entity.*
 
 @Database(
     entities = [
+        ImageEntity::class,
         AddressEntity::class,
         CoordinateEntity::class,
         LocationEntity::class,
@@ -18,6 +19,7 @@ import io.schiar.fridgnet.model.datasource.room.entity.*
     exportSchema = false
 )
 abstract class FridgnetDatabase: RoomDatabase() {
+    abstract fun imageDAO(): ImageDAO
     abstract fun addressDAO(): AddressDAO
     abstract fun locationDAO(): LocationDAO
 

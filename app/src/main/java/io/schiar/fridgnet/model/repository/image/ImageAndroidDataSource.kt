@@ -5,23 +5,18 @@ import android.content.ContentResolver
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
 import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.Image
 
 class ImageAndroidDataSource(private val contentResolver: ContentResolver): ImageDataSource {
-    override fun extractCoordinate(uri: String): Coordinate {
+    override suspend fun fetchImageBy(uri: String): Image? {
         val systemURI = Uri.parse(uri)
-        contentResolver.openInputStream(systemURI)!!.use { ins ->
+        (contentResolver.openInputStream(systemURI)?: return null).use { ins ->
             val exifInterface = ExifInterface(ins)
-            val latLng = exifInterface.latLong ?: doubleArrayOf(0.0, 0.0)
-            return Coordinate(latitude = latLng[0], longitude = latLng[1])
-        }
-    }
-
-    @SuppressLint("RestrictedApi")
-    override fun extractDate(uri: String): Long {
-        val systemURI = Uri.parse(uri)
-        contentResolver.openInputStream(systemURI)!!.use { ins ->
-            val exifInterface = ExifInterface(ins)
-            return exifInterface.dateTime ?: 0L
+            val latLng = exifInterface.latLong ?: return null
+            val coordinate = Coordinate(latitude = latLng[0], longitude = latLng[1])
+            @SuppressLint("RestrictedApi")
+            val date = exifInterface.dateTime ?: 0L
+            return Image(uri = uri, date = date, coordinate = coordinate)
         }
     }
 }

@@ -11,9 +11,10 @@ import io.schiar.fridgnet.model.repository.address.AddressDBDataSource
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderDBRepository
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderDataSource
 import io.schiar.fridgnet.model.repository.address.AddressRepository
+import io.schiar.fridgnet.model.repository.image.ImageAndroidDBRepository
 import io.schiar.fridgnet.model.repository.image.ImageAndroidDataSource
+import io.schiar.fridgnet.model.repository.image.ImageDBDataSource
 import io.schiar.fridgnet.model.repository.image.ImageRepository
-import io.schiar.fridgnet.model.repository.image.ImageURIRepository
 import io.schiar.fridgnet.model.repository.location.LocationAPIDBRepository
 import io.schiar.fridgnet.model.repository.location.LocationDBDataSource
 import io.schiar.fridgnet.model.repository.location.LocationRepository
@@ -74,8 +75,11 @@ class MainActivity: ComponentActivity() {
 
     private fun createImageRepository(): ImageRepository {
         val contentResolver = applicationContext.contentResolver
-        return ImageURIRepository(
-            dataSource = ImageAndroidDataSource(contentResolver = contentResolver)
+        val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
+        val imageDAO = fridgnetDatabase.imageDAO()
+        return ImageAndroidDBRepository(
+            imageAndroidDataSource = ImageAndroidDataSource(contentResolver = contentResolver),
+            imageDBDataSource = ImageDBDataSource(imageDAO = imageDAO)
         )
     }
 }

@@ -9,6 +9,7 @@ data class CoordinateEntity(
     val id: Long = 0,
     val coordinatesID: Long? = null,
     val addressCoordinatesID: Long? = null,
+    val imageCoordinateID: Long? = null,
     val latitude: Double,
     val longitude: Double
 )
