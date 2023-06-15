@@ -29,4 +29,10 @@ class ImageDBDataSource(private val imageDAO: ImageDAO): ImageDataSource {
     override suspend fun fetchImageBy(uri: String): Image? {
         return imageDAO.selectImageBy(uri = uri)?.toImage()
     }
+
+    suspend fun deleteAll() = coroutineScope {
+        launch(Dispatchers.IO) {
+            imageDAO.deleteAll()
+        }
+    }
 }

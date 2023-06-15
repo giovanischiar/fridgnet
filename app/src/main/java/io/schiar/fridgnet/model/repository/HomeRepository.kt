@@ -9,4 +9,5 @@ interface HomeRepository {
     fun selectImagesFrom(addressName: String)
     fun locationImages(): List<AddressLocationImages>
     fun changeCurrent(administrativeUnit: AdministrativeUnit)
+    suspend fun removeAllImages()
 }

@@ -44,6 +44,10 @@ class HomeViewModel(private val repository: HomeRepository): ViewModel() {
         onLocationReady()
     }
 
+    suspend fun removeAllImages() {
+        repository.removeAllImages()
+    }
+
     private fun onAddressReady() {
         _addressLocationImages.update {
             repository.locationImages().toAddressLocationImagesViewDataList()

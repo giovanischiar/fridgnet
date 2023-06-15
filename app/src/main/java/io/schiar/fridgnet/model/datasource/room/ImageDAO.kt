@@ -22,4 +22,7 @@ interface ImageDAO {
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Image")
     fun selectImagesWithCoordinate(): List<ImageWithCoordinate>
+
+    @Query("DELETE FROM Image")
+    fun deleteAll()
 }

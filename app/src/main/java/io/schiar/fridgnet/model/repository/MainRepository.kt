@@ -86,6 +86,10 @@ class MainRepository(
         currentAdministrativeUnit = administrativeUnit
     }
 
+    override suspend fun removeAllImages() {
+        imageRepository.removeAllImages()
+    }
+
     // MapViewModel
     override fun selectNewLocationFrom(region: Region) {
         locationRepository.selectNewLocationFrom(region = region)

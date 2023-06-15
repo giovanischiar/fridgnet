@@ -85,6 +85,11 @@ class ImageAndroidDBRepository(
         }
     }
 
+    override suspend fun removeAllImages() {
+        uriImage.clear()
+        imageDBDataSource.deleteAll()
+    }
+
     private fun log(uri: String, msg: String) {
         Log.d(tag = "Uri to Image Feature", msg = "Fetching Image of uri $uri: $msg")
     }
