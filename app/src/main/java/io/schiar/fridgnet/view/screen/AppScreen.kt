@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view
+package io.schiar.fridgnet.view.screen
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
@@ -20,10 +20,6 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.PhotoPicker
-import io.schiar.fridgnet.view.screen.HomeScreen
-import io.schiar.fridgnet.view.screen.MapScreen
-import io.schiar.fridgnet.view.screen.PhotosScreen
-import io.schiar.fridgnet.view.screen.PolygonsScreen
 import io.schiar.fridgnet.view.util.BottomNavScreen
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether

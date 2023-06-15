@@ -18,7 +18,7 @@ import io.schiar.fridgnet.model.repository.image.ImageRepository
 import io.schiar.fridgnet.model.repository.location.LocationAPIDBRepository
 import io.schiar.fridgnet.model.repository.location.LocationDBDataSource
 import io.schiar.fridgnet.model.repository.location.LocationRepository
-import io.schiar.fridgnet.view.AppScreen
+import io.schiar.fridgnet.view.screen.AppScreen
 import io.schiar.fridgnet.viewmodel.*
 import io.schiar.fridgnet.viewmodel.util.ViewModelFactory
 import java.util.*
