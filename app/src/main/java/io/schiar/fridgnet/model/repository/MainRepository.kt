@@ -34,6 +34,7 @@ class MainRepository(
             addressRepository.setup()
             locationRepository.setup()
         }
+        imageRepository.addImagesFromDatabase(onReady = ::onImageAdded)
         onDatabaseLoaded()
     }
 

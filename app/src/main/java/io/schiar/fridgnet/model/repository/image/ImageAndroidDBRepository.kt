@@ -20,6 +20,10 @@ class ImageAndroidDBRepository(
         imageDBDataSource.setup(onLoaded = ::onLoaded)
     }
 
+    override suspend fun addImagesFromDatabase(onReady: suspend (image: Image) -> Unit) {
+        uriImage.values.forEach { image -> onReady(image) }
+    }
+
     private fun onLoaded(image: Image) {
         uriImage[image.uri] = image
     }
