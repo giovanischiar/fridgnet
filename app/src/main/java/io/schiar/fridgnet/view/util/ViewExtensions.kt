@@ -1,5 +1,10 @@
 package io.schiar.fridgnet.view.util
 
+import android.graphics.BitmapFactory
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asImageBitmap
+import com.google.android.gms.maps.model.BitmapDescriptor
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.MapUiSettings
@@ -43,5 +48,15 @@ fun MapUiSettings.static(): MapUiSettings {
         tiltGesturesEnabled = false,
         zoomControlsEnabled = false,
         zoomGesturesEnabled = false
+    )
+}
+
+fun ByteArray.toImageBitmap(): ImageBitmap {
+    return BitmapFactory.decodeByteArray(this, 0, this.size).asImageBitmap()
+}
+
+fun ByteArray.toBitmapDescriptor(): BitmapDescriptor {
+    return BitmapDescriptorFactory.fromBitmap(
+        BitmapFactory.decodeByteArray(this, 0, this.size)
     )
 }

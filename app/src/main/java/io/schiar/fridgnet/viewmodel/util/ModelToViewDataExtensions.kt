@@ -22,10 +22,11 @@ fun Coordinate.toCoordinateViewData(): CoordinateViewData {
 
 // Image
 fun Image.toViewData(): ImageViewData {
-    val (uri, date, location) = this
+    val (uri, byteArray, date, location) = this
     val (latitude, longitude) = location
     return ImageViewData(
         uri = Uri.parse(uri),
+        byteArray = byteArray,
         date = date.toString(),
         coordinate = CoordinateViewData(
             latitude = latitude,

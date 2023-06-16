@@ -15,10 +15,10 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.*
 import io.schiar.fridgnet.view.component.debug.MapPolygonInfo
-import io.schiar.fridgnet.view.util.BitmapLoader
 import io.schiar.fridgnet.view.util.debug.BoundsTestCreator
 import io.schiar.fridgnet.view.util.debug.generatePolygonsAppCreatedUnitTest
 import io.schiar.fridgnet.view.util.debug.showMapPolygonInfo
+import io.schiar.fridgnet.view.util.toBitmapDescriptor
 import io.schiar.fridgnet.view.util.toLatLng
 import io.schiar.fridgnet.view.util.toLatLngBounds
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
@@ -90,13 +90,9 @@ fun Map(
                 if (!(bitmaps.containsKey(it.uri) || jobs.containsKey(it.uri))) {
                     jobs[it.uri] = coroutineScope.launch(Dispatchers.IO) {
                         val bitmap = withContext(Dispatchers.IO) {
-                            val bitmapLoader = BitmapLoader(
-                                contentResolver = context.contentResolver,
-                                uri = it.uri
-                            )
-                            bitmapLoader.convert()
+                            it.byteArray.toBitmapDescriptor()
                         }
-                        if (bitmap != null) bitmaps[it.uri] = bitmap
+                        bitmaps[it.uri] = bitmap
                         jobs.remove(it.uri)
                     }
                 }

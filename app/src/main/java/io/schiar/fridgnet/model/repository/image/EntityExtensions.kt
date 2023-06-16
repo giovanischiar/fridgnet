@@ -8,6 +8,7 @@ import io.schiar.fridgnet.model.repository.location.toCoordinate
 fun ImageWithCoordinate.toImage(): Image {
     return Image(
         uri = imageEntity.uri,
+        byteArray = imageEntity.byteArray,
         date = imageEntity.date,
         coordinate = coordinate.toCoordinate()
     )
@@ -16,6 +17,7 @@ fun ImageWithCoordinate.toImage(): Image {
 fun Image.toImageEntity(coordinateID: Long): ImageEntity {
     return ImageEntity(
         uri = uri,
+        byteArray = byteArray,
         date = date,
         coordinateID = coordinateID
     )
