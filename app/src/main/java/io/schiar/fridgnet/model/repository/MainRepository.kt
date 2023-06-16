@@ -8,6 +8,7 @@ import io.schiar.fridgnet.model.repository.location.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
+import kotlin.jvm.optionals.getOrNull
 import java.util.Collections.synchronizedMap as syncMapOf
 
 class MainRepository(
@@ -19,13 +20,13 @@ class MainRepository(
     private var onLocationReady: () -> Unit = {}
     private var onImageAdded: () -> Unit = {}
     private var currentAdministrativeUnit = AdministrativeUnit.CITY
-    private var currentImages: Pair<Address, List<Image>>? = null
+    private var currentImages: Pair<Address, Set<Image>>? = null
     private val locationAddress: MutableMap<Address, Location> = syncMapOf(mutableMapOf())
     private val nameAddress: MutableMap<String, Address> = syncMapOf(mutableMapOf())
-    private val cityImages: MutableMap<Address, List<Image>> = syncMapOf(mutableMapOf())
-    private val countyImages: MutableMap<Address, List<Image>> = syncMapOf(mutableMapOf())
-    private val stateImages: MutableMap<Address, List<Image>> = syncMapOf(mutableMapOf())
-    private val countryImages: MutableMap<Address, List<Image>> = syncMapOf(mutableMapOf())
+    private val cityImages: MutableMap<Address, Set<Image>> = syncMapOf(mutableMapOf())
+    private val countyImages: MutableMap<Address, Set<Image>> = syncMapOf(mutableMapOf())
+    private val stateImages: MutableMap<Address, Set<Image>> = syncMapOf(mutableMapOf())
+    private val countryImages: MutableMap<Address, Set<Image>> = syncMapOf(mutableMapOf())
 
     // AppViewModel
     override suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) = coroutineScope {
@@ -72,12 +73,15 @@ class MainRepository(
             AdministrativeUnit.STATE -> stateImages
             AdministrativeUnit.COUNTRY -> countryImages
         }.filterKeys {
-            nameAddress.containsKey(it.name()) && nameAddress[it.name()]?.administrativeUnit == currentAdministrativeUnit
+            nameAddress.containsKey(it.name()) &&
+            nameAddress[it.name()]?.administrativeUnit == currentAdministrativeUnit
         }.map { (address, images) ->
             AddressLocationImages(
                 address = address,
                 location = locationAddress[address],
-                initialCoordinate = images[0].coordinate
+                initialCoordinate = images.stream()
+                    .findFirst()
+                    .getOrNull()?.coordinate ?: return emptyList()
             )
         }
     }
@@ -128,7 +132,9 @@ class MainRepository(
     }
 
     override fun currentImages(): Pair<Address, List<Image>>? {
-        return currentImages
+        val first = currentImages?.first ?: return null
+        val second = currentImages?.second ?: return null
+        return (first to second.toList())
     }
 
     private suspend fun onImageAdded(image: Image) {
@@ -176,24 +182,24 @@ class MainRepository(
     private fun addImagesToEachAddress(address: Address, image: Image): List<Image> {
         return when (address.administrativeUnit) {
             AdministrativeUnit.CITY -> {
-                val images = cityImages.getOrDefault(address, listOf()) + image
+                val images = cityImages.getOrDefault(address, mutableSetOf()) + image
                 cityImages[address] = images
-                images
+                images.toList()
             }
             AdministrativeUnit.COUNTY -> {
-                val images = countyImages.getOrDefault(address, listOf()) + image
+                val images = countyImages.getOrDefault(address, mutableSetOf()) + image
                 countyImages[address] = images
-                images
+                images.toList()
             }
             AdministrativeUnit.STATE -> {
-                val images = stateImages.getOrDefault(address, listOf()) + image
+                val images = stateImages.getOrDefault(address, mutableSetOf()) + image
                 stateImages[address] = images
-                images
+                images.toList()
             }
             AdministrativeUnit.COUNTRY -> {
-                val images = countryImages.getOrDefault(address, listOf()) + image
+                val images = countryImages.getOrDefault(address, mutableSetOf()) + image
                 countryImages[address] = images
-                images
+                images.toList()
             }
         }
     }
