@@ -10,4 +10,5 @@ interface PhotosRepository {
     fun currentImages(): Pair<Address, List<Image>>?
     fun selectedLocation(): Location?
     fun selectedBoundingBox(): BoundingBox?
+    fun selectedImagesBoundingBox(): BoundingBox?
 }

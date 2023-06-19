@@ -9,6 +9,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
 import kotlin.jvm.optionals.getOrNull
+import kotlin.streams.toList
 import java.util.Collections.synchronizedMap as syncMapOf
 
 class MainRepository(
@@ -144,12 +145,19 @@ class MainRepository(
     override fun selectedBoundingBox(): BoundingBox? {
         val location = locationAddress[currentImages?.first] ?: return null
         var boundingBox = location.boundingBox
-        for(image in (currentImages ?: return null).second.stream()) {
+        for (image in (currentImages ?: return null).second.stream()) {
             if (!boundingBox.contains(image.coordinate)) {
                 boundingBox += image.coordinate
             }
         }
         return boundingBox
+    }
+
+    override fun selectedImagesBoundingBox(): BoundingBox? {
+        val coordinates = (currentImages ?: return null).second.stream().map {
+            it.coordinate
+        }.toList()
+        return Polygon(coordinates = coordinates).findBoundingBox()
     }
 
     private suspend fun onImageAdded(image: Image) {

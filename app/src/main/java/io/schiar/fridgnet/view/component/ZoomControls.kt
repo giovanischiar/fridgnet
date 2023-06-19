@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ZoomControls(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     cameraPositionState: CameraPositionState,
     enabled: Boolean
 ) {

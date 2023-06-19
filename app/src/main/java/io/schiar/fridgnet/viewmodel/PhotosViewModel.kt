@@ -21,12 +21,13 @@ class PhotosViewModel(private val repository: PhotosRepository): ViewModel() {
         = _selectedImages.asStateFlow()
 
     private val _selectedLocation = MutableStateFlow<LocationViewData?>(value = null)
-
     val selectedLocation: StateFlow<LocationViewData?> = _selectedLocation
 
     private val _selectedBoundingBox = MutableStateFlow<BoundingBoxViewData?>(value = null)
-
     val selectedBoundingBox: StateFlow<BoundingBoxViewData?> = _selectedBoundingBox
+
+    private val _selectedImagesBoundingBox = MutableStateFlow<BoundingBoxViewData?>(value = null)
+    val selectedImagesBoundingBox: StateFlow<BoundingBoxViewData?> = _selectedImagesBoundingBox
 
     fun subscribe() {
         repository.subscribeForNewImages(callback = ::updateCurrentImages)
@@ -36,5 +37,8 @@ class PhotosViewModel(private val repository: PhotosRepository): ViewModel() {
         _selectedImages.update { repository.currentImages()?.toAddressImagesViewData() }
         _selectedLocation.update { repository.selectedLocation()?.toLocationViewData() }
         _selectedBoundingBox.update { repository.selectedBoundingBox()?.toBoundingBoxViewData() }
+        _selectedImagesBoundingBox.update {
+            repository.selectedImagesBoundingBox()?.toBoundingBoxViewData()
+        }
     }
 }
