@@ -137,6 +137,21 @@ class MainRepository(
         return (first to second.toList())
     }
 
+    override fun selectedLocation(): Location? {
+        return locationAddress[currentImages?.first]
+    }
+
+    override fun selectedBoundingBox(): BoundingBox? {
+        val location = locationAddress[currentImages?.first] ?: return null
+        var boundingBox = location.boundingBox
+        for(image in (currentImages ?: return null).second.stream()) {
+            if (!boundingBox.contains(image.coordinate)) {
+                boundingBox += image.coordinate
+            }
+        }
+        return boundingBox
+    }
+
     private suspend fun onImageAdded(image: Image) {
         val coordinate = image.coordinate
         Log.d(

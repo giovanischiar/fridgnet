@@ -104,6 +104,10 @@ data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
         )
     }
 
+    operator fun plus(other: Coordinate): BoundingBox {
+        return plus(other = BoundingBox(southwest = other, northeast = other))
+    }
+
     fun contains(other: BoundingBox): Boolean {
         val southwestOrNortheastInside = contains(other.northeast) || contains(other.southwest)
 

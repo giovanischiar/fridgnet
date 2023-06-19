@@ -12,9 +12,9 @@ import io.schiar.fridgnet.view.util.toImageBitmap
 import io.schiar.fridgnet.view.viewdata.ImageViewData
 
 @Composable
-fun PhotoGrid(images: List<ImageViewData>) {
+fun PhotoGrid(modifier: Modifier, images: List<ImageViewData>) {
     val sortedImages = images.sortedBy { it.date }.reversed()
-    LazyVerticalGrid(columns = GridCells.Fixed(6)) {
+    LazyVerticalGrid(modifier = modifier, columns = GridCells.Fixed(6)) {
         items(images.size) { index ->
             Image(
                 modifier = Modifier.height(75.dp),
