@@ -23,7 +23,7 @@ class LocationAPIDBRepository(
     private var locationsBeingFetched: Set<Address> = emptySet()
     private var addressLocation: Map<Address, Location> = emptyMap()
 
-    private var onLocationReady: (location: Location) -> Unit = {}
+    private var onLocationReady: suspend (location: Location) -> Unit = {}
 
     override suspend fun setup() {
         locationDBDataSource.setup(onLoaded = ::onLoaded)
@@ -81,7 +81,9 @@ class LocationAPIDBRepository(
         addressLocation = addressLocation + (location.address to location)
     }
 
-    override suspend fun loadRegions(address: Address, onLocationReady: (location: Location) -> Unit) {
+    override suspend fun loadRegions(
+        address: Address, onLocationReady: suspend (location: Location) -> Unit
+    ) {
         this.onLocationReady = onLocationReady
         val locationAlreadyBeingFetched = synchronized(lock = this) {
             locationsBeingFetched.contains(address)

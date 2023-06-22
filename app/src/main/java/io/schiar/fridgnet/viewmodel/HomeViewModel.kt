@@ -29,16 +29,16 @@ class HomeViewModel(private val repository: HomeRepository): ViewModel() {
     val currentAdministrativeUnit: StateFlow<String> = _currentAdministrativeUnit
 
     fun subscribe() {
-        repository.subscribeForAddressImageAdded(callback = ::onAddressReady)
+        repository.subscribeForNewAddressAdded(callback = ::onAddressReady)
         repository.subscribeForLocationsReady(callback = ::onLocationReady)
     }
 
-    fun selectImages(address: String) {
+    suspend fun selectImages(address: String) {
         Log.d("Select Image Feature", "Select $address")
         repository.selectImagesFrom(addressName = address)
     }
 
-    fun changeCurrent(administrativeUnitName: String) {
+    suspend fun changeCurrent(administrativeUnitName: String) {
         _currentAdministrativeUnit.update { administrativeUnitName }
         repository.changeCurrent(administrativeUnit = valueOf(administrativeUnitName))
         onLocationReady()
@@ -48,13 +48,13 @@ class HomeViewModel(private val repository: HomeRepository): ViewModel() {
         repository.removeAllImages()
     }
 
-    private fun onAddressReady() {
+    private suspend fun onAddressReady() {
         _addressLocationImages.update {
             repository.locationImages().toAddressLocationImagesViewDataList()
         }
     }
 
-    private fun onLocationReady() {
+    private suspend fun onLocationReady() {
         _addressLocationImages.update {
             repository.locationImages().toAddressLocationImagesViewDataList()
         }

@@ -2,6 +2,8 @@ package io.schiar.fridgnet.model.repository.address
 
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeUnit.*
 import io.schiar.fridgnet.model.Coordinate
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -13,14 +15,71 @@ class AddressGeocoderDBRepository(
     private val addressGeocoderDataSource: AddressDataSource,
     private val addressDBDataSource: AddressDBDataSource
 ): AddressRepository {
-    private var coordinateAddress: MutableMap<Coordinate, Address> = syncMapOf(mutableMapOf())
+    private val coordinateAddress: MutableMap<Coordinate, Address> = syncMapOf(mutableMapOf())
+    private val nameAddress: MutableMap<String, Address> = syncMapOf(mutableMapOf())
+    private val cityCoordinates: MutableMap<Address, Set<Coordinate>> = syncMapOf(mutableMapOf())
+    private val countyCoordinates: MutableMap<Address, Set<Coordinate>> = syncMapOf(mutableMapOf())
+    private val stateCoordinates: MutableMap<Address, Set<Coordinate>> = syncMapOf(mutableMapOf())
+    private val countryCoordinates: MutableMap<Address, Set<Coordinate>> = syncMapOf(mutableMapOf())
+
+    override var currentAdministrativeUnit = CITY
+    private var currentAddress: Address? = null
+    private var onNewAddressAdded: suspend (address: Address) -> Unit = {}
+    private var onNewCoordinateWasAdded: suspend () -> Unit = {}
 
     override suspend fun setup() {
         addressDBDataSource.setup(onLoaded = ::onLoaded)
     }
 
-    private fun onLoaded(coordinate: Coordinate, address: Address) {
+    override fun coordinatesFromAddressName(
+        addressName: String, onNewCoordinateWasAdded: suspend () -> Unit
+    ): Pair<Address?, Set<Coordinate>> {
+        this.onNewCoordinateWasAdded  = onNewCoordinateWasAdded
+        val address = nameAddress[addressName] ?: return Pair(null, emptySet())
+        currentAddress = address
+        return Pair(address, addressCoordinateFromAdministrativeUnit(
+            administrativeUnit = address.administrativeUnit
+        )[address] ?: emptySet())
+    }
+
+    override fun subscribeForNewAddressAdded(callback: suspend (address: Address) -> Unit) {
+        onNewAddressAdded = callback
+    }
+
+    override fun currentAddressCoordinates(): Map<Address, Set<Coordinate>> {
+        return addressCoordinateFromAdministrativeUnit(currentAdministrativeUnit)
+    }
+
+    override fun currentCoordinates(): Pair<Address?, Set<Coordinate>> {
+        val coordinates = addressCoordinateFromAdministrativeUnit(currentAdministrativeUnit)[currentAddress]
+            ?: emptySet()
+        return Pair(currentAddress, coordinates)
+    }
+
+    override fun addressCoordinateFromAdministrativeUnit(
+        administrativeUnit: AdministrativeUnit
+    ): Map<Address, Set<Coordinate>> {
+        return when (administrativeUnit) {
+            CITY -> cityCoordinates
+            COUNTY -> countyCoordinates
+            STATE -> stateCoordinates
+            COUNTRY -> countryCoordinates
+        }
+    }
+
+    private suspend fun onLoaded(coordinate: Coordinate, address: Address) {
         coordinateAddress[coordinate] = address
+        address.allAddresses().forEach { subAddress ->
+            nameAddress[subAddress.name()] = address
+            val coordinates = addCoordinateToEachAddress(coordinate = coordinate, address = subAddress)
+            if (coordinates.size == 1 && address.administrativeUnit == currentAdministrativeUnit) {
+                onNewAddressAdded(subAddress)
+            }
+
+            if (currentAddress == address) {
+                onNewCoordinateWasAdded()
+            }
+        }
     }
 
     override suspend fun fetchAddressBy(coordinate: Coordinate): Address? {
@@ -55,6 +114,31 @@ class AddressGeocoderDBRepository(
                     }
                 }
                 addressFromGeocoder
+            }
+        }
+    }
+
+    private fun addCoordinateToEachAddress(address: Address, coordinate: Coordinate): List<Coordinate> {
+        return when (address.administrativeUnit) {
+            CITY -> {
+                val coordinates = cityCoordinates.getOrDefault(address, emptySet()) + coordinate
+                cityCoordinates[address] = coordinates
+                coordinates.toList()
+            }
+            COUNTY -> {
+                val coordinates = countyCoordinates.getOrDefault(address, emptySet()) + coordinate
+                countyCoordinates[address] = coordinates
+                coordinates.toList()
+            }
+            STATE -> {
+                val coordinates = stateCoordinates.getOrDefault(address, emptySet()) + coordinate
+                stateCoordinates[address] = coordinates
+                coordinates.toList()
+            }
+            COUNTRY -> {
+                val coordinates = countryCoordinates.getOrDefault(address, emptySet()) + coordinate
+                countryCoordinates[address] = coordinates
+                coordinates.toList()
             }
         }
     }

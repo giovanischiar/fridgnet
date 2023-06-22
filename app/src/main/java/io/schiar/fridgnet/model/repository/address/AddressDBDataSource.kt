@@ -17,7 +17,7 @@ class AddressDBDataSource(private val addressDAO: AddressDAO): AddressDataSource
         return selectAddressBy(latitude = latitude, longitude = longitude)
     }
 
-    suspend fun setup(onLoaded: (coordinate: Coordinate, address: Address) -> Unit) {
+    suspend fun setup(onLoaded: suspend (coordinate: Coordinate, address: Address) -> Unit) {
         coroutineScope {
             launch {
                 withContext(Dispatchers.IO) { selectAddresses() }

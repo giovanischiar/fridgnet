@@ -8,7 +8,6 @@ import io.schiar.fridgnet.model.repository.location.LocationRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.withContext
-import kotlin.jvm.optionals.getOrNull
 import kotlin.streams.toList
 import java.util.Collections.synchronizedMap as syncMapOf
 
@@ -17,17 +16,10 @@ class MainRepository(
     private val addressRepository: AddressRepository,
     private val imageRepository: ImageRepository,
 ) : AppRepository, HomeRepository, MapRepository, PhotosRepository, PolygonsRepository {
-    private var onAddressOnImageAdded: () -> Unit = {}
-    private var onLocationReady: () -> Unit = {}
-    private var onImageAdded: () -> Unit = {}
-    private var currentAdministrativeUnit = AdministrativeUnit.CITY
+    private var onLocationReady: suspend () -> Unit = {}
+    private var onImageAdded: suspend () -> Unit = {}
     private var currentImages: Pair<Address, Set<Image>>? = null
     private val locationAddress: MutableMap<Address, Location> = syncMapOf(mutableMapOf())
-    private val nameAddress: MutableMap<String, Address> = syncMapOf(mutableMapOf())
-    private val cityImages: MutableMap<Address, Set<Image>> = syncMapOf(mutableMapOf())
-    private val countyImages: MutableMap<Address, Set<Image>> = syncMapOf(mutableMapOf())
-    private val stateImages: MutableMap<Address, Set<Image>> = syncMapOf(mutableMapOf())
-    private val countryImages: MutableMap<Address, Set<Image>> = syncMapOf(mutableMapOf())
 
     // AppViewModel
     override suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) = coroutineScope {
@@ -36,7 +28,6 @@ class MainRepository(
             addressRepository.setup()
             locationRepository.setup()
         }
-        imageRepository.addImagesFromDatabase(onReady = ::onImageAdded)
         onDatabaseLoaded()
     }
 
@@ -45,50 +36,49 @@ class MainRepository(
     }
 
     // HomeViewModel
-    override fun subscribeForAddressImageAdded(callback: () -> Unit) {
-        onAddressOnImageAdded = callback
+    override fun subscribeForNewAddressAdded(callback: suspend () -> Unit) {
+        addressRepository.subscribeForNewAddressAdded { address ->
+            onNewAddressAdded(address = address, callback = callback)
+        }
     }
 
-    override fun subscribeForLocationsReady(callback: () -> Unit) {
+    private suspend fun onNewAddressAdded(address: Address, callback: suspend () -> Unit) {
+        onAddressReady(address)
+        callback()
+    }
+
+    override fun subscribeForLocationsReady(callback: suspend () -> Unit) {
         onLocationReady = callback
     }
 
-    override fun selectImagesFrom(addressName: String) {
+    override suspend fun selectImagesFrom(addressName: String) {
         Log.d("Select Image Feature", "Searching Images for $addressName")
-        val address = nameAddress[addressName] ?: return
-        Log.d("Select Image Feature", "address = nameAddress[$addressName] result in $address")
-        val images =  when (currentAdministrativeUnit) {
-            AdministrativeUnit.CITY -> cityImages[address]
-            AdministrativeUnit.COUNTY -> countyImages[address]
-            AdministrativeUnit.STATE -> stateImages[address]
-            AdministrativeUnit.COUNTRY -> countryImages[address]
-        } ?: return
-        currentImages = address to images
+        val (address, coordinates) = addressRepository.coordinatesFromAddressName(
+            addressName, ::onNewImageArrived
+        )
+        currentImages = Pair(address ?: return, imageRepository.imagesFromCoordinates(coordinates))
     }
 
-    override fun locationImages(): List<AddressLocationImages> {
+    private suspend fun onNewImageArrived() {
+        val (address, coordinates) = addressRepository.currentCoordinates()
+        currentImages = Pair(address ?: return, imageRepository.imagesFromCoordinates(coordinates))
+        onImageAdded()
+    }
+
+    override suspend fun locationImages(): List<AddressLocationImages> {
         Log.d("Add Image Feature", "Updating Location Images")
-        return when (currentAdministrativeUnit) {
-            AdministrativeUnit.CITY -> cityImages
-            AdministrativeUnit.COUNTY -> countyImages
-            AdministrativeUnit.STATE -> stateImages
-            AdministrativeUnit.COUNTRY -> countryImages
-        }.filterKeys {
-            nameAddress.containsKey(it.name()) &&
-            nameAddress[it.name()]?.administrativeUnit == currentAdministrativeUnit
-        }.map { (address, images) ->
+        return addressRepository.currentAddressCoordinates()
+            .map { (address, coordinates) ->
             AddressLocationImages(
                 address = address,
-                location = locationAddress[address],
-                initialCoordinate = images.stream()
-                    .findFirst()
-                    .getOrNull()?.coordinate ?: return emptyList()
+                location = withContext(Dispatchers.IO) { locationAddress[address] },
+                initialCoordinate = coordinates.first()
             )
         }
     }
 
     override fun changeCurrent(administrativeUnit: AdministrativeUnit) {
-        currentAdministrativeUnit = administrativeUnit
+        addressRepository.currentAdministrativeUnit = administrativeUnit
     }
 
     override suspend fun removeAllImages() {
@@ -128,7 +118,7 @@ class MainRepository(
     }
 
     // PhotosViewModel
-    override fun subscribeForNewImages(callback: () -> Unit) {
+    override fun subscribeForNewImages(callback: suspend () -> Unit) {
         onImageAdded = callback
     }
 
@@ -170,13 +160,10 @@ class MainRepository(
             addressRepository.fetchAddressBy(coordinate = coordinate)
         } ?: return
 
-        address.allAddresses().forEach { subAddress ->
-            onAddressReady(image = image, address = subAddress)
-        }
+        address.allAddresses().forEach { subAddress -> onAddressReady(address = subAddress) }
     }
 
-    private suspend fun onAddressReady(image: Image, address: Address) {
-        addAddressToImage(image = image, address = address)
+    private suspend fun onAddressReady(address: Address) {
         locationRepository.loadRegions(address = address) { location ->
             addLocationToAddress(location = location)
             onLocationReady()
@@ -186,44 +173,5 @@ class MainRepository(
     private fun addLocationToAddress(location: Location) {
         Log.d("Add Image Feature", "add ${location.address} to $location")
         locationAddress[location.address] = location
-    }
-
-    private fun addAddressToImage(address: Address, image: Image) {
-        Log.d("Add Image Feature", "add $image to $address")
-        val images = addImagesToEachAddress(address = address, image = image)
-        nameAddress[address.name()] = address
-        if (images.size == 1 && address.administrativeUnit == currentAdministrativeUnit) {
-            onAddressOnImageAdded()
-        }
-
-        if (currentImages?.first == address) {
-            selectImagesFrom(address.name())
-            onImageAdded()
-        }
-    }
-
-    private fun addImagesToEachAddress(address: Address, image: Image): List<Image> {
-        return when (address.administrativeUnit) {
-            AdministrativeUnit.CITY -> {
-                val images = cityImages.getOrDefault(address, mutableSetOf()) + image
-                cityImages[address] = images
-                images.toList()
-            }
-            AdministrativeUnit.COUNTY -> {
-                val images = countyImages.getOrDefault(address, mutableSetOf()) + image
-                countyImages[address] = images
-                images.toList()
-            }
-            AdministrativeUnit.STATE -> {
-                val images = stateImages.getOrDefault(address, mutableSetOf()) + image
-                stateImages[address] = images
-                images.toList()
-            }
-            AdministrativeUnit.COUNTRY -> {
-                val images = countryImages.getOrDefault(address, mutableSetOf()) + image
-                countryImages[address] = images
-                images.toList()
-            }
-        }
     }
 }

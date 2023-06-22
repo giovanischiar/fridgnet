@@ -20,6 +20,14 @@ interface ImageDAO {
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
+    @Query(
+        "SELECT * FROM Image JOIN Coordinate ON Image.coordinateID is Coordinate.id " +
+        "WHERE Coordinate.latitude is :latitude AND Coordinate.longitude is :longitude"
+    )
+    fun selectImageBy(latitude: Double, longitude: Double): ImageWithCoordinate?
+
+    @Transaction
+    @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Image")
     fun selectImagesWithCoordinate(): List<ImageWithCoordinate>
 

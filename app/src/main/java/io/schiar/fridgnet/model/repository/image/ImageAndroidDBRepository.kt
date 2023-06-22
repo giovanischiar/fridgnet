@@ -2,6 +2,7 @@ package io.schiar.fridgnet.model.repository.image
 
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.BoundingBox
+import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.Image
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -15,6 +16,7 @@ class ImageAndroidDBRepository(
     private val imageDBDataSource: ImageDBDataSource
 ): ImageRepository {
     private val uriImage: MutableMap<String, Image> = syncMapOf(mutableMapOf())
+    private val coordinateImage: MutableMap<Coordinate, Image> = syncMapOf(mutableMapOf())
 
     override suspend fun setup() {
         imageDBDataSource.setup(onLoaded = ::onLoaded)
@@ -26,6 +28,7 @@ class ImageAndroidDBRepository(
 
     private fun onLoaded(image: Image) {
         uriImage[image.uri] = image
+        coordinateImage[image.coordinate] = image
     }
 
     private suspend fun fetchImageBy(uri: String): Image? {
@@ -85,9 +88,39 @@ class ImageAndroidDBRepository(
         }
     }
 
+    override suspend fun imagesFromCoordinates(coordinates: Set<Coordinate>): Set<Image> {
+        return coordinates.mapNotNull {
+            coordinate -> fetchImageBy(coordinate)
+        }.toSet()
+    }
+
+    private suspend fun fetchImageBy(coordinate: Coordinate): Image? {
+        log(coordinate = coordinate, "Let's check on the memory")
+        return if (coordinateImage.containsKey(coordinate)) {
+            log(coordinate = coordinate, "It's already on the memory! Returning...")
+            coordinateImage[coordinate]
+        } else {
+            log(coordinate = coordinate, "Shoot! Time to search in the database")
+            val imageFromDatabase = withContext(Dispatchers.IO) {
+                imageDBDataSource.fetchImageBy(coordinate = coordinate)
+            }
+            log(coordinate = coordinate, "it's on the database! Returning...")
+            if (imageFromDatabase != null) { onLoaded(image = imageFromDatabase) }
+            imageFromDatabase
+        }
+    }
+
     override suspend fun removeAllImages() {
         uriImage.clear()
+        coordinateImage.clear()
         imageDBDataSource.deleteAll()
+    }
+
+    private fun log(coordinate: Coordinate, msg: String) {
+        val (latitude, longitude) = coordinate
+        Log.d(
+            tag = "Uri to Image Feature",
+            msg = "Fetching Image in ($latitude, $longitude): $msg")
     }
 
     private fun log(uri: String, msg: String) {

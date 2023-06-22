@@ -44,7 +44,7 @@ fun HomeScreen(
                     administrativeUnits = administrativeUnits,
                     currentAdministrativeUnit = currentAdministrativeUnit
                 ) {
-                    viewModel.changeCurrent(administrativeUnitName = it)
+                    runBlocking { viewModel.changeCurrent(administrativeUnitName = it) }
                 }
 
                 Box {
@@ -102,7 +102,7 @@ fun HomeScreen(
                     location = location,
                     columnCount = columnCount
                 ) {
-                    viewModel.selectImages(address)
+                    runBlocking { viewModel.selectImages(address) }
                     onNavigateImage()
                 }
             }

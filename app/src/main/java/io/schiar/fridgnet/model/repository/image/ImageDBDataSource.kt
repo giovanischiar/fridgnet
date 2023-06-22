@@ -1,5 +1,6 @@
 package io.schiar.fridgnet.model.repository.image
 
+import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.room.ImageDAO
 import io.schiar.fridgnet.model.repository.location.toCoordinateEntity
@@ -28,6 +29,11 @@ class ImageDBDataSource(private val imageDAO: ImageDAO): ImageDataSource {
 
     override suspend fun fetchImageBy(uri: String): Image? {
         return imageDAO.selectImageBy(uri = uri)?.toImage()
+    }
+
+    fun fetchImageBy(coordinate: Coordinate): Image? {
+        val (latitude, longitude) = coordinate
+        return imageDAO.selectImageBy(latitude = latitude, longitude = longitude)?.toImage()
     }
 
     suspend fun deleteAll() = coroutineScope {

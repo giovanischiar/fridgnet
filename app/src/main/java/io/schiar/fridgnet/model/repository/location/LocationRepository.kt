@@ -9,7 +9,7 @@ interface LocationRepository {
     var allCitiesBoundingBox: BoundingBox?
     var currentLocation: Location?
 
-    suspend fun loadRegions(address: Address, onLocationReady: (location: Location) -> Unit)
+    suspend fun loadRegions(address: Address, onLocationReady: suspend (location: Location) -> Unit)
     suspend fun switchRegion(region: Region)
     suspend fun switchAll()
     suspend fun setup()

@@ -6,7 +6,7 @@ import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Location
 
 interface PhotosRepository {
-    fun subscribeForNewImages(callback: () -> Unit)
+    fun subscribeForNewImages(callback: suspend () -> Unit)
     fun currentImages(): Pair<Address, List<Image>>?
     fun selectedLocation(): Location?
     fun selectedBoundingBox(): BoundingBox?
