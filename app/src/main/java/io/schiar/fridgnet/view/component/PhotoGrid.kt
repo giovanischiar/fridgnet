@@ -19,7 +19,7 @@ fun PhotoGrid(modifier: Modifier, images: List<ImageViewData>) {
             Image(
                 modifier = Modifier.height(75.dp),
                 bitmap = sortedImages[index].byteArray.toImageBitmap(),
-                contentDescription = "some useful description",
+                contentDescription = "Photo from phone",
                 contentScale = ContentScale.Crop
             )
         }
