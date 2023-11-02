@@ -20,5 +20,7 @@ fun RegionDrawer(region: RegionViewData, onClick: (region: RegionViewData) -> Un
         zIndex = region.zIndex
     )
 
-    if (showBoundingBoxPolygon) { BoundingBoxDrawer(boundingBox = region.boundingBox) }
+    if (showBoundingBoxPolygon) {
+        BoundingBoxDrawer(boundingBox = region.boundingBox)
+    }
 }

@@ -1,7 +1,11 @@
 package io.schiar.fridgnet.model.repository.location
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.*
+import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.Location
+import io.schiar.fridgnet.model.Polygon
+import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.room.LocationDAO
 import io.schiar.fridgnet.model.datasource.room.entity.PolygonEntity
 import io.schiar.fridgnet.model.datasource.room.relationentity.RegionWithPolygonAndHoles
@@ -10,7 +14,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class LocationDBDataSource(private val locationDAO: LocationDAO): LocationDataSource {
+class LocationDBDataSource(private val locationDAO: LocationDAO) : LocationDataSource {
     suspend fun setup(onLoaded: (location: Location) -> Unit) = coroutineScope {
         launch {
             withContext(Dispatchers.IO) { selectLocations() }.forEach { location ->
@@ -55,12 +59,14 @@ class LocationDBDataSource(private val locationDAO: LocationDAO): LocationDataSo
             ) ?: return null
         }
         val locationEntity = locationWithRegions.locationEntity
-        locationDAO.update(locationEntity.boundingBoxUpdated(
-            southwestLatitude = location.boundingBox.southwest.latitude,
-            southwestLongitude = location.boundingBox.southwest.longitude,
-            northeastLatitude = location.boundingBox.northeast.latitude,
-            northeastLongitude = location.boundingBox.northeast.longitude
-        ))
+        locationDAO.update(
+            locationEntity.boundingBoxUpdated(
+                southwestLatitude = location.boundingBox.southwest.latitude,
+                southwestLongitude = location.boundingBox.southwest.longitude,
+                northeastLatitude = location.boundingBox.northeast.latitude,
+                northeastLongitude = location.boundingBox.northeast.longitude
+            )
+        )
         return locationWithRegions.regions
     }
 

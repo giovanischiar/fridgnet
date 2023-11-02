@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 
-class AppViewModel(private val repository: AppRepository): ViewModel() {
+class AppViewModel(private val repository: AppRepository) : ViewModel() {
     private var _databaseLoaded = MutableStateFlow(value = false)
     val databaseLoaded: StateFlow<Boolean> = _databaseLoaded
 
@@ -17,5 +17,8 @@ class AppViewModel(private val repository: AppRepository): ViewModel() {
     private fun onDatabaseLoaded() {
         _databaseLoaded.update { true }
     }
-    suspend fun addURIs(uris: List<String>) { repository.addURIs(uris = uris) }
+
+    suspend fun addURIs(uris: List<String>) {
+        repository.addURIs(uris = uris)
+    }
 }

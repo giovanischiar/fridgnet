@@ -47,7 +47,9 @@ fun AppScreen(
 
     LaunchedEffect(Unit) {
         appViewModel.databaseLoaded.collectLatest {
-            if (it) { snackbarHostState.showSnackbar(message = "Database Loaded!") }
+            if (it) {
+                snackbarHostState.showSnackbar(message = "Database Loaded!")
+            }
         }
     }
 
@@ -112,10 +114,12 @@ fun AppScreen(
                                 )
                             }
                         },
-                        label = { Text(
-                            stringResource(screen.resourceId),
-                            color = colorResource(id = R.color.white)
-                        ) },
+                        label = {
+                            Text(
+                                stringResource(screen.resourceId),
+                                color = colorResource(id = R.color.white)
+                            )
+                        },
                         selected = selected,
                         onClick = {
                             navController.navigate(screen.route) {
@@ -149,7 +153,7 @@ fun AppScreen(
                         photosViewModel.updateCurrentImages()
                         navController.navigate("Photos")
                     },
-                    info = { screenInfo ->  currentScreenInfo = screenInfo }
+                    info = { screenInfo -> currentScreenInfo = screenInfo }
                 )
             }
 
@@ -160,21 +164,21 @@ fun AppScreen(
                         polygonsViewModel.updateCurrentLocation()
                         navController.navigate("Polygons")
                     },
-                    info = { screenInfo ->  currentScreenInfo = screenInfo }
+                    info = { screenInfo -> currentScreenInfo = screenInfo }
                 )
             }
 
             composable(route = "Photos") {
                 PhotosScreen(
                     viewModel = photosViewModel,
-                    info = { screenInfo ->  currentScreenInfo = screenInfo }
+                    info = { screenInfo -> currentScreenInfo = screenInfo }
                 )
             }
 
             composable(route = "Polygons") {
                 PolygonsScreen(
                     viewModel = polygonsViewModel,
-                    info = { screenInfo ->  currentScreenInfo = screenInfo }
+                    info = { screenInfo -> currentScreenInfo = screenInfo }
                 )
             }
         }
@@ -187,5 +191,7 @@ fun AppScreen(
         photoPickerShowing = false
     }
 
-    if (photoPickerShowing) { PhotoPicker { uris -> onURIsReady(uris = uris) } }
+    if (photoPickerShowing) {
+        PhotoPicker { uris -> onURIsReady(uris = uris) }
+    }
 }

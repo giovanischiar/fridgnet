@@ -5,7 +5,10 @@ import com.google.maps.android.compose.CameraPositionState
 import io.schiar.fridgnet.view.viewdata.RegionViewData
 
 class BoundsTestCreator {
-    fun generateTest(cameraPositionState: CameraPositionState, visibleRegions: List<RegionViewData>) {
+    fun generateTest(
+        cameraPositionState: CameraPositionState,
+        visibleRegions: List<RegionViewData>
+    ) {
         if (visibleRegions.isNotEmpty()) {
             Log.d("BoundingBoxTest", "package io.schiar.fridgnet.boundingbox")
             Log.d("BoundingBoxTest", "")
@@ -21,9 +24,12 @@ class BoundsTestCreator {
                 val boundingBox = cameraPositionState.projection?.visibleRegion!!.latLngBounds
                 val southwest = boundingBox.southwest
                 val northeast = boundingBox.northeast
-                val southwestStr = "Coordinate(latitude = ${southwest.latitude}, longitude = ${southwest.longitude})"
-                val northeastStr = "Coordinate(latitude = ${northeast.latitude}, longitude = ${northeast.longitude})"
-                val boundingBoxStr = "BoundingBox(\n\t\tsouthwest = $southwestStr,\n\t\tnortheast = $northeastStr\n\t)"
+                val southwestStr =
+                    "Coordinate(latitude = ${southwest.latitude}, longitude = ${southwest.longitude})"
+                val northeastStr =
+                    "Coordinate(latitude = ${northeast.latitude}, longitude = ${northeast.longitude})"
+                val boundingBoxStr =
+                    "BoundingBox(\n\t\tsouthwest = $southwestStr,\n\t\tnortheast = $northeastStr\n\t)"
                 Log.d("BoundingBoxTest", "\tprivate val boundingBox = $southwestStr")
                 Log.d("BoundingBoxTest", "")
             }

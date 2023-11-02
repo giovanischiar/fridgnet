@@ -5,7 +5,7 @@ import androidx.room.Relation
 import io.schiar.fridgnet.model.datasource.room.entity.CoordinateEntity
 import io.schiar.fridgnet.model.datasource.room.entity.ImageEntity
 
-data class ImageWithCoordinate (
+data class ImageWithCoordinate(
     @Embedded
     val imageEntity: ImageEntity,
     @Relation(parentColumn = "coordinateID", entityColumn = "id")

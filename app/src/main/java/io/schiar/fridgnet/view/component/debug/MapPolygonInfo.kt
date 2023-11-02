@@ -14,9 +14,14 @@ import io.schiar.fridgnet.viewmodel.util.toBoundingBox
 
 @Composable
 fun MapPolygonInfo(modifier: Modifier, visibleRegions: List<RegionViewData>) {
-    Column(modifier = modifier.background(Color.White).padding(PaddingValues(end = 5.dp))) {
+    Column(
+        modifier = modifier
+            .background(Color.White)
+            .padding(PaddingValues(end = 5.dp))
+    ) {
         Text(text = "Polygons now being drawn: ${visibleRegions.size} ")
-        Text(text = "Polygons that contains antimeridian: ${
+        Text(
+            text = "Polygons that contains antimeridian: ${
                 visibleRegions.filter {
                     it.boundingBox.toBoundingBox().containsAntimeridian()
                 }.size

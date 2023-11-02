@@ -1,6 +1,12 @@
 package io.schiar.fridgnet.model.repository.location
 
-import io.schiar.fridgnet.model.*
+import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.BoundingBox
+import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.Location
+import io.schiar.fridgnet.model.Polygon
+import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.room.entity.CoordinateEntity
 import io.schiar.fridgnet.model.datasource.room.relationentity.LocationWithRegions
 import io.schiar.fridgnet.model.datasource.room.relationentity.PolygonWithCoordinates

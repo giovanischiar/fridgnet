@@ -7,12 +7,12 @@ import org.junit.Test
 
 class ContainsCoordinatesTest {
     private val bounds = BoundingBox(
-        southwest = Coordinate(latitude = 0.0,longitude = 0.0),
+        southwest = Coordinate(latitude = 0.0, longitude = 0.0),
         northeast = Coordinate(latitude = 10.0, longitude = 10.0)
     )
 
     private val boundsAntimeridian = BoundingBox(
-        southwest = Coordinate(latitude = 0.0,longitude = 170.0),
+        southwest = Coordinate(latitude = 0.0, longitude = 170.0),
         northeast = Coordinate(latitude = 10.0, longitude = -150.0)
     )
 

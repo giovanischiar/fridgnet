@@ -13,12 +13,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class PhotosViewModel(private val repository: PhotosRepository): ViewModel() {
+class PhotosViewModel(private val repository: PhotosRepository) : ViewModel() {
     private val _selectedImages = MutableStateFlow<Pair<String, List<ImageViewData>>?>(
         value = null
     )
-    val selectedImages: StateFlow<Pair<String, List<ImageViewData>>?>
-        = _selectedImages.asStateFlow()
+    val selectedImages: StateFlow<Pair<String, List<ImageViewData>>?> =
+        _selectedImages.asStateFlow()
 
     private val _selectedLocation = MutableStateFlow<LocationViewData?>(value = null)
     val selectedLocation: StateFlow<LocationViewData?> = _selectedLocation

@@ -12,12 +12,14 @@ data class Location(
             regions = regions
                 .sortedBy { region -> region.polygon.coordinates.size }
                 .asReversed()
-                .mapIndexed { index, region -> if (index == 0) region else region.switch()
-            },
+                .mapIndexed { index, region ->
+                    if (index == 0) region else region.switch()
+                },
             boundingBox = boundingBox,
             zIndex = zIndex
         ).updateBoundingBox()
     }
+
     fun switch(region: Region): Location {
         val mutableRegions = regions.toMutableList()
         val index = regions.indexOf(region)
@@ -39,7 +41,7 @@ data class Location(
                 .map { it.boundingBox }
                 .reduce { boundingBox, otherBoundingBox ->
                     boundingBox + otherBoundingBox
-            },
+                },
             zIndex = zIndex
         )
     }

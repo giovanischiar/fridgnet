@@ -21,13 +21,13 @@ interface AddressDAO {
 
     @Query(
         "SELECT * FROM Address JOIN Coordinate ON Address.id is Coordinate.addressCoordinatesID " +
-        "WHERE Coordinate.latitude == :latitude AND Coordinate.longitude == :longitude LIMIT 1"
+                "WHERE Coordinate.latitude == :latitude AND Coordinate.longitude == :longitude LIMIT 1"
     )
     fun selectAddressEntityBy(latitude: Double, longitude: Double): AddressEntity?
 
     @Query(
         "SELECT * FROM Address WHERE " +
-        "Address.locality is :locality AND Address.adminArea = :adminArea"
+                "Address.locality is :locality AND Address.adminArea = :adminArea"
     )
     fun selectAddressBy(locality: String, adminArea: String): AddressEntity?
 }

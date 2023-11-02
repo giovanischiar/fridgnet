@@ -7,7 +7,7 @@ import org.junit.Test
 
 class PolygonsOutsideBoundsTest {
     private val bounds = BoundingBox(
-        southwest = Coordinate(latitude = 0.0,longitude = 0.0),
+        southwest = Coordinate(latitude = 0.0, longitude = 0.0),
         northeast = Coordinate(latitude = 20.0, longitude = 20.0)
     )
 

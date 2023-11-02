@@ -14,7 +14,7 @@ import java.util.Collections.synchronizedMap as syncMapOf
 class ImageAndroidDBRepository(
     private val imageAndroidDataSource: ImageAndroidDataSource,
     private val imageDBDataSource: ImageDBDataSource
-): ImageRepository {
+) : ImageRepository {
     private val uriImage: MutableMap<String, Image> = syncMapOf(mutableMapOf())
     private val coordinateImage: MutableMap<Coordinate, Image> = syncMapOf(mutableMapOf())
 
@@ -89,8 +89,8 @@ class ImageAndroidDBRepository(
     }
 
     override suspend fun imagesFromCoordinates(coordinates: Set<Coordinate>): Set<Image> {
-        return coordinates.mapNotNull {
-            coordinate -> fetchImageBy(coordinate)
+        return coordinates.mapNotNull { coordinate ->
+            fetchImageBy(coordinate)
         }.toSet()
     }
 
@@ -105,7 +105,9 @@ class ImageAndroidDBRepository(
                 imageDBDataSource.fetchImageBy(coordinate = coordinate)
             }
             log(coordinate = coordinate, "it's on the database! Returning...")
-            if (imageFromDatabase != null) { onLoaded(image = imageFromDatabase) }
+            if (imageFromDatabase != null) {
+                onLoaded(image = imageFromDatabase)
+            }
             imageFromDatabase
         }
     }
@@ -120,7 +122,8 @@ class ImageAndroidDBRepository(
         val (latitude, longitude) = coordinate
         Log.d(
             tag = "Uri to Image Feature",
-            msg = "Fetching Image in ($latitude, $longitude): $msg")
+            msg = "Fetching Image in ($latitude, $longitude): $msg"
+        )
     }
 
     private fun log(uri: String, msg: String) {

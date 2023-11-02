@@ -12,13 +12,14 @@ import io.schiar.fridgnet.model.Image
 import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
-class ImageAndroidDataSource(private val contentResolver: ContentResolver): ImageDataSource {
+class ImageAndroidDataSource(private val contentResolver: ContentResolver) : ImageDataSource {
     override suspend fun fetchImageBy(uri: String): Image? {
         val systemURI = Uri.parse(uri)
-        (contentResolver.openInputStream(systemURI)?: return null).use { ins ->
+        (contentResolver.openInputStream(systemURI) ?: return null).use { ins ->
             val exifInterface = ExifInterface(ins)
             val latLng = exifInterface.latLong ?: return null
             val coordinate = Coordinate(latitude = latLng[0], longitude = latLng[1])
+
             @SuppressLint("RestrictedApi")
             val date = exifInterface.dateTime ?: 0L
             return Image(
@@ -53,7 +54,7 @@ class ImageAndroidDataSource(private val contentResolver: ContentResolver): Imag
         return rawBitmap.resize()
     }
 
-    private fun Bitmap.resize(): Bitmap  {
+    private fun Bitmap.resize(): Bitmap {
         val width = this.width
         val height = this.height
         val maxWidth = 100f

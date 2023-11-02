@@ -9,7 +9,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ImageDBDataSource(private val imageDAO: ImageDAO): ImageDataSource {
+class ImageDBDataSource(private val imageDAO: ImageDAO) : ImageDataSource {
     suspend fun setup(onLoaded: (image: Image) -> Unit) = coroutineScope {
         launch {
             withContext(Dispatchers.IO) { selectImages() }.forEach { image ->

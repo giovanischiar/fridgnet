@@ -1,10 +1,21 @@
 package io.schiar.fridgnet.view.screen
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Icon
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
@@ -13,7 +24,12 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.*
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.MapProperties
+import com.google.maps.android.compose.MapUiSettings
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.LocationDrawer
 import io.schiar.fridgnet.view.component.PhotoGrid
@@ -73,8 +89,8 @@ fun PhotosScreen(
     Column {
         Box(
             modifier = Modifier
-            .fillMaxWidth()
-            .weight(weight)
+                .fillMaxWidth()
+                .weight(weight)
         ) {
             GoogleMap(
                 cameraPositionState = cameraPositionState,
@@ -107,7 +123,8 @@ fun PhotosScreen(
                     containerColor = colorResource(id = R.color.indigo_dye_500).copy(alpha = 0.40f),
                     elevation = FloatingActionButtonDefaults.elevation(0.dp),
                     onClick = {
-                        val imagesBoundingBox = selectedImagesBoundingBox ?: return@FloatingActionButton
+                        val imagesBoundingBox =
+                            selectedImagesBoundingBox ?: return@FloatingActionButton
                         val location = selectedLocation ?: return@FloatingActionButton
                         val boundingBox = if (zoomedOut) {
                             imagesBoundingBox
@@ -119,11 +136,13 @@ fun PhotosScreen(
                     }
                 ) {
                     Icon(
-                        painter = painterResource(id = if (zoomedOut) {
-                            R.drawable.ic_zoom_in_map
-                        } else {
-                            R.drawable.ic_fit_screen
-                        }),
+                        painter = painterResource(
+                            id = if (zoomedOut) {
+                                R.drawable.ic_zoom_in_map
+                            } else {
+                                R.drawable.ic_fit_screen
+                            }
+                        ),
                         contentDescription = if (zoomedOut) {
                             "Zoom to fit all photos"
                         } else {

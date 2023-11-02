@@ -50,7 +50,7 @@ class LocationAPIDBRepository(
     override suspend fun switchAll() {
         val currentLocation = this.currentLocation ?: return
         val locationUpdated = currentLocation.switchAll()
-        with (regionLocation.iterator()) {
+        with(regionLocation.iterator()) {
             forEach { if (currentLocation.regions.contains(it.key)) remove() }
         }
         addRegionLocation(location = locationUpdated)
@@ -93,7 +93,7 @@ class LocationAPIDBRepository(
             locationsBeingFetched = locationsBeingFetched + address
             coroutineScope {
                 launch(Dispatchers.IO) {
-                    log(address,"Job started")
+                    log(address, "Job started")
                     val location = withContext(Dispatchers.IO) {
                         fetchLocationBy(address = address)
                     }
@@ -121,7 +121,10 @@ class LocationAPIDBRepository(
             }
         }
 
-        log(location.address, "Going through the ${location.regions.size} regions of the location to add")
+        log(
+            location.address,
+            "Going through the ${location.regions.size} regions of the location to add"
+        )
         for (region in location.regions) {
             regionLocation[region] = location
         }

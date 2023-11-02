@@ -140,6 +140,7 @@ class PolygonsAppCreatedTest {
 
         Assert.assertTrue(boundingBox.contains(polygon12))
     }
+
     @Test
     fun `Polygons app generated are inside bounding box 13`() {
         val polygon13 = BoundingBox(

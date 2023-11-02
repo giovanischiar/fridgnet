@@ -1,7 +1,14 @@
 package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.*
+import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AddressLocationImages
+import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.BoundingBox
+import io.schiar.fridgnet.model.Image
+import io.schiar.fridgnet.model.Location
+import io.schiar.fridgnet.model.Polygon
+import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.repository.address.AddressRepository
 import io.schiar.fridgnet.model.repository.image.ImageRepository
 import io.schiar.fridgnet.model.repository.location.LocationRepository
@@ -69,12 +76,12 @@ class MainRepository(
         Log.d("Add Image Feature", "Updating Location Images")
         return addressRepository.currentAddressCoordinates()
             .map { (address, coordinates) ->
-            AddressLocationImages(
-                address = address,
-                location = withContext(Dispatchers.IO) { locationAddress[address] },
-                initialCoordinate = coordinates.first()
-            )
-        }
+                AddressLocationImages(
+                    address = address,
+                    location = withContext(Dispatchers.IO) { locationAddress[address] },
+                    initialCoordinate = coordinates.first()
+                )
+            }
     }
 
     override fun changeCurrent(administrativeUnit: AdministrativeUnit) {

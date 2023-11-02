@@ -1,6 +1,9 @@
 package io.schiar.fridgnet.model
 
-import io.schiar.fridgnet.model.AdministrativeUnit.*
+import io.schiar.fridgnet.model.AdministrativeUnit.CITY
+import io.schiar.fridgnet.model.AdministrativeUnit.COUNTRY
+import io.schiar.fridgnet.model.AdministrativeUnit.COUNTY
+import io.schiar.fridgnet.model.AdministrativeUnit.STATE
 
 data class Address(
     val locality: String?,
@@ -25,7 +28,7 @@ data class Address(
     }
 
     fun addressAccordingTo(administrativeUnit: AdministrativeUnit): Address {
-        return when(administrativeUnit) {
+        return when (administrativeUnit) {
             CITY -> this
 
             COUNTY -> Address(

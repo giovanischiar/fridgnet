@@ -31,7 +31,7 @@ class PolygonSearcher {
                 Log.d("Search for API Polygon", "Trying to using the q")
                 return quotesApi.getResults(q = "$city, $state, $country")
             }
-            val secondBody =  bodies[1]
+            val secondBody = bodies[1]
             Log.d(
                 "Search for API Polygon",
                 "Second Result name: {$secondBody.name} type: {$secondBody.type}"

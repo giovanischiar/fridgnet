@@ -16,10 +16,18 @@ data class Polygon(val coordinates: List<Coordinate>) {
             val coordinate = this.coordinates[i]
             val (latitude, longitude) = coordinate
 
-            if (latitude > maxLatitude) { maxLatitude = latitude }
-            if (longitude > maxLongitude) { maxLongitude = longitude }
-            if (latitude < minLatitude) { minLatitude = latitude }
-            if (longitude < minLongitude) { minLongitude = longitude }
+            if (latitude > maxLatitude) {
+                maxLatitude = latitude
+            }
+            if (longitude > maxLongitude) {
+                maxLongitude = longitude
+            }
+            if (latitude < minLatitude) {
+                minLatitude = latitude
+            }
+            if (longitude < minLongitude) {
+                minLongitude = longitude
+            }
 
             if (wasAntimeridianEverCrossed) {
                 if (longitude < 0 && longitude > furtherEastAwayFromAntimeridianLongitude) {
@@ -31,8 +39,8 @@ data class Polygon(val coordinates: List<Coordinate>) {
                 }
             }
 
-            if (i+1 < this.coordinates.size) {
-                val next = this.coordinates[i+1]
+            if (i + 1 < this.coordinates.size) {
+                val next = this.coordinates[i + 1]
                 wasAntimeridianEverCrossed = wasAntimeridianEverCrossed ||
                         coordinate.wasAntimeridianCrossed(next.longitude)
             }

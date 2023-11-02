@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class PolygonsViewModel(private val repository: PolygonsRepository): ViewModel() {
+class PolygonsViewModel(private val repository: PolygonsRepository) : ViewModel() {
     private val _currentLocation = MutableStateFlow<LocationViewData?>(null)
     val currentLocation: StateFlow<LocationViewData?> = _currentLocation.asStateFlow()
 

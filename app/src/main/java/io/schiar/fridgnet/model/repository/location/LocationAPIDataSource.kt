@@ -1,8 +1,16 @@
 package io.schiar.fridgnet.model.repository.location
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.*
-import io.schiar.fridgnet.model.AdministrativeUnit.*
+import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeUnit.CITY
+import io.schiar.fridgnet.model.AdministrativeUnit.COUNTRY
+import io.schiar.fridgnet.model.AdministrativeUnit.COUNTY
+import io.schiar.fridgnet.model.AdministrativeUnit.STATE
+import io.schiar.fridgnet.model.BoundingBox
+import io.schiar.fridgnet.model.Location
+import io.schiar.fridgnet.model.Polygon
+import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.nominatim.GeoJson
 import io.schiar.fridgnet.model.datasource.nominatim.GeoJsonAttributes
 import io.schiar.fridgnet.model.datasource.nominatim.PolygonSearcher
@@ -11,7 +19,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.withContext
 
-class LocationAPIDataSource: LocationDataSource {
+class LocationAPIDataSource : LocationDataSource {
     private var fetchingPlaces: Set<String> = emptySet()
     private var mutex: Mutex = Mutex()
 
@@ -111,7 +119,10 @@ class LocationAPIDataSource: LocationDataSource {
         val bodyList = results.body() ?: return null
         if (bodyList.isEmpty()) return null
         val body = bodyList[0]
-        Log.d("API Result", "type: $administrativeUnit, address: ${address.name()} body.geojson: ${body.geojson}")
+        Log.d(
+            "API Result",
+            "type: $administrativeUnit, address: ${address.name()} body.geojson: ${body.geojson}"
+        )
         val geoJson = body.geojson
         val boundingBox = body.boundingbox.toBoundingBox()
         return bodyToLocation(
@@ -140,6 +151,7 @@ class LocationAPIDataSource: LocationDataSource {
                 )
                 listOf(region)
             }
+
             "LineString" -> {
                 val pointDoubleList = geoJson.coordinates as List<List<Double>>
                 val polygon = Polygon(coordinates = pointDoubleList.toLineStringCoordinates())

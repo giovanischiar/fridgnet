@@ -13,7 +13,7 @@ fun AdministrativeUnitDropdown(
     onDropdown: (administrativeUnit: String) -> Unit
 ) {
     fun textOf(administrativeUnit: String): String {
-        return when(administrativeUnit) {
+        return when (administrativeUnit) {
             "CITY" -> "Cities"
             "COUNTY" -> "Counties"
             "STATE" -> "States"

@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class HomeViewModel(private val repository: HomeRepository): ViewModel() {
+class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
     private val _addressLocationImages = MutableStateFlow<List<AddressLocationImagesViewData>>(
         emptyList()
     )

@@ -10,8 +10,8 @@ interface NominatimApi {
         @Query("q") q: String,
         @Query("polygon_geojson") polygon_geojson: Int = 1,
         @Query("limit") limit: Int = 1,
-        @Query("format") format : String = "jsonv2"
-    ) : Response<List<Result<GeoJsonAttributes>>>
+        @Query("format") format: String = "jsonv2"
+    ): Response<List<Result<GeoJsonAttributes>>>
 
     @GET("/search?")
     suspend fun getResultsCity(
@@ -20,8 +20,8 @@ interface NominatimApi {
         @Query("country") country: String,
         @Query("polygon_geojson") polygon_geojson: Int = 1,
         @Query("limit") limit: Int = 2,
-        @Query("format") format : String = "jsonv2"
-    ) : Response<List<Result<GeoJsonAttributes>>>
+        @Query("format") format: String = "jsonv2"
+    ): Response<List<Result<GeoJsonAttributes>>>
 
     @GET("/search?")
     suspend fun getResultsCounty(
@@ -30,8 +30,8 @@ interface NominatimApi {
         @Query("country") country: String,
         @Query("polygon_geojson") polygon_geojson: Int = 1,
         @Query("limit") limit: Int = 1,
-        @Query("format") format : String = "jsonv2"
-    ) : Response<List<Result<GeoJsonAttributes>>>
+        @Query("format") format: String = "jsonv2"
+    ): Response<List<Result<GeoJsonAttributes>>>
 
     @GET("/search?")
     suspend fun getResultsState(
@@ -39,14 +39,14 @@ interface NominatimApi {
         @Query("country") country: String,
         @Query("polygon_geojson") polygon_geojson: Int = 1,
         @Query("limit") limit: Int = 1,
-        @Query("format") format : String = "jsonv2"
-    ) : Response<List<Result<GeoJsonAttributes>>>
+        @Query("format") format: String = "jsonv2"
+    ): Response<List<Result<GeoJsonAttributes>>>
 
     @GET("/search?")
     suspend fun getResultsCountry(
         @Query("country") country: String,
         @Query("polygon_geojson") polygon_geojson: Int = 1,
         @Query("limit") limit: Int = 1,
-        @Query("format") format : String = "jsonv2"
-    ) : Response<List<Result<GeoJsonAttributes>>>
+        @Query("format") format: String = "jsonv2"
+    ): Response<List<Result<GeoJsonAttributes>>>
 }

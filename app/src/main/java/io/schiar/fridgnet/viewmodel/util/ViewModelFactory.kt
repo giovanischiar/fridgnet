@@ -2,9 +2,12 @@ package io.schiar.fridgnet.viewmodel.util
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import io.schiar.fridgnet.model.repository.AppRepository
 import io.schiar.fridgnet.model.repository.MainRepository
-import io.schiar.fridgnet.viewmodel.*
+import io.schiar.fridgnet.viewmodel.AppViewModel
+import io.schiar.fridgnet.viewmodel.HomeViewModel
+import io.schiar.fridgnet.viewmodel.MapViewModel
+import io.schiar.fridgnet.viewmodel.PhotosViewModel
+import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 
 class ViewModelFactory(private val repository: MainRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {

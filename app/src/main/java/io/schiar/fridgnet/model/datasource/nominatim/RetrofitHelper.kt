@@ -7,7 +7,8 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitHelper {
     private const val baseUrl = "https://nominatim.openstreetmap.org/"
-    private val resultDocument = object : TypeToken<Result<io.schiar.fridgnet.model.datasource.nominatim.GeoJsonAttributes>?>() {}.type
+    private val resultDocument = object :
+        TypeToken<Result<io.schiar.fridgnet.model.datasource.nominatim.GeoJsonAttributes>?>() {}.type
 
     fun getInstance(): Retrofit {
         val gson = GsonBuilder().apply {

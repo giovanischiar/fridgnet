@@ -4,7 +4,12 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import io.schiar.fridgnet.model.datasource.room.entity.*
+import io.schiar.fridgnet.model.datasource.room.entity.AddressEntity
+import io.schiar.fridgnet.model.datasource.room.entity.CoordinateEntity
+import io.schiar.fridgnet.model.datasource.room.entity.ImageEntity
+import io.schiar.fridgnet.model.datasource.room.entity.LocationEntity
+import io.schiar.fridgnet.model.datasource.room.entity.PolygonEntity
+import io.schiar.fridgnet.model.datasource.room.entity.RegionEntity
 
 @Database(
     entities = [
@@ -18,7 +23,7 @@ import io.schiar.fridgnet.model.datasource.room.entity.*
     version = 1,
     exportSchema = false
 )
-abstract class FridgnetDatabase: RoomDatabase() {
+abstract class FridgnetDatabase : RoomDatabase() {
     abstract fun imageDAO(): ImageDAO
     abstract fun addressDAO(): AddressDAO
     abstract fun locationDAO(): LocationDAO

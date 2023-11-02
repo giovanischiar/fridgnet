@@ -11,7 +11,7 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class AddressDBDataSource(private val addressDAO: AddressDAO): AddressDataSource {
+class AddressDBDataSource(private val addressDAO: AddressDAO) : AddressDataSource {
     override fun fetchAddressBy(coordinate: Coordinate): Address? {
         val (latitude, longitude) = coordinate
         return selectAddressBy(latitude = latitude, longitude = longitude)
@@ -22,12 +22,12 @@ class AddressDBDataSource(private val addressDAO: AddressDAO): AddressDataSource
             launch {
                 withContext(Dispatchers.IO) { selectAddresses() }
                     .forEach { addressWithCoordinates ->
-                    addressWithCoordinates.coordinates.forEach { coordinateEntity ->
-                        val coordinate = coordinateEntity.toCoordinate()
-                        val address = addressWithCoordinates.addressEntity.toAddress()
-                        onLoaded(coordinate, address)
+                        addressWithCoordinates.coordinates.forEach { coordinateEntity ->
+                            val coordinate = coordinateEntity.toCoordinate()
+                            val address = addressWithCoordinates.addressEntity.toAddress()
+                            onLoaded(coordinate, address)
+                        }
                     }
-                }
             }
         }
     }
@@ -43,7 +43,7 @@ class AddressDBDataSource(private val addressDAO: AddressDAO): AddressDataSource
         val (locality, subAdminArea, adminArea) = address
         val storedAddressEntity = addressDAO.selectAddressBy(
             locality = locality ?: return null,
-            adminArea = adminArea?: return null
+            adminArea = adminArea ?: return null
         )
 
         return if (storedAddressEntity != null) {

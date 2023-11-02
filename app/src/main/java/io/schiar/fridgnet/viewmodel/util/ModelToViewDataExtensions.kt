@@ -1,8 +1,21 @@
 package io.schiar.fridgnet.viewmodel.util
 
 import android.net.Uri
-import io.schiar.fridgnet.model.*
-import io.schiar.fridgnet.view.viewdata.*
+import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AddressLocationImages
+import io.schiar.fridgnet.model.BoundingBox
+import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.Image
+import io.schiar.fridgnet.model.Location
+import io.schiar.fridgnet.model.Polygon
+import io.schiar.fridgnet.model.Region
+import io.schiar.fridgnet.view.viewdata.AddressLocationImagesViewData
+import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
+import io.schiar.fridgnet.view.viewdata.CoordinateViewData
+import io.schiar.fridgnet.view.viewdata.ImageViewData
+import io.schiar.fridgnet.view.viewdata.LocationViewData
+import io.schiar.fridgnet.view.viewdata.PolygonViewData
+import io.schiar.fridgnet.view.viewdata.RegionViewData
 
 // BoundingBox
 fun BoundingBox.toBoundingBoxViewData(): BoundingBoxViewData {

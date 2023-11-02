@@ -11,9 +11,7 @@ fun LocationDrawer(location: LocationViewData, onClickLocation: () -> Unit = {})
     location.regions.map {
         Polygon(
             points = it.polygon.coordinates.toLatLngList(),
-            onClick = {
-                onClickLocation()
-            },
+            onClick = { onClickLocation() },
             visible = it.active,
             holes = it.holes.map { hole -> hole.coordinates.toLatLngList() },
             fillColor = Color.Transparent,

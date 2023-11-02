@@ -41,7 +41,8 @@ data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
         } else {
             val distanceFromAntimeridianToNortheast = 180.0 + northeast.longitude
             val distanceFromSouthwestToAntimeridian = 180.0 - southwest.longitude
-            val halfDistance = (distanceFromSouthwestToAntimeridian + distanceFromAntimeridianToNortheast)/2
+            val halfDistance =
+                (distanceFromSouthwestToAntimeridian + distanceFromAntimeridianToNortheast) / 2
             if (southwest.longitude + halfDistance >= 180.0) {
                 val restOfTheDistance = southwest.longitude + halfDistance - 180.0
                 -180.0 + restOfTheDistance
@@ -60,8 +61,9 @@ data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
 
     fun centerAntipode(): Double {
         val centerLongitude = centerLongitude()
-        return centerLongitude + if (centerLongitude < 0) 180.0 else - 180.0
+        return centerLongitude + if (centerLongitude < 0) 180.0 else -180.0
     }
+
     fun westOfLongitude(longitude: Double): Boolean {
         val centerAntipode = centerAntipode()
 
