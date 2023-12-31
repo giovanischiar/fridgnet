@@ -215,4 +215,5 @@ The red dashed arrows that goes from View Model classes to View Classes show whe
 <img src="readme-res/viewmodel-repository-diagram.svg">
 
 ### Model
-<img src="readme-res/model-class-diagram.svg">
+<img src="readme-res/model-class-diagram#gh-light-mode-only.svg">
+<img src="readme-res/model-class-diagram#gh-dark-mode-only.svg">
