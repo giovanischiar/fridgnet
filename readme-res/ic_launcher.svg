@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0 -0 108 108">
+    <path stroke-width="0.0" d="M 10.8 0 h 86.4 a 10.8 10.8 0 0 1 10.8 10.8 v 86.4 a 10.8 10.8 0 0 1 -10.8 10.8 h -86.4 a 10.8 10.8 0 0 1 -10.8 -10.8 v -86.4 a 10.8 10.8 0 0 1 10.8 -10.8 Z" fill-opacity="1" fill="#08415C"/>
+    <path stroke="#08415C" fill="#FFFBFF" fill-opacity="1" d="M 34.5 29.5 h 39 a 5 5 0 0 1 5 5 v 30.28 h -49 v -30.28 a 5 5 0 0 1 5 -5 Z" stroke-width="1.944"/>
+    <path stroke="#08415C" fill="#E54B4B" fill-opacity="1" d="M 38.4173 50.0723 L 38.4173 50.0723 C 38.4173 41.4652 45.394 34.4877 54.0003 34.4877 C 62.6066 34.4877 69.5833 41.4652 69.5833 50.0723 L 61.7918 50.0723 C 61.7918 45.7683 58.3034 42.2792 54.0003 42.2792 C 49.6972 42.2792 46.2088 45.7683 46.2088 50.0723 Z" stroke-width="1.944"/>
+    <path fill-opacity="1" stroke-width="1.944" d="M 38.4 49.98 h 7.8 v 5 h -7.8 v -5 Z" fill="#C4CBCA" stroke="#08415C"/>
+    <path fill-opacity="1" stroke-width="1.944" d="M 61.8 49.98 h 7.8 v 5 h -7.8 v -5 Z" fill="#C4CBCA" stroke="#08415C"/>
+    <path fill-opacity="0" stroke-width="2.944" d="M 32.5 60.56 L 42.5 60.56" stroke="#08415C"/>
+    <path fill-opacity="1" stroke-width="1.944" d="M 29.5 64.78 h 49 v 8.72 a 5 5 0 0 1 -5 5 h -39 a 5 5 0 0 1 -5 -5 v -8.72 Z" fill="#FFFBFF" stroke="#08415C"/>
+    <path fill-opacity="0" stroke-width="2.944" d="M 32.5 68.64 L 42.5 68.64" stroke="#08415C"/>
+</svg>
