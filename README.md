@@ -19,6 +19,17 @@
   - [JSON Format Handling](#json-format-handling)
   - [Clipping of locations](#clipping-of-locations)
 - [Structure](#structure)
+  - [Implementation](#implementation)
+  - [Aggregation](#aggregation)
+  - [Composition](#composition)
+  - [Aggregation With List](#aggregation-with-list)
+  - [Composition With Mutable Map](#composition-with-list)
+  - [Composition With Pair of Set](#composition-with-pair-of-set)
+- [Diagrams](#diagrams)
+  -[Whole Project](#whole-project)
+  -[View/ViewModel Relationship](#view/viewmodel-relationship)
+  -[ViewModel/Repository Relationship](#viewModel/repository-relationship)
+  -[Model](#model)
 
 ## Use Cases
 
