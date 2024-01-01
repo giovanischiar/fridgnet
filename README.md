@@ -27,8 +27,8 @@
   - [Composition With Pair of Set](#composition-with-pair-of-set)
 - [Diagrams](#diagrams)
   - [Whole Project](#whole-project)
-  - [View/ViewModel Relationship](#view-viewmodel-relationship)
-  - [ViewModel/Repository Relationship](#viewModel-repository-relationship)
+  - [View/ViewModel Relationship](#viewviewmodel-relationship)
+  - [ViewModel/Repository Relationship](#viewModelrepository-relationship)
   - [Model](#model)
 
 ## Use Cases
