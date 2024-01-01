@@ -111,7 +111,23 @@
     The point was the `coordinates` field has a variable type, so I had to learn how to create a custom JSON deserializer when convert the JSON into Kotlin objects
 
 ### Clipping of polygons
-  - Plot those polygons as the locations grow became a very onerous task. So to solve that I implemented clipping of theses polygons. That way the app won't draw polygons that are not visible. I created some tests to aid me in this task. Before I created theses tests I draw on paper each possible case a polygon should not be drawn by the app. Let's take a look of the digitalized (and enhanced) version: <img src="readme-res/clipping-visual-tests.svg"> As you can see, the big rectangle at the center is the visible area of the map at the moment; I call it `bounds`. To simplify it, instead of compare each coordinate of each polygon against `bounds`'s coordinates, I compare its `southeast` and `northeast` coordinates. Let's take a closer look of what those rectangles mean <img src="readme-res/clipping-test-legend.svg"> For each polygon I calculated its `boundingbox` that consists of its `southwest` and `northeast` coordinates. These coordinates create a box that encloses the polygon. Each `boundingbox` around `bounds` is numerated and then to each one I wrote a test that was labeled after its relative position to `bounds`. Here's a slighty modified exerpt of [PolygonsOutsideBoundsTest.kt](https://github.com/giovanischiar/fridgnet/blob/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox/PolygonsOutsideBoundsTest.kt) showing that each unit test corresponds a numbered `boundingbox` drawn on the diagram:
+  - Plot those polygons as the locations grow became a very onerous task. So to solve that I implemented clipping of theses polygons. That way the app won't draw polygons that are not visible. I created some tests to aid me in this task. Before I created theses tests I draw on paper each possible case a polygon should not be drawn by the app. Let's take a look of the digitalized (and enhanced) version: 
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./readme-res/clipping-visual-tests.dark.svg">
+    <img alt="Clipping of polygons Diagram" src="./readme-res/clipping-visual-tests.light.svg">
+  </picture>
+  As you can see, the big rectangle at the center is the visible area of the map at the moment; I call it `bounds`. To simplify it, instead of compare each coordinate of each polygon against `bounds`'s coordinates, I compare its `southeast` and `northeast` coordinates. Let's take a closer look of what those rectangles mean 
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="./readme-res/clipping-test-legend.dark.svg">
+    <img alt="Clipping Visual Tests Diagram" src="./readme-res/clipping-test-legend.light.svg">
+  </picture>
+
+  ```kotlin
+  @Test // 26
+  fun `Polygon with southwest and northeast different from bounds south of bounds`() { /* .. */ }
+  ```
+
+  For each polygon I calculated its `boundingbox` that consists of its `southwest` and `northeast` coordinates. These coordinates create a box that encloses the polygon. Each `boundingbox` around `bounds` is numerated and then to each one I wrote a test that was labeled after its relative position to `bounds`. Here's a slighty modified exerpt of [PolygonsOutsideBoundsTest.kt](https://github.com/giovanischiar/fridgnet/blob/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox/PolygonsOutsideBoundsTest.kt) showing that each unit test corresponds a numbered `boundingbox` drawn on the diagram:
     
       ```kotlin
       /* ... */
@@ -149,17 +165,26 @@
 Before showing the diagrams, I will introduce the notation I used to create it.
   
 ### Diagram Elements
-<img src="readme-res/diagram-elements.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagram-elements.dark.svg">
+  <img alt="Diagram Elements Diagram" src="./readme-res/diagram-elements.light.svg">
+</picture>
 
 ### Implementation
-<img src="readme-res/implementation.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/implementation.dark.svg">
+  <img alt="Implementation Diagram" src="./readme-res/implementation.light.svg">
+</picture>
 
 ```kotlin
 class MainRepository : HomeRepository { /*...*/ }
 ```
 
 ### Aggregation
-<img src="readme-res/aggregation.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/aggregation.dark.svg">
+  <img alt="Aggregation Diagram" src="./readme-res/aggregation.light.svg">
+</picture>
 
 ```kotlin
 data class Region(
@@ -168,7 +193,10 @@ data class Region(
 ```
 
 ### Composition
-<img src="readme-res/composition.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/composition.dark.svg">
+  <img alt="Composition Diagram" src="./readme-res/composition.light.svg">
+</picture>
 
 ```kotlin
 data class Address(
@@ -177,7 +205,10 @@ data class Address(
 ```
 
 ### Aggregation With List
-<img src="readme-res/aggregation-list.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/aggregation-list.dark.svg">
+  <img alt="Aggregation With List Diagram" src="./readme-res/aggregation-list.light.svg">
+</picture>
 
 ```kotlin
 data class Region(
@@ -186,7 +217,10 @@ data class Region(
 ```
 
 ### Composition With Mutable Map
-<img src="readme-res/composition-mutable-map.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/composition-mutable-map.dark.svg">
+  <img alt="Composition With Mutable Map Diagram" src="./readme-res/composition-mutable-map.light.svg">
+</picture>
 
 ```kotlin
 class MainRepository {
@@ -195,7 +229,10 @@ class MainRepository {
 ```
 
 ### Composition With Pair of Set
-<img src="readme-res/composition-pair-set.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/composition-pair-set.dark.svg">
+  <img alt="Composition With Pair of Set Diagram" src="./readme-res/composition-pair-set.light.svg">
+</picture>
 
 ```kotlin
 class MainRepository {
@@ -205,17 +242,27 @@ class MainRepository {
 
 ## Diagrams
 ### Whole Project
-<img src="readme-res/project-structure-diagram.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/project-structure-diagram.dark.svg">
+  <img alt="Whole Project Diagram" src="./readme-res/project-structure-diagram.light.svg">
+</picture>
 
 ### View/ViewModel Relationship
-<img src="readme-res/view-view-model-diagram.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/view-view-model-diagram.dark.svg">
+  <img alt="View/ViewModel Relationship Diagram" src="./readme-res/view-view-model-diagram.light.svg">
+</picture>
+
 The red dashed arrows that goes from View Model classes to View Classes show where each `MutableStateFlow` is used in View. The blue dashed arrows are the methods View called to View Model.
 
 ### ViewModel/Repository Relationship
-<img src="readme-res/viewmodel-repository-diagram.svg">
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/viewmodel-repository-diagram.dark.svg">
+  <img alt="ViewModel/Repository Relationship Diagram" src="./readme-res/viewmodel-repository-diagram.light.svg">
+</picture>
 
 ### Model
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/model-class-diagram.dark.svg">
-  <img alt="Model Diagram" src="./readme-res/model-class-diagram.light.svg">
+  <img alt="Model Diagram Diagram" src="./readme-res/model-class-diagram.light.svg">
 </picture>
