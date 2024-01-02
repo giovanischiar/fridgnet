@@ -29,7 +29,7 @@
   - [Whole Project](#whole-project)
   - [View/ViewModel Relationship](#viewviewmodel-relationship)
   - [ViewModel/Repository Relationship](#viewModelrepository-relationship)
-  - [Model](#model)
+  - [MainRepository](#main-repository)
 
 ## Use Cases
 
@@ -272,8 +272,12 @@ The red dashed arrows that goes from View Model classes to View Classes show whe
   <img alt="ViewModel/Repository Relationship Diagram" src="./readme-res/viewmodel-repository-diagram.light.svg">
 </picture>
 
-### Model
+### Main Repository
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/model-class-diagram.dark.svg">
-  <img alt="Model Diagram Diagram" src="./readme-res/model-class-diagram.light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/main-repository-diagram-1.dark.svg">
+  <img alt="Main Repository Diagram 1" src="./readme-res/main-repository-diagram-1.light.svg">
+</picture>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/main-repository-diagram-2.dark.svg">
+  <img alt="Main Repository Diagram 2" src="./readme-res/main-repository-diagram-2.light.svg">
 </picture>
