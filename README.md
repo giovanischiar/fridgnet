@@ -143,37 +143,37 @@
 
   For each polygon I calculated its `boundingbox` that consists of its `southwest` and `northeast` coordinates. These coordinates create a box that encloses the polygon. Each `boundingbox` around `bounds` is numerated and then to each one I wrote a test that was labeled after its relative position to `bounds`. Here's a slighty modified exerpt of [PolygonsOutsideBoundsTest.kt](https://github.com/giovanischiar/fridgnet/blob/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox/PolygonsOutsideBoundsTest.kt) showing that each unit test corresponds a numbered `boundingbox` drawn on the diagram:
     
-      ```kotlin
-      /* ... */
+  ```kotlin
+  /* ... */
 
-      @Test // 1
-      fun `Polygon with southwest latitude equals bounds southwest latitude west of bounds`() {/* ... */}
+  @Test // 1
+  fun `Polygon with southwest latitude equals bounds southwest latitude west of bounds`() {/* ... */}
 
-      @Test // 2
-      fun `Polygon with southwest latitude equals bounds southwest latitude east of bounds`() {/* ... */}
+  @Test // 2
+  fun `Polygon with southwest latitude equals bounds southwest latitude east of bounds`() {/* ... */}
 
-      @Test // 3
-      fun `Polygon with southwest longitude equals bounds southwest longitude south of bounds`() {/* ... */}
+  @Test // 3
+  fun `Polygon with southwest longitude equals bounds southwest longitude south of bounds`() {/* ... */}
 
-      @Test // 4
-      fun `Polygon with southwest longitude equals bounds southwest longitude north of bounds`() {/* ... */}
+  @Test // 4
+  fun `Polygon with southwest longitude equals bounds southwest longitude north of bounds`() {/* ... */}
 
-      @Test // 5
-      fun `Polygon with southwest latitude equals bounds northeast latitude west of bounds`() {/* ... */}
+  @Test // 5
+  fun `Polygon with southwest latitude equals bounds northeast latitude west of bounds`() {/* ... */}
 
-      @Test // 6
-      fun `Polygon with southwest latitude equals bounds northeast latitude east of bounds`() {/* ... */}
+  @Test // 6
+  fun `Polygon with southwest latitude equals bounds northeast latitude east of bounds`() {/* ... */}
 
-      @Test // 7
-      fun `Polygon with southwest longitude equals bounds northeast longitude south of bounds`() {/* ... */}
+  @Test // 7
+  fun `Polygon with southwest longitude equals bounds northeast longitude south of bounds`() {/* ... */}
 
-      @Test // 8
-      fun `Polygon with southwest longitude equals bounds northeast longitude north of bounds`() {/* ... */}
+  @Test // 8
+  fun `Polygon with southwest longitude equals bounds northeast longitude north of bounds`() {/* ... */}
 
-      /* ... */
-      ``` 
+  /* ... */
+  ``` 
     
-      The tests of this file only cover if the algorithm correctly returns `false` to those outside of `bounds`. Besides other file that cover the opposite case, there are other tests that covers further more; for example, how the algorithm will behave if the [antimeridian](https://en.wikipedia.org/wiki/180th_meridian) is visible? Or what if theres is a polygon that crosses that meridian? All cases was carefully considered and its files is inside the [boundingbox folder](https://github.com/giovanischiar/fridgnet/tree/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox) in tests.
+  The tests of this file only cover if the algorithm correctly returns `false` to those outside of `bounds`. Besides other file that cover the opposite case, there are other tests that covers further more; for example, how the algorithm will behave if the [antimeridian](https://en.wikipedia.org/wiki/180th_meridian) is visible? Or what if theres is a polygon that crosses that meridian? All cases was carefully considered and its files is inside the [boundingbox folder](https://github.com/giovanischiar/fridgnet/tree/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox) in tests.
 
 ## Structure
 Before showing the diagrams, I will introduce the notation I used to create it.
