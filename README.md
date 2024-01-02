@@ -29,7 +29,10 @@
   - [Whole Project](#whole-project)
   - [View/ViewModel Relationship](#viewviewmodel-relationship)
   - [ViewModel/Repository Relationship](#viewModelrepository-relationship)
-  - [MainRepository](#main-repository)
+  - [MainRepository](#mainrepository)
+  - [AddressGeocoderDBRepository](#addressgeocoderdbrepository)
+  - [ImageAndroidDBRepository](#imageandroiddbrepository)
+  - [LocationAPIDBRepository](#locationapidbrepository)
 
 ## Use Cases
 
@@ -272,7 +275,7 @@ The red dashed arrows that goes from View Model classes to View Classes show whe
   <img alt="ViewModel/Repository Relationship Diagram" src="./readme-res/viewmodel-repository-diagram.light.svg">
 </picture>
 
-### Main Repository
+### MainRepository
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/main-repository-diagram-1.dark.svg">
   <img alt="Main Repository Diagram 1" src="./readme-res/main-repository-diagram-1.light.svg">
@@ -282,19 +285,19 @@ The red dashed arrows that goes from View Model classes to View Classes show whe
   <img alt="Main Repository Diagram 2" src="./readme-res/main-repository-diagram-2.light.svg">
 </picture>
 
-### Address Geocoder DB Repository
+### AddressGeocoderDBRepository
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/address-geocoder-db-repository-diagram.dark.svg">
   <img alt="Address Geocoder DB Repository Diagram" src="./readme-res/address-geocoder-diagram-2.light.svg">
 </picture>
 
-### Image Android DB Repository
+### ImageAndroidDBRepository
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/image-android-db-repository-diagram.dark.svg">
   <img alt="Image Android DB Repository Diagram" src="./readme-res/image-android-db-repository-diagram.light.svg">
 </picture>
 
-### Location API DB Repository
+### LocationAPIDBRepository
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/location-api-db-repository-diagram.dark.svg">
   <img alt="Location API DB Repository Diagram" src="./readme-res/location-api-db-repository-diagram.light.svg">
