@@ -288,7 +288,7 @@ The red dashed arrows that goes from View Model classes to View Classes show whe
 ### AddressGeocoderDBRepository
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/address-geocoder-db-repository-diagram.dark.svg">
-  <img alt="Address Geocoder DB Repository Diagram" src="./readme-res/address-geocoder-diagram-2.light.svg">
+  <img alt="Address Geocoder DB Repository Diagram" src="./readme-res//address-geocoder-db-repository-diagram.light.svg">
 </picture>
 
 ### ImageAndroidDBRepository
