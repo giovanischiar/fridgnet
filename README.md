@@ -30,6 +30,7 @@
 - [Diagrams](#diagrams)
   - [Whole Project](#whole-project)
   - [View/ViewModel Relationship](#viewviewmodel-relationship)
+  - [ViewModel](#viewmodel)
   - [ViewModel/Repository Relationship](#viewModelrepository-relationship)
   - [MainRepository](#mainrepository)
   - [AddressGeocoderDBRepository](#addressgeocoderdbrepository)
@@ -300,7 +301,11 @@ class MainRepository {
   <img alt="View/ViewModel Relationship Diagram" src="./readme-res/view-view-model-diagram.light.svg">
 </picture>
 
-The red dashed arrows that goes from View Model classes to View Classes show where each `MutableStateFlow` is used in View. The blue dashed arrows are the methods View called to View Model.
+### ViewModel
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/viewmodel-diagram-1.dark.svg">
+  <img alt="ViewModel Diagram 1" src="./readme-res/viewmodel-diagram-1.light.svg">
+</picture>
 
 ### ViewModel/Repository Relationship
 <picture>
