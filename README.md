@@ -325,6 +325,15 @@ class MainRepository {
   <img alt="ViewModel Diagram 1" src="./readme-res/viewmodel-diagram-1.light.svg">
 </picture>
 
+|number|attribute                  |number|attribute                  |number|attribute                  |
+|:----:|:-------------------------:|:----:|:-------------------------:|:----:|:-------------------------:|
+|1     |`databaseLoaded`           |7     |`mapViewModel`             |13    |`allPhotosBoundingBox`     |
+|2     |`addressLocationImages`    |8     |`polygonsViewModel`        |14    |`selectedImages`           |
+|3     |`administrativeUnits`      |9     |`photosViewModel`          |15    |`selectedLocation`         |
+|4     |`currentAdministrativeUnit`|10    |`currentLocation`          |16    |`selectedBoundingBox`      |
+|5     |`appViewModel`             |11    |`visibleImages`            |17    |`selectedImagesBoundingBox`|
+|6     |`homeViewModel`            |12    |`visibleRegions`           |      |                           |
+
 ### ViewModel/Repository Relationship
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/viewmodel-repository-diagram.dark.svg">
