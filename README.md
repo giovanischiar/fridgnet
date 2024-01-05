@@ -20,7 +20,7 @@
   - [Clipping of locations](#clipping-of-locations)
 - [Structure](#structure)
   - [Method Calling](#method-calling)
-  - [View/ViewWModel Relationship](#viewviewmodel-relationship)
+  - [Screen/ViewWModel Relationship](#screenviewmodel-relationship)
   - [Implementation](#implementation)
   - [Aggregation](#aggregation)
   - [Composition](#composition)
@@ -201,10 +201,10 @@ class AppViewModel(private val repository: AppRepository) : ViewModel {
 }
 ```
 
-### View/ViewModel Relationship
+### Screen/ViewModel Relationship
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/view-view-model-relationship.dark.svg">
-  <img alt="View ViewModel Relationship" src="./readme-res/view-view-model-relationship.light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/screen-viewmodel-relationship.dark.svg">
+  <img alt="Screen ViewModel Relationship" src="./readme-res/screen-viewmodel-relationship.light.svg">
 </picture>
 
 ```kotlin
