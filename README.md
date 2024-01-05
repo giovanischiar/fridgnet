@@ -19,8 +19,9 @@
   - [JSON Format Handling](#json-format-handling)
   - [Clipping of locations](#clipping-of-locations)
 - [Structure](#structure)
-  - [Implementation](#implementation)
   - [Method Calling](#method-calling)
+  - [View/ViewWModel Relationship](#viewviewmodel-relationship)
+  - [Implementation](#implementation)
   - [Aggregation](#aggregation)
   - [Composition](#composition)
   - [Aggregation With List](#aggregation-with-list)
@@ -197,6 +198,22 @@ class AppViewModel(private val repository: AppRepository) : ViewModel {
     suspend fun addURIs(uris: List<String>) {
         repository.addURIs(uris = uris)
     }
+}
+```
+
+### View/ViewModel Relationship
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/view-view-model-relationship.dark.svg">
+  <img alt="View ViewModel Relationship" src="./readme-res/view-view-model-relationship.light.svg">
+</picture>
+```kotlin
+@Composable
+fun HomeScreen(viewModel: HomeViewModel, /*...*/) {
+  /*...*/
+  LaunchedEffect(Unit) { viewModel.subscribe() }
+  val addressLocationImages by viewModel.addressLocationImages.collectAsState()
+  /*...*/
+
 }
 ```
 
