@@ -213,7 +213,6 @@ fun HomeScreen(viewModel: HomeViewModel, /*...*/) {
   LaunchedEffect(Unit) { viewModel.subscribe() }
   val addressLocationImages by viewModel.addressLocationImages.collectAsState()
   /*...*/
-
 }
 ```
 
