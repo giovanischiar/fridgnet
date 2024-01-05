@@ -20,6 +20,7 @@
   - [Clipping of locations](#clipping-of-locations)
 - [Structure](#structure)
   - [Implementation](#implementation)
+  - [Method Calling](#method-calling)
   - [Aggregation](#aggregation)
   - [Composition](#composition)
   - [Aggregation With List](#aggregation-with-list)
@@ -183,6 +184,21 @@ Before showing the diagrams, I will introduce the notation I used to create it.
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagram-elements.dark.svg">
   <img alt="Diagram Elements Diagram" src="./readme-res/diagram-elements.light.svg">
 </picture>
+
+### Method Calling
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/method-calling.dark.svg">
+  <img alt="Method Calling Diagram Diagram" src="./readme-res/method-calling.light.svg">
+</picture>
+
+```kotlin
+class AppViewModel(private val repository: AppRepository) : ViewModel { 
+  /*...*/ 
+    suspend fun addURIs(uris: List<String>) {
+        repository.addURIs(uris = uris)
+    }
+}
+```
 
 ### Implementation
 <picture>
