@@ -206,6 +206,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel {
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/view-view-model-relationship.dark.svg">
   <img alt="View ViewModel Relationship" src="./readme-res/view-view-model-relationship.light.svg">
 </picture>
+
 ```kotlin
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, /*...*/) {
