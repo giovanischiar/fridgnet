@@ -308,17 +308,6 @@ class MainRepository {
   <img alt="ViewData Diagram" src="./readme-res/viewdata-diagram.light.svg">
 </picture>
 
-|number|attribute          |number|attribute          |number|attribute          |
-|:----:|:-----------------:|:----:|:-----------------:|:----:|:-----------------:|
-|1     |`addressName`      |9     |`southwest`        |17    |`coordinates`      |
-|2     |`location`         |10    |`northwest`        |18    |`uri`              |
-|3     |`initialCoordinate`|11    |`polygon`          |19    |`byteArray`        |
-|4     |`address`          |12    |`holes`            |20    |`date`             |
-|5     |`regions`          |13    |`active`           |21    |`coordinate`       |
-|6     |`boundingBox`      |14    |`boundingBox`      |22    |`latitude`         |
-|7     |`center`           |15    |`center`           |23    |`longitude`        |
-|8     |`zIndex`           |16    |`zIndex`           |      |                   |
-
 ### ViewModel
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/viewmodel-diagram-1.dark.svg">
