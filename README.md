@@ -33,6 +33,7 @@
   - [ViewData](#viewdata)
   - [ViewModel](#viewmodel)
   - [ViewModel/Repository Relationship](#viewModelrepository-relationship)
+  - [Model](#model)
   - [MainRepository](#mainrepository)
   - [AddressGeocoderDBRepository](#addressgeocoderdbrepository)
   - [ImageAndroidDBRepository](#imageandroiddbrepository)
@@ -320,14 +321,16 @@ class MainRepository {
   <img alt="ViewModel/Repository Relationship Diagram" src="./readme-res/viewmodel-repository-diagram.light.svg">
 </picture>
 
+### Model
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/model-diagram.dark.svg">
+  <img alt="Model Diagram" src="./readme-res/model-diagram.light.svg">
+</picture>
+
 ### MainRepository
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/main-repository-diagram-1.dark.svg">
   <img alt="Main Repository Diagram 1" src="./readme-res/main-repository-diagram-1.light.svg">
-</picture>
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/main-repository-diagram-2.dark.svg">
-  <img alt="Main Repository Diagram 2" src="./readme-res/main-repository-diagram-2.light.svg">
 </picture>
 
 ### AddressGeocoderDBRepository
