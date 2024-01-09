@@ -29,15 +29,13 @@
   - [Composition With Pair of Set](#composition-with-pair-of-set)
 - [Diagrams](#diagrams)
   - [Whole Project](#whole-project)
-  - [View/ViewModel Relationship](#viewviewmodel-relationship)
-  - [ViewData](#viewdata)
-  - [ViewModel](#viewmodel)
-  - [ViewModel/Repository Relationship](#viewModelrepository-relationship)
+  - [Package `view` with `viewmodel`](#package-view-with-viewmodel`)
+  - [Package `view.viewdata`](#package-viewviewdata)
+  - [Package `viewmodel` with `view.viewdata`](#package-viewmodel-with-viewviewdata`)
+  - [Package `viewmodel` with `model.repository`](#package-viewmodel-with-modelrepository)
   - [Package `model`](#package-model)
-  - [Package `model.repository`](#package-modelrepository)
-  - [AddressGeocoderDBRepository](#addressgeocoderdbrepository)
-  - [ImageAndroidDBRepository](#imageandroiddbrepository)
-  - [LocationAPIDBRepository](#locationapidbrepository)
+  - [Package `model.repository` with `model`](package-modelrepository-with-model`)
+  - [Package `model.repository` with `model.datasource`](package-modelrepository-with-modeldatasource`)
 
 ## Use Cases
 
@@ -297,25 +295,25 @@ class MainRepository {
   <img alt="Whole Project Diagram" src="./readme-res/diagrams/light/project-structure-diagram.light.svg">
 </picture>
 
-### View/ViewModel Relationship
+### Package `view` with `viewmodel`
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/view-view-model-diagram.dark.svg">
   <img alt="View/ViewModel Relationship Diagram" src="./readme-res/diagrams/light/view-view-model-diagram.light.svg">
 </picture>
 
-### ViewData
+### Package `view.viewdata`
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewdata-diagram.dark.svg">
   <img alt="ViewData Diagram" src="./readme-res/diagrams/light/viewdata-diagram.light.svg">
 </picture>
 
-### ViewModel
+### Package `viewmodel` with `view.viewdata`
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewmodel-diagram-1.dark.svg">
   <img alt="ViewModel Diagram 1" src="./readme-res/diagrams/light/viewmodel-diagram-1.light.svg">
 </picture>
 
-### ViewModel/Repository Relationship
+### Package `viewmodel` with `model.repository`
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewmodel-repository-diagram.dark.svg">
   <img alt="ViewModel/Repository Relationship Diagram" src="./readme-res/diagrams/light/viewmodel-repository-diagram.light.svg">
@@ -327,26 +325,26 @@ class MainRepository {
   <img alt="Model Diagram" src="./readme-res/diagrams/light/model-diagram.light.svg">
 </picture>
 
-### Package `model.repository`
+### Package `model.repository` with `model`
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-diagram.dark.svg">
-  <img alt="Main Repository Diagram 1" src="./readme-res/diagrams/light/repository-diagram.light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-model-diagram.dark.svg">
+  <img alt="Repository Model Diagram" src="./readme-res/diagrams/light/repository-model-diagram.light.svg">
 </picture>
-
-### AddressGeocoderDBRepository
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/address-geocoder-db-repository-diagram.dark.svg">
   <img alt="Address Geocoder DB Repository Diagram" src="./readme-res/diagrams/light/address-geocoder-db-repository-diagram.light.svg">
 </picture>
-
-### ImageAndroidDBRepository
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/image-android-db-repository-diagram.dark.svg">
   <img alt="Image Android DB Repository Diagram" src="./readme-res/diagrams/light/image-android-db-repository-diagram.light.svg">
 </picture>
-
-### LocationAPIDBRepository
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/location-api-db-repository-diagram.dark.svg">
   <img alt="Location API DB Repository Diagram" src="./readme-res/diagrams/light/location-api-db-repository-diagram.light.svg">
+</picture>
+
+### Package `model.repository` with `model.datasource`
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-diagram.dark.svg">
+  <img alt="Main Repository Diagram 1" src="./readme-res/diagrams/light/repository-diagram.light.svg">
 </picture>
