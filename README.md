@@ -355,6 +355,6 @@ class MainRepository {
   - The Geocoder library sometimes doesn't get the address of the locations right, and the Nominatim Library sometimes doesn't return the right outline for the location. A solution would be let the user search and correct the location;
   - Use the date of each photo to show not only where but when the photo was taken;
   - In the `Photos Screen` now it only works when you click in cities, not in county, states, or countries
-  - Cities may have exclaves that are also belongs to states, county or countries. The app only consider that the exclave belongs only to a city
+  - Cities may have exclaves that are also belongs to states, county or countries. When you remove a exclave from a city, it doesn't remove from others, so it still plots in the map;
   - Create a dark mode;
   - Although unit tests were created to test the clipping, there are many other tests I'd like to create for this application;
