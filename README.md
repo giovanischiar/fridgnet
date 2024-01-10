@@ -4,8 +4,8 @@
 </h1>
 
 <p align="center">
-  <strong>Collect interesting places and pin in your map like a fridge magnet! </strong><br>
-  This app shows for you all cities, counties, states and countries your photos was taken, each time you input a photo in the app, the app will search for the city and then show you
+  <strong>Collect interesting places, and pin them in your map like a fridge magnet! </strong><br>
+  This app shows for you where all cities, counties, states, and countries your photos was taken. Each time you input a photo in the app, it will search for the city, county, state and country and then plot it in a map.
 </p>
 
 ## Contents
@@ -20,7 +20,7 @@
   - [Clipping of locations](#clipping-of-locations)
 - [Structure](#structure)
   - [Method Calling](#method-calling)
-  - [Screen/ViewWModel Relationship](#screenviewmodel-relationship)
+  - [Screen/ViewModel Relationship](#screenviewmodel-relationship)
   - [Implementation](#implementation)
   - [Aggregation](#aggregation)
   - [Composition](#composition)
@@ -36,19 +36,21 @@
   - [Package `model`](#package-model)
   - [Package `model.repository` with `model`](package-modelrepository-with-model`)
   - [Package `model.repository` with `model.datasource`](package-modelrepository-with-modeldatasource`)
+- [Future Tasks](#future-tasks)
+
 
 ## Use Cases
 
 ### Add Photos
 
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Screenshot&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|Description|
-|:-------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <img src="readme-res/screenshots/app-screen.png" width="232.05" height="490.8">                         |                                                            The app starts with a blank screen; that's the `HomeScreen`. Let's click on the red button to add photos.                                                            |
-| <img src="readme-res/screenshots/pick-images-screen.png" width="232.05" height="490.8">                 |                                                                      Thats's the image picker system screen, you can select one or multiple photos at once.                                                                     |
-| <img src="readme-res/screenshots/home-screen.png" width="232.05" height="490.8">                        |                 After selecting the photos, the app will search for the address where each photo was taken using its coordinates, group them by their cities, and show each city plotted on their own mini map.                 |
-| <img src="readme-res/screenshots/home-screen-with-dropdown-expanded.png" width="232.05" height="490.8"> |                                                                     You can also see them grouped by county, state, and country by clicking on the dropdown.                                                                    |
-| <img src="readme-res/screenshots/map-screen.png" width="232.05" height="490.8">                         | When you click on `Map` at the bottom tab it shows the `MapScreen`. It's the world map where all countries, states, counties, and cities in which every place the photos where taken is plotted together along with each photo. |
-| <img src="readme-res/screenshots/photos-screen.png" width="232.05" height="490.8">                      |             The `PhotosScreen` is shown when you click on one mini map on Home Screen. The map of the city is plotted along with its photos on each coordinate, and there's a complete list of the photos below it.             |
+|:-:|:-:|
+|<img src="readme-res/screenshots/app-screen.png" width="232.05" height="490.8">|The app starts with a blank screen; that's the `HomeScreen`. Let's click on the red button to add photos.|
+|<img src="readme-res/screenshots/pick-images-screen.png" width="232.05" height="490.8">|Thats's the image picker system screen, you can select either one or multiple photos at once.|
+|<img src="readme-res/screenshots/home-screen.png" width="232.05" height="490.8">|After selecting the photos, the app will search for the address where each photo was taken using its coordinates, group them by their cities, and show each city plotted on their own mini map.|
+|<img src="readme-res/screenshots/home-screen-with-dropdown-expanded.png" width="232.05" height="490.8">|You can also see them grouped by county, state, and country by clicking on the dropdown.|
+|<img src="readme-res/screenshots/map-screen.png" width="232.05" height="490.8"> |When you click on `Map` at the bottom tab it shows the `MapScreen`. It's the world map where all countries, states, counties, and cities in where every place the photos where taken is plotted together along with each photo.|
+|<img src="readme-res/screenshots/photos-screen.png" width="232.05" height="490.8">|The `PhotosScreen` is shown when you click on any mini map on Home Screen. The map of the city is plotted along with its photos on each coordinate, and there's a complete list of the photos below it.|
 
 #### Add Photos Flow
 
@@ -66,15 +68,15 @@
 ### Hide Exclaves
 
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Screenshot&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|Description|
-|:-----------------------------------------------------------------------------------------------------------------:|:-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------:|
-| <img src="readme-res/screenshots/home-screen-san-francisco-highlighted.png" width="232.05" height="490.8">        | Sometimes, there are locations that own exclaves. Take a look of San Francisco. As you can see, the  Farallon Islands is part of San Francisco. However, the map becomes too small when including theses islands. To hide the islands on the map, go to `MapScreen` and click on the San Francisco territory. |
-| <img src="readme-res/screenshots/polygons-screen-san-francisco.png" width="232.05" height="490.8">                |                                           This screen is the `PolygonsScreen`; it allows you to hide exclaves by clicking on the check on the upper corner of each map. you can uncheck one-by-one or click on `switch all` to check or uncheck all of them at once.                                          |
-| <img src="readme-res/screenshots/home-screen-san-francisco-edited-highlighted.png" width="232.05" height="490.8"> |                                                   Now the `HomeScreen` shows the mini map of San Francisco without taking account those islands. Therefore, it shows bigger than before. This change will also applies both `PhotosScreen` and `MapScreen`.                                                   |
-| <img src="readme-res/screenshots/polygons-screen-united-states.png" width="232.05" height="490.8">                |                                                                         You can do it even with countries, counties or states, like for example, the United States. you'll be surprised how many overseas territories a country have.                                                                         |
+|:-:|:-:|
+|<img src="readme-res/screenshots/home-screen-san-francisco-highlighted.png" width="232.05" height="490.8">|Sometimes, there are locations that own [exclaves](https://en.wikipedia.org/wiki/Enclave_and_exclave). Take a look of San Francisco. As you can see, the Farallon Islands is part of San Francisco. However, the map becomes too small when including theses islands. To hide the islands on the map, go to `MapScreen` and click on the San Francisco territory.|
+|<img src="readme-res/screenshots/polygons-screen-san-francisco.png" width="232.05" height="490.8">|This screen is the `PolygonsScreen`; it allows you to hide exclaves by clicking on the check on the upper corner of each map. you can uncheck one-by-one or click on `switch all` to check or uncheck all of them at once.|
+|<img src="readme-res/screenshots/home-screen-san-francisco-edited-highlighted.png" width="232.05" height="490.8">|Now the `HomeScreen` shows the mini map of San Francisco without taking account those islands. Therefore, it shows bigger than before. This change will also applies both `PhotosScreen` and `MapScreen`.|
+|<img src="readme-res/screenshots/polygons-screen-united-states.png" width="232.05" height="490.8">|You can do it even with countries, counties or states, like for example, the United States. you'll be surprised how many overseas territories a country have.|
 
 # Technologies
 |Technology|Purpose|
-|:---------------------------------:|:-:|
+|:-:|:-:|
 |<img src="https://3.bp.blogspot.com/-VVp3WvJvl84/X0Vu6EjYqDI/AAAAAAAAPjU/ZOMKiUlgfg8ok8DY8Hc-ocOvGdB0z86AgCLcBGAsYHQ/s1600/jetpack%2Bcompose%2Bicon_RGB.png" width="50" height="50"><br>[Jetpack Compose](https://developer.android.com/jetpack/compose)|Designing UI|
 |<img src="https://developers.google.com/static/maps/images/maps-icon.svg" width="50" height="50"><br>[Geocoder](https://developers.google.com/maps/documentation/javascript/reference/geocoder)|Convert coordinates into Addresses|
 |<img src="https://nominatim.openstreetmap.org/ui/theme/logo.png" width="50" height="50"><br>[Nominatim](https://nominatim.openstreetmap.org/ui/about.html)|Caching nominatim JSON responses and persistance|
@@ -85,7 +87,7 @@
 ## Challenges
 
 ### JSON Format Handling
-  - The challenge was to handle the JSON response format that Nominatim returns when searching for a location. When you search for a location to get its coordinates, it returned using the [geojson format](https://datatracker.ietf.org/doc/html/rfc7946). Among other types, this application recognize 4 different types:
+  - The challenge was to handle the JSON response format that Nominatim returns when searching for a location. When you search for a location to get its polygon coordinates, it returned using the [geojson format](https://datatracker.ietf.org/doc/html/rfc7946). Among other types, this application recognize 4 different types:
     - [`Point`](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.2)
       
       ```javascript
@@ -119,16 +121,16 @@
           }
       ```
       
-      This type its one of the effective used in the aplication to draw the outline of cities, counties, states, and countries. This type consider that the location is only one closed polygon with possible holes within.
+      This type its one of the effectives that is used in the aplication to draw the outline of cities, counties, states, and countries. This type consider that the location is only one closed polygon with possible holes within, where the first list is the coordinates of the polygon itself while the other ones are the inside possible holes.
     - [`MultiPolygon`](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.7)
 
       This other second effective type is used to draw locations that contain more than one polygon, like United States that have Alaska and Hawaii as ultramarine states. Its an array of `Polygon`
 
-    Altough only `Polygon` and ` Multipolygon` are used to plot locations on the map, when I was searching for the locations, there was times that the API returned `Point` or `LineString` making me have to handle those types, too.
+    Altough only `Polygon` and `Multipolygon` are used to plot locations on the map, when I was searching for the locations, there was times that the API returned `Point` or `LineString` making me have to handle those types, too.
     The point was the `coordinates` field has a variable type, so I had to learn how to create a custom JSON deserializer when convert the JSON into Kotlin objects
 
 ### Clipping of polygons
-  - Plot those polygons as the locations grow became a very onerous task. So to solve that I implemented clipping of theses polygons. That way the app won't draw polygons that are not visible. I created some tests to aid me in this task. Before I created theses tests I draw on paper each possible case a polygon should not be drawn by the app. Let's take a look of the digitalized (and enhanced) version: 
+  - Plot those polygons as the locations grow became a very onerous task. So, to solve that, I implemented clipping of theses polygons. Thus the app won't draw polygons that are not visible. I created some tests to aid me in this task. Before I created theses tests I draw on paper each possible case a polygon should not be drawn by the app. Let's take a look of the digitalized (and enhanced) version: 
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./readme-res/clipping-challenge/dark/clipping-visual-tests.dark.svg">
     <img alt="Clipping of polygons Diagram" src="./readme-res/clipping-challenge/light/clipping-visual-tests.light.svg">
@@ -176,7 +178,7 @@
   /* ... */
   ``` 
     
-  The tests of this file only cover if the algorithm correctly returns `false` to those outside of `bounds`. Besides other file that cover the opposite case, there are other tests that covers further more; for example, how the algorithm will behave if the [antimeridian](https://en.wikipedia.org/wiki/180th_meridian) is visible? Or what if theres is a polygon that crosses that meridian? All cases was carefully considered and its files is inside the [boundingbox folder](https://github.com/giovanischiar/fridgnet/tree/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox) in tests.
+  The tests of this file only cover if the algorithm correctly returns `false` to those polygons outside of `bounds`. There is another file that covers the opposite case. There are other tests that covers even more; for example, how the algorithm will behave if the [antimeridian](https://en.wikipedia.org/wiki/180th_meridian) is visible? Or what if there is a polygon that crosses that meridian? Every case was thoroughly considered and its files are inside the [boundingbox folder](https://github.com/giovanischiar/fridgnet/tree/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox) in tests.
 
 ## Structure
 Before showing the diagrams, I will introduce the notation I used to create it.
@@ -348,3 +350,11 @@ class MainRepository {
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-diagram.dark.svg">
   <img alt="Main Repository Diagram 1" src="./readme-res/diagrams/light/repository-diagram.light.svg">
 </picture>
+
+## Future Tasks
+  - The Geocoder library sometimes doesn't get the address of the locations right, and the Nominatim Library sometimes doesn't return the right outline for the location. A solution would be let the user search and correct the location;
+  - Use the date of each photo to show not only where but when the photo was taken;
+  - In the `Photos Screen` now it only works when you click in cities, not in county, states, or countries
+  - Cities may have exclaves that are also belongs to states, county or countries. The app only consider that the exclave belongs only to a city
+  - Create a dark mode;
+  - Although unit tests were created to test the clipping, there are many other tests I'd like to create for this application;
