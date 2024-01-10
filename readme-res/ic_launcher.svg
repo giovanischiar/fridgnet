@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="-0 -0 108 108">
-    <path stroke-width="0.0" d="M 10.8 0 h 86.4 a 10.8 10.8 0 0 1 10.8 10.8 v 86.4 a 10.8 10.8 0 0 1 -10.8 10.8 h -86.4 a 10.8 10.8 0 0 1 -10.8 -10.8 v -86.4 a 10.8 10.8 0 0 1 10.8 -10.8 Z" fill-opacity="1" fill="#08415C"/>
-    <path stroke="#08415C" fill="#FFFBFF" fill-opacity="1" d="M 34.5 29.5 h 39 a 5 5 0 0 1 5 5 v 30.28 h -49 v -30.28 a 5 5 0 0 1 5 -5 Z" stroke-width="1.944"/>
-    <path stroke="#08415C" fill="#E54B4B" fill-opacity="1" d="M 38.4173 50.0723 L 38.4173 50.0723 C 38.4173 41.4652 45.394 34.4877 54.0003 34.4877 C 62.6066 34.4877 69.5833 41.4652 69.5833 50.0723 L 61.7918 50.0723 C 61.7918 45.7683 58.3034 42.2792 54.0003 42.2792 C 49.6972 42.2792 46.2088 45.7683 46.2088 50.0723 Z" stroke-width="1.944"/>
-    <path fill-opacity="1" stroke-width="1.944" d="M 38.4 49.98 h 7.8 v 5 h -7.8 v -5 Z" fill="#C4CBCA" stroke="#08415C"/>
-    <path fill-opacity="1" stroke-width="1.944" d="M 61.8 49.98 h 7.8 v 5 h -7.8 v -5 Z" fill="#C4CBCA" stroke="#08415C"/>
-    <path fill-opacity="0" stroke-width="2.944" d="M 32.5 60.56 L 42.5 60.56" stroke="#08415C"/>
-    <path fill-opacity="1" stroke-width="1.944" d="M 29.5 64.78 h 49 v 8.72 a 5 5 0 0 1 -5 5 h -39 a 5 5 0 0 1 -5 -5 v -8.72 Z" fill="#FFFBFF" stroke="#08415C"/>
-    <path fill-opacity="0" stroke-width="2.944" d="M 32.5 68.64 L 42.5 68.64" stroke="#08415C"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108">
+    <path fill-opacity="1" fill="#08415C" stroke-width="0.0" d="M 10.8 0 h 86.4 a 10.8 10.8 0 0 1 10.8 10.8 v 86.4 a 10.8 10.8 0 0 1 -10.8 10.8 h -86.4 a 10.8 10.8 0 0 1 -10.8 -10.8 v -86.4 a 10.8 10.8 0 0 1 10.8 -10.8 Z"/>
+    <path fill-opacity="1" stroke="#08415C" fill="#FFFBFF" stroke-width="3.14928" d="M 19.31 14.31 h 69.38 a 5 5 0 0 1 5 5 v 52.1536 h -79.38 v -52.1536 a 5 5 0 0 1 5 -5 Z"/>
+    <path fill-opacity="1" stroke="#08415C" fill="#E54B4B" stroke-width="3.14928" d="M 28.7558 46.3972 L 28.7558 46.3972 C 28.7558 32.4536 40.0581 21.15 54.0003 21.15 C 67.9425 21.15 79.2448 32.4536 79.2448 46.3972 L 66.6226 46.3972 C 66.6226 39.4246 60.9714 33.7723 54.0003 33.7723 C 47.0292 33.7723 41.378 39.4246 41.378 46.3972 Z"/>
+    <path fill-opacity="1" stroke="#08415C" fill="#C4CBCA" stroke-width="3.14928" d="M 28.764 46.3736 h 12.636 v 8.1 h -12.636 v -8.1 Z"/>
+    <path fill-opacity="1" stroke="#08415C" fill="#C4CBCA" stroke-width="3.14928" d="M 66.6 46.3736 h 12.636 v 8.1 h -12.636 v -8.1 Z"/>
+    <path fill-opacity="0" stroke="#08415C" stroke-width="4.14928" d="M 19.17 64.6272 L 35.37 64.6272"/>
+    <path fill-opacity="1" stroke="#08415C" fill="#FFFBFF" stroke-width="3.14928" d="M 14.31 71.4636 h 79.38 v 17.2264 a 5 5 0 0 1 -5 5 h -69.38 a 5 5 0 0 1 -5 -5 v -17.2264 Z"/>
+    <path fill-opacity="0" stroke="#08415C" stroke-width="4.14928" d="M 19.17 77.7168 L 35.37 77.7168"/>
 </svg>
