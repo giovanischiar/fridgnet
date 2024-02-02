@@ -4,8 +4,8 @@
 </h1>
 
 <p align="center">
-  <strong>Collect interesting places, and pin them in your map like a fridge magnet! </strong><br>
-  This app shows for you where all cities, counties, states, and countries your photos was taken. Each time you input a photo in the app, it will search for the city, county, state and country and then plot it in a map.
+  <strong>Collect interesting places, and pin them in your map like a fridge magnet!</strong><br>
+  This app shows you where all cities, counties, states, and countries your photos were taken. Each time you input a photo into the app, it will search for the city, county, state, and country, and then plot them on a map.
 </p>
 
 ## Contents
@@ -29,13 +29,13 @@
   - [Composition With Pair of Set](#composition-with-pair-of-set)
 - [Diagrams](#diagrams)
   - [Whole Project](#whole-project)
-  - [Package `view` with `viewmodel`](#package-view-with-viewmodel`)
+  - [Package `view` and `viewmodel`](#package-view-with-viewmodel`)
   - [Package `view.viewdata`](#package-viewviewdata)
-  - [Package `viewmodel` with `view.viewdata`](#package-viewmodel-with-viewviewdata`)
-  - [Package `viewmodel` with `model.repository`](#package-viewmodel-with-modelrepository)
+  - [Package `viewmodel` and `view.viewdata`](#package-viewmodel-with-viewviewdata`)
+  - [Package `viewmodel` and `model.repository`](#package-viewmodel-with-modelrepository)
   - [Package `model`](#package-model)
-  - [Package `model.repository` with `model`](package-modelrepository-with-model`)
-  - [Package `model.repository` with `model.datasource`](package-modelrepository-with-modeldatasource`)
+  - [Package `model.repository` and `model`](package-modelrepository-with-model`)
+  - [Package `model.repository` and `model.datasource`](package-modelrepository-with-modeldatasource`)
 - [Future Tasks](#future-tasks)
 
 
@@ -46,48 +46,44 @@
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Screenshot&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|Description|
 |:-:|:-:|
 |<img src="readme-res/screenshots/app-screen.png" width="232.05" height="490.8">|The app starts with a blank screen; that's the `HomeScreen`. Let's click on the red button to add photos.|
-|<img src="readme-res/screenshots/pick-images-screen.png" width="232.05" height="490.8">|Thats's the image picker system screen, you can select either one or multiple photos at once.|
-|<img src="readme-res/screenshots/home-screen.png" width="232.05" height="490.8">|After selecting the photos, the app will search for the address where each photo was taken using its coordinates, group them by their cities, and show each city plotted on their own mini map.|
-|<img src="readme-res/screenshots/home-screen-with-dropdown-expanded.png" width="232.05" height="490.8">|You can also see them grouped by county, state, and country by clicking on the dropdown.|
-|<img src="readme-res/screenshots/map-screen.png" width="232.05" height="490.8"> |When you click on `Map` at the bottom tab it shows the `MapScreen`. It's the world map where all countries, states, counties, and cities in where every place the photos where taken is plotted together along with each photo.|
-|<img src="readme-res/screenshots/photos-screen.png" width="232.05" height="490.8">|The `PhotosScreen` is shown when you click on any mini map on Home Screen. The map of the city is plotted along with its photos on each coordinate, and there's a complete list of the photos below it.|
+|<img src="readme-res/screenshots/pick-images-screen.png" width="232.05" height="490.8">|That's the image picker system screen; you can select either one or multiple photos at once.|
+|<img src="readme-res/screenshots/home-screen.png" width="232.05" height="490.8">|After selecting the photos, the app will search for the address where each photo was taken using its coordinates, group them by their cities, and show each city plotted on its own mini-map.|
+|<img src="readme-res/screenshots/home-screen-with-dropdown-expanded.png" width="232.05" height="490.8">|You can also see them grouped by county, state, or country by clicking on the dropdown.|
+|<img src="readme-res/screenshots/map-screen.png" width="232.05" height="490.8"> |When you click on `Map` at the bottom tab, it shows the `MapScreen`. It's the world map where all countries, states, counties, and cities where every photo was taken are plotted together along with each photo.|
+|<img src="readme-res/screenshots/photos-screen.png" width="232.05" height="490.8">|The `PhotosScreen` is shown when you click on any mini-map on the `HomeScreen`. The map of the city is plotted along with its photos at each coordinate, and there's a complete list of the photos below it.|
 
 #### Add Photos Flow
 
-  - User click on add image, they are able to add as many images they want
-  - APP reads the metadata of the image and extract the GPS coordinate of each photo
-  - APP send each photo coordinate to Geocoder
-  - Geocoder return with an `Address` object, these `Address` contains many data, including `locality`, `subAdminArea`, `adminArea` and `countryName`
-  - APP then send each of theses address data to Nominatim API
-  - Nominatim API return an JSON with the polygon coordinates of the location
-  - APP convert the JSON into Location objects
-  - APP group images of same Location and show on Home Screen the grid of unique Locations represented by the polygon coordinates plotted on Google Maps components
-  - On Map screen, each location is plotted together on a Google Maps Screen with each photo placed where taken
-  - When user click on any Google Maps component in the Home screen they are show other Screen with a bigger location map with each photo added shown on Map with each photo located where taken, and also listed it above the map
+  - The user sends the photos to the application using the Photo Picker.
+  - The application extracts the GPS coordinates for each photo and sends them to the Geocoder.
+  - The Geocoder finds the address for each GPS coordinate and returns to the application.
+  - The application extracts the names of all the different levels of administrative regions (city, county, state, and country) for each address and sends each one to the Nominatim API.
+  - The Nominatim API returns a JSON containing the list of coordinates that mark the outline of each level of administrative region.
+  - The application plots these coordinates and connects them, forming a polygon, using Google Map Components to show it to the user.
 
 ### Hide Exclaves
 
 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Screenshot&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;|Description|
 |:-:|:-:|
-|<img src="readme-res/screenshots/home-screen-san-francisco-highlighted.png" width="232.05" height="490.8">|Sometimes, there are locations that own [exclaves](https://en.wikipedia.org/wiki/Enclave_and_exclave). Take a look of San Francisco. As you can see, the Farallon Islands is part of San Francisco. However, the map becomes too small when including theses islands. To hide the islands on the map, go to `MapScreen` and click on the San Francisco territory.|
-|<img src="readme-res/screenshots/polygons-screen-san-francisco.png" width="232.05" height="490.8">|This screen is the `PolygonsScreen`; it allows you to hide exclaves by clicking on the check on the upper corner of each map. you can uncheck one-by-one or click on `switch all` to check or uncheck all of them at once.|
-|<img src="readme-res/screenshots/home-screen-san-francisco-edited-highlighted.png" width="232.05" height="490.8">|Now the `HomeScreen` shows the mini map of San Francisco without taking account those islands. Therefore, it shows bigger than before. This change will also applies both `PhotosScreen` and `MapScreen`.|
-|<img src="readme-res/screenshots/polygons-screen-united-states.png" width="232.05" height="490.8">|You can do it even with countries, counties or states, like for example, the United States. you'll be surprised how many overseas territories a country have.|
+|<img src="readme-res/screenshots/home-screen-san-francisco-highlighted.png" width="232.05" height="490.8">|Sometimes, there are locations that have [exclaves](https://en.wikipedia.org/wiki/Enclave_and_exclave). Take a look at San Francisco. As you can see, the Farallon Islands are part of San Francisco. However, the map becomes too small when including these islands. To hide the islands on the map, go to the `MapScreen` and click on the San Francisco territory.|
+|<img src="readme-res/screenshots/polygons-screen-san-francisco.png" width="232.05" height="490.8">|This screen is the `PolygonsScreen`; it allows you to hide exclaves by clicking on the checkbox in the upper corner of each map. You can uncheck them one by one or click on `switch all` to check or uncheck all of them at once.|
+|<img src="readme-res/screenshots/home-screen-san-francisco-edited-highlighted.png" width="232.05" height="490.8">|Now the `HomeScreen` shows the mini-map of San Francisco without taking into account those islands. Therefore, it appears bigger than before. This change will also apply to both the `PhotosScreen` and `MapScreen`.|
+|<img src="readme-res/screenshots/polygons-screen-united-states.png" width="232.05" height="490.8">|You can do it even with countries, counties, or states, like, for example, the United States. You'll be surprised at how many overseas territories a country has.|
 
 # Technologies
 |Technology|Purpose|
 |:-:|:-:|
-|<img src="https://3.bp.blogspot.com/-VVp3WvJvl84/X0Vu6EjYqDI/AAAAAAAAPjU/ZOMKiUlgfg8ok8DY8Hc-ocOvGdB0z86AgCLcBGAsYHQ/s1600/jetpack%2Bcompose%2Bicon_RGB.png" width="50" height="50"><br>[Jetpack Compose](https://developer.android.com/jetpack/compose)|Designing UI|
-|<img src="https://developers.google.com/static/maps/images/maps-icon.svg" width="50" height="50"><br>[Geocoder](https://developers.google.com/maps/documentation/javascript/reference/geocoder)|Convert coordinates into Addresses|
-|<img src="https://nominatim.openstreetmap.org/ui/theme/logo.png" width="50" height="50"><br>[Nominatim](https://nominatim.openstreetmap.org/ui/about.html)|Caching nominatim JSON responses and persistance|
-|<img src="https://4.bp.blogspot.com/-NnAkV5vpYuw/XNMYF4RtLvI/AAAAAAAAI70/kdgLm3cnTO4FB4rUC0v9smscN3zHJPlLgCLcBGAs/s1600/Jetpack_logo%2B%25282%2529.png" width="50" height="50"><br>[Room](https://developer.android.com/jetpack/androidx/releases/room)|Convert Nominatim JSON data returned by Nominatim API into Kotlin objects|
-|<img src="https://avatars.githubusercontent.com/u/1342004?s=48&v=4" width="50" height="50"><br>[GSON](https://github.com/google/gson)|Convert Nominatim JSON data returned by Nominatim API into Kotlin objects|
-|<img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" width="50" height="50"><br>[IconCreator](https://github.com/giovanischiar/icon-creator)|My own library that generate the application icon|
+|<img src="https://3.bp.blogspot.com/-VVp3WvJvl84/X0Vu6EjYqDI/AAAAAAAAPjU/ZOMKiUlgfg8ok8DY8Hc-ocOvGdB0z86AgCLcBGAsYHQ/s1600/jetpack%2Bcompose%2Bicon_RGB.png" width="50" height="50"><br>[Jetpack Compose](https://developer.android.com/jetpack/compose)|UI design|
+|<img src="https://developers.google.com/static/maps/images/maps-icon.svg" width="50" height="50"><br>[Geocoder](https://developers.google.com/maps/documentation/javascript/reference/geocoder)|Coordinates into addresses converter|
+|<img src="https://nominatim.openstreetmap.org/ui/theme/logo.png" width="50" height="50"><br>[Nominatim](https://nominatim.openstreetmap.org/ui/about.html)|Cordinates of the outline of administrative regions|
+|<img src="https://4.bp.blogspot.com/-NnAkV5vpYuw/XNMYF4RtLvI/AAAAAAAAI70/kdgLm3cnTO4FB4rUC0v9smscN3zHJPlLgCLcBGAs/s1600/Jetpack_logo%2B%25282%2529.png" width="50" height="50"><br>[Room](https://developer.android.com/jetpack/androidx/releases/room)|Nominatim JSON caching and application persistence|
+|<img src="https://avatars.githubusercontent.com/u/1342004?s=48&v=4" width="50" height="50"><br>[GSON](https://github.com/google/gson)|Nominatim JSON data returned by Nominatim converter into Kotlin objects|
+|<img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" width="50" height="50"><br>[IconCreator](https://github.com/giovanischiar/icon-creator)|My own library that generates the application icon.|
 
 ## Challenges
 
 ### JSON Format Handling
-  - The challenge was to handle the JSON response format that Nominatim returns when searching for a location. When you search for a location to get its polygon coordinates, it returned using the [geojson format](https://datatracker.ietf.org/doc/html/rfc7946). Among other types, this application recognize 4 different types:
+  - The challenge was to handle the JSON response format that Nominatim returns when searching for a location. When you search for a location to get its polygon coordinates, it returns them using the [GeoJSON format](https://datatracker.ietf.org/doc/html/rfc7946). Among other types, this application recognizes 4 different types:
     - [`Point`](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.2)
       
       ```javascript
@@ -97,7 +93,7 @@
           }
       ```
       
-      This type is straightfoward, it's only a single coordinate where follow the format `[longitude, latitude]`. All of the following types also use this same coordinate format
+      This type is straightforward; it's only a single coordinate that follows the format `[longitude, latitude]`. All of the following types also use this same coordinate format.
     - [`LineString`](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.4)
       
       ```javascript
@@ -107,7 +103,7 @@
           }
       ```
       
-      This type is now an array of `Point`. It is used to return the coordinates of streets
+      This type is an array of `Point`. It is used to return the coordinates of streets.
     - [`Polygon`](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.6)
       
       ```javascript
@@ -121,21 +117,24 @@
           }
       ```
       
-      This type its one of the effectives that is used in the aplication to draw the outline of cities, counties, states, and countries. This type consider that the location is only one closed polygon with possible holes within, where the first list is the coordinates of the polygon itself while the other ones are the inside possible holes.
+      This type is one of the effective ones used in the application to draw the outline of cities, counties, states, and countries. This type considers that the location is only one closed polygon with possible holes within, where the first list represents the coordinates of the polygon itself while the other ones represent the possible inside holes.
     - [`MultiPolygon`](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.7)
 
-      This other second effective type is used to draw locations that contain more than one polygon, like United States that have Alaska and Hawaii as ultramarine states. Its an array of `Polygon`
+      This second effective type is used to draw locations that contain more than one polygon, like the United States, which has Alaska and Hawaii as outlying states. It's an array of `Polygon`.
 
-    Altough only `Polygon` and `Multipolygon` are used to plot locations on the map, when I was searching for the locations, there was times that the API returned `Point` or `LineString` making me have to handle those types, too.
-    The point was the `coordinates` field has a variable type, so I had to learn how to create a custom JSON deserializer when convert the JSON into Kotlin objects
+    Although only `Polygon` and `Multipolygon` are used to plot locations on the map, there were times when the API returned `Point` or `LineString`, making me have to handle those types as well. The issue was that the `coordinates` field had a variable type, so I had to learn how to create a custom JSON deserializer when converting the JSON into Kotlin objects.
 
 ### Clipping of polygons
-  - Plot those polygons as the locations grow became a very onerous task. So, to solve that, I implemented clipping of theses polygons. Thus the app won't draw polygons that are not visible. I created some tests to aid me in this task. Before I created theses tests I draw on paper each possible case a polygon should not be drawn by the app. Let's take a look of the digitalized (and enhanced) version: 
+
+  - The application, especially the 'MapScreen', mainly consists of rendering polygons on a map. These polygons are a list of several coordinates outlining a region of the map when those coordinates are connected to each other. As many polygons are rendered on the map, the heavier the calculations the app would need to do, making the app very slow. That's when the classical Computer Graphics method called [clipping](https://en.wikipedia.org/wiki/Clipping_(computer_graphics)) comes in handy. It prevents the app from rendering unnecessary polygons that the screen is not presenting at the moment. To make this clipping algorithm happen, I started drawing on paper all the possible cases where a polygon shouldn't be rendered because it is not visible on the screen. Let's take a look at the digitized (and enhanced) version:
+
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./readme-res/clipping-challenge/dark/clipping-visual-tests.dark.svg">
     <img alt="Clipping of polygons Diagram" src="./readme-res/clipping-challenge/light/clipping-visual-tests.light.svg">
   </picture>
-  As you can see, the big rectangle at the center is the visible area of the map at the moment; I call it `bounds`. To simplify it, instead of compare each coordinate of each polygon against `bounds`'s coordinates, I compare its `southeast` and `northeast` coordinates. Let's take a closer look of what those rectangles mean 
+
+  As you can see, the big rectangle at the center is the visible area of the map at the moment; I call it `bounds`. To simplify, instead of comparing each coordinate of each polygon against the coordinates of `bounds`, I compare its `southeast` and `northeast` coordinates. Let's take a closer look at what those rectangles mean.
+
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./readme-res/clipping-challenge/dark/clipping-test-legend.dark.svg">
     <img alt="Clipping Visual Tests Diagram" src="./readme-res/clipping-challenge/light/clipping-test-legend.light.svg">
@@ -146,7 +145,7 @@
   fun `Polygon with southwest and northeast different from bounds south of bounds`() { /* .. */ }
   ```
 
-  For each polygon I calculated its `boundingbox` that consists of its `southwest` and `northeast` coordinates. These coordinates create a box that encloses the polygon. Each `boundingbox` around `bounds` is numerated and then to each one I wrote a test that was labeled after its relative position to `bounds`. Here's a slighty modified exerpt of [PolygonsOutsideBoundsTest.kt](https://github.com/giovanischiar/fridgnet/blob/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox/PolygonsOutsideBoundsTest.kt) showing that each unit test corresponds a numbered `boundingbox` drawn on the diagram:
+  For each polygon, I calculated its `boundingbox`, which consists of its `southwest` and `northeast` coordinates. These coordinates create a box that encloses the polygon. Each `boundingbox` around `bounds` is numbered, and then for each one, I wrote a test labeled after its relative position to `bounds`. Here's a slightly modified excerpt of [PolygonsOutsideBoundsTest.kt](https://github.com/giovanischiar/fridgnet/blob/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox/PolygonsOutsideBoundsTest.kt) showing that each unit test corresponds to a numbered `boundingbox` drawn on the diagram:
     
   ```kotlin
   /* ... */
@@ -178,10 +177,11 @@
   /* ... */
   ``` 
     
-  The tests of this file only cover if the algorithm correctly returns `false` to those polygons outside of `bounds`. There is another file that covers the opposite case. There are other tests that covers even more; for example, how the algorithm will behave if the [antimeridian](https://en.wikipedia.org/wiki/180th_meridian) is visible? Or what if there is a polygon that crosses that meridian? Every case was thoroughly considered and its files are inside the [boundingbox folder](https://github.com/giovanischiar/fridgnet/tree/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox) in tests.
+
+  The tests in this file only cover whether the algorithm correctly returns `false` for those polygons outside of `bounds`. Another file covers the opposite case. There are also other tests that cover even more scenarios; for example, how the algorithm will behave if the [antimeridian](https://en.wikipedia.org/wiki/180th_meridian) is visible? Or what if there is a polygon that crosses that meridian? Every case was thoroughly considered, and its files are inside the [boundingbox folder](https://github.com/giovanischiar/fridgnet/tree/main/app/src/test/java/io/schiar/fridgnet/model/boundingbox) in the tests.
 
 ## Structure
-Before showing the diagrams, I will introduce the notation I used to create it.
+Before presenting the diagrams, I will introduce the notation I used to create them.
   
 ### Diagram Elements
 <picture>
@@ -292,42 +292,56 @@ class MainRepository {
 
 ## Diagrams
 ### Whole Project
+  This diagram shows all the packages the application has, along with their structures. Some packages are simplified, while others are more detailed.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/project-structure-diagram.dark.svg">
   <img alt="Whole Project Diagram" src="./readme-res/diagrams/light/project-structure-diagram.light.svg">
 </picture>
 
-### Package `view` with `viewmodel`
+### Package `view` and `viewmodel`
+  These diagrams illustrate the relationship between screens from `view` and `viewmodel` classes. The arrows from the View Models represent View Data objects (classes that hold all the necessary data for the view to display), primitives, or collections encapsulated by [State Flows](https://kotlinlang.org/api/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines.flow/-state-flow/), which are classes that encapsulate data streams. Every update in the View Data triggers the State Flow to emit these new values to the `view`, and the view updates automatically. Typically, the methods called from screens in `view` to classes in `viewmodel` trigger these changes, as represented in the diagram below by arrows from the `view` screens to `viewmodel` classes.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/view-view-model-diagram.dark.svg">
   <img alt="View/ViewModel Relationship Diagram" src="./readme-res/diagrams/light/view-view-model-diagram.light.svg">
 </picture>
 
 ### Package `view.viewdata`
+  View Datas are classes that hold all the data the `view` needs to present. They are composed of `model` classes and served by View Models to the `view`. This diagram represents all the associations among the classes in the `view.viewdata`.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewdata-diagram.dark.svg">
   <img alt="ViewData Diagram" src="./readme-res/diagrams/light/viewdata-diagram.light.svg">
 </picture>
 
-### Package `viewmodel` with `view.viewdata`
+### Package `viewmodel` and `view.viewdata`
+  View Models serve the `view` with objects made from `view.viewdata` classes, collections, or primitive objects encapsulated by State Flows. This diagram represents all the associations among the classes in `viewmodel` and `view.viewdata`.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewmodel-diagram-1.dark.svg">
   <img alt="ViewModel Diagram 1" src="./readme-res/diagrams/light/viewmodel-diagram-1.light.svg">
 </picture>
 
-### Package `viewmodel` with `model.repository`
+### Package `viewmodel` and `model.repository`
+  View Models also serve as a [façade](https://en.wikipedia.org/wiki/Facade_pattern), triggering methods in `model.repository` classes. This diagram shows that each View Model has its own interface to `MainRepository` and illustrates all methods each View Model calls, represented by arrows from View Models to Repositories. It also demonstrates that all interfaces are implemented by `MainRepository`.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewmodel-repository-diagram.dark.svg">
   <img alt="ViewModel/Repository Relationship Diagram" src="./readme-res/diagrams/light/viewmodel-repository-diagram.light.svg">
 </picture>
 
 ### Package `model`
+  Model classes handle the logic of the application. This diagram represents all the associations among the classes in the 'model'.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/model-diagram.dark.svg">
   <img alt="Model Diagram" src="./readme-res/diagrams/light/model-diagram.light.svg">
 </picture>
 
-### Package `model.repository` with `model`
+### Package `model.repository` and `model`
+  These diagrams represent all the associations among the classes in `model.repository` and `model`.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-model-diagram.dark.svg">
   <img alt="Repository Model Diagram" src="./readme-res/diagrams/light/repository-model-diagram.light.svg">
@@ -345,16 +359,19 @@ class MainRepository {
   <img alt="Location API DB Repository Diagram" src="./readme-res/diagrams/light/location-api-db-repository-diagram.light.svg">
 </picture>
 
-### Package `model.repository` with `model.datasource`
+### Package `model.repository` and `model.datasource`
+  Data Sources provide `MainRepository` with all the needed data for the application. They contain modules that make requests to the Nominatim API and consult the database. This diagram represents all the associations among the classes in `model.repository` and `model.datasource`.
+
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-diagram.dark.svg">
   <img alt="Main Repository Diagram 1" src="./readme-res/diagrams/light/repository-diagram.light.svg">
 </picture>
 
 ## Future Tasks
-  - The Geocoder library sometimes doesn't get the address of the locations right, and the Nominatim Library sometimes doesn't return the right outline for the location. A solution would be let the user search and correct the location;
-  - Use the date of each photo to show not only where but when the photo was taken;
-  - In the `Photos Screen` now it only works when you click in cities, not in county, states, or countries
-  - Cities may have exclaves that are also belongs to states, county or countries. When you remove a exclave from a city, it doesn't remove from others, so it still plots in the map;
-  - Create a dark mode;
-  - Although unit tests were created to test the clipping, there are many other tests I'd like to create for this application;
+  - Fix Bugs:
+    - The Geocoder library sometimes doesn't get the address of the locations right, and the Nominatim API sometimes doesn't return the right outline for the location. A solution would be to let the user search and correct the location.
+    - The `PhotosScreen` displays a map with photos pinned at their respective coordinates, along with a grid of all the photos. It is accessed by clicking on the mini-map at the `HomeScreen`. However, it now only functions when clicking on a city map. It does not work when changing the current level of administrative region on the dropdown located at the top of the `HomeScreen` to a county, state, or country.
+    - In the [hide exclave](#hide-exclaves) feature, all the exclaves that belong to a city may also belong to its county, which belongs to the state, which belongs to the country. When you hide the exclave from a city, although on the 'HomeScreen' the exclave from the city is hidden, it doesn't get hidden from the other levels of the administrative region. Thus, on the 'MapScreen', these exclaves are still showing. This happens because the app is not prepared for an exclave to belong to multiple locations.
+  - Use the date of each photo to show not only where but also when the photo was taken.
+  - Create a dark mode.
+  - Although unit tests were created to test the clipping, there are many other tests I'd like to create for this application.
