@@ -59,7 +59,7 @@
   - The Geocoder finds the address for each GPS coordinate and returns to the application.
   - The application extracts the names of all the different levels of administrative regions (city, county, state, and country) for each address and sends each one to the Nominatim API.
   - The Nominatim API returns a JSON containing the list of coordinates that mark the outline of each level of administrative region.
-  - The application plots these coordinates and connects them, forming a polygon, using Google Map Components to show it to the user.
+  - The application plots the coordinates of each administrative region and connects them, forming polygons, using Google Map Components to show them to the user.
 
 ### Hide Exclaves
 
@@ -73,17 +73,17 @@
 # Technologies
 |Technology|Purpose|
 |:-:|:-:|
-|<img src="https://3.bp.blogspot.com/-VVp3WvJvl84/X0Vu6EjYqDI/AAAAAAAAPjU/ZOMKiUlgfg8ok8DY8Hc-ocOvGdB0z86AgCLcBGAsYHQ/s1600/jetpack%2Bcompose%2Bicon_RGB.png" width="50" height="50"><br>[Jetpack Compose](https://developer.android.com/jetpack/compose)|UI design|
-|<img src="https://developers.google.com/static/maps/images/maps-icon.svg" width="50" height="50"><br>[Geocoder](https://developers.google.com/maps/documentation/javascript/reference/geocoder)|Coordinates into addresses converter|
-|<img src="https://nominatim.openstreetmap.org/ui/theme/logo.png" width="50" height="50"><br>[Nominatim](https://nominatim.openstreetmap.org/ui/about.html)|Cordinates of the outline of administrative regions|
-|<img src="https://4.bp.blogspot.com/-NnAkV5vpYuw/XNMYF4RtLvI/AAAAAAAAI70/kdgLm3cnTO4FB4rUC0v9smscN3zHJPlLgCLcBGAs/s1600/Jetpack_logo%2B%25282%2529.png" width="50" height="50"><br>[Room](https://developer.android.com/jetpack/androidx/releases/room)|Nominatim JSON caching and application persistence|
-|<img src="https://avatars.githubusercontent.com/u/1342004?s=48&v=4" width="50" height="50"><br>[GSON](https://github.com/google/gson)|Nominatim JSON data returned by Nominatim converter into Kotlin objects|
-|<img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" width="50" height="50"><br>[IconCreator](https://github.com/giovanischiar/icon-creator)|My own library that generates the application icon.|
+|<img src="https://3.bp.blogspot.com/-VVp3WvJvl84/X0Vu6EjYqDI/AAAAAAAAPjU/ZOMKiUlgfg8ok8DY8Hc-ocOvGdB0z86AgCLcBGAsYHQ/s1600/jetpack%2Bcompose%2Bicon_RGB.png" width="50" height="50"><br>[Jetpack Compose](https://developer.android.com/jetpack/compose)|Design UI|
+|<img src="https://developers.google.com/static/maps/images/maps-icon.svg" width="50" height="50"><br>[Geocoder](https://developers.google.com/maps/documentation/javascript/reference/geocoder)|Convert coordinates into addresses|
+|<img src="https://nominatim.openstreetmap.org/ui/theme/logo.png" width="50" height="50"><br>[Nominatim](https://nominatim.openstreetmap.org/ui/about.html)|Retrieve coordinates of the outline of administrative regions|
+|<img src="https://4.bp.blogspot.com/-NnAkV5vpYuw/XNMYF4RtLvI/AAAAAAAAI70/kdgLm3cnTO4FB4rUC0v9smscN3zHJPlLgCLcBGAs/s1600/Jetpack_logo%2B%25282%2529.png" width="50" height="50"><br>[Room](https://developer.android.com/jetpack/androidx/releases/room)|Cache Nominatim JSONs data, and persist application data|
+|<img src="https://avatars.githubusercontent.com/u/1342004?s=48&v=4" width="50" height="50"><br>[GSON](https://github.com/google/gson)|Convert Nominatim JSON data into Kotlin objects|
+|<img src="https://github.githubassets.com/assets/GitHub-Mark-ea2971cee799.png" width="50" height="50"><br>[IconCreator](https://github.com/giovanischiar/icon-creator)|Generate application Icon (my own library)|
 
 ## Challenges
 
 ### JSON Format Handling
-  - The challenge was to handle the JSON response format that Nominatim returns when searching for a location. When you search for a location to get its polygon coordinates, it returns them using the [GeoJSON format](https://datatracker.ietf.org/doc/html/rfc7946). Among other types, this application recognizes 4 different types:
+  - The challenge was to handle the JSON response format that Nominatim returns when searching for a location. When you search for a location to get its polygon coordinates, it returns them using the [GeoJSON format](https://datatracker.ietf.org/doc/html/rfc7946). Among other types, this application recognizes these 4:
     - [`Point`](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.2)
       
       ```javascript
@@ -110,17 +110,17 @@
           {
             "type": "Polygon",
             "coordinates": [
-              [[0, 0], /*...*/, [0, 0]] // This first array it's the polygon that represent the outermost polygon. End and start coordinates must be the same
+              [[0, 0], /*...*/, [0, 0]] // This first array is the polygon that represents the outermost polygon. First and last coordinates must be the same
               [[0.1, 0.1], /*...*/, [0.1, 0.1]] // any subsequent arrays in this list are handled as holes inside the polygon
               /* ... */
             ]
           }
       ```
       
-      This type is one of the effective ones used in the application to draw the outline of cities, counties, states, and countries. This type considers that the location is only one closed polygon with possible holes within, where the first list represents the coordinates of the polygon itself while the other ones represent the possible inside holes.
+      This type is one of the main ones used in the application to draw the outline of cities, counties, states, and countries. This type considers that the location is only one closed polygon with possible holes within, where the first list represents the coordinates of the polygon itself while the other ones represent the possible inside holes.
     - [`MultiPolygon`](https://datatracker.ietf.org/doc/html/rfc7946#section-3.1.7)
 
-      This second effective type is used to draw locations that contain more than one polygon, like the United States, which has Alaska and Hawaii as outlying states. It's an array of `Polygon`.
+      This other type is used to draw locations that contain more than one polygon, like the United States, which has Alaska and Hawaii as outlying states. It's an array of `Polygon`.
 
     Although only `Polygon` and `Multipolygon` are used to plot locations on the map, there were times when the API returned `Point` or `LineString`, making me have to handle those types as well. The issue was that the `coordinates` field had a variable type, so I had to learn how to create a custom JSON deserializer when converting the JSON into Kotlin objects.
 
@@ -308,7 +308,7 @@ class MainRepository {
 </picture>
 
 ### Package `view.viewdata`
-  View Datas are classes that hold all the data the `view` needs to present. They are composed of `model` classes and served by View Models to the `view`. This diagram represents all the associations among the classes in the `view.viewdata`.
+  View Datas are classes that hold all the data the `view` needs to present. They are created from `model` classes and served by View Models to the `view`. This diagram represents all the associations among the classes in the `view.viewdata`.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewdata-diagram.dark.svg">
@@ -332,7 +332,7 @@ class MainRepository {
 </picture>
 
 ### Package `model`
-  Model classes handle the logic of the application. This diagram represents all the associations among the classes in the 'model'.
+  Model classes handle the logic of the application. This diagram represents all the associations among the classes in the `model`.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/model-diagram.dark.svg">
@@ -371,7 +371,7 @@ class MainRepository {
   - Fix Bugs:
     - The Geocoder library sometimes doesn't get the address of the locations right, and the Nominatim API sometimes doesn't return the right outline for the location. A solution would be to let the user search and correct the location.
     - The `PhotosScreen` displays a map with photos pinned at their respective coordinates, along with a grid of all the photos. It is accessed by clicking on the mini-map at the `HomeScreen`. However, it now only functions when clicking on a city map. It does not work when changing the current level of administrative region on the dropdown located at the top of the `HomeScreen` to a county, state, or country.
-    - In the [hide exclave](#hide-exclaves) feature, all the exclaves that belong to a city may also belong to its county, which belongs to the state, which belongs to the country. When you hide the exclave from a city, although on the 'HomeScreen' the exclave from the city is hidden, it doesn't get hidden from the other levels of the administrative region. Thus, on the 'MapScreen', these exclaves are still showing. This happens because the app is not prepared for an exclave to belong to multiple locations.
+    - In the [hide exclave](#hide-exclaves) feature, all the exclaves that belong to a city may also belong to its county, which belongs to the state, which belongs to the country. When you hide the exclave from a city, although on the `HomeScreen` the exclave from the city is hidden, it doesn't get hidden from the other levels of the administrative region. Thus, on the `MapScreen`, these exclaves are still showing. This happens because the app is not prepared for an exclave to belong to multiple locations.
   - Use the date of each photo to show not only where but also when the photo was taken.
   - Create a dark mode.
   - Although unit tests were created to test the clipping, there are many other tests I'd like to create for this application.
