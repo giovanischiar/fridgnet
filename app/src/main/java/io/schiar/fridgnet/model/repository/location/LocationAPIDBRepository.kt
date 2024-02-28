@@ -6,6 +6,8 @@ import io.schiar.fridgnet.model.AdministrativeUnit.CITY
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Region
+import io.schiar.fridgnet.model.datasource.LocationDataSource
+import io.schiar.fridgnet.model.datasource.retriever.LocationRetriever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -13,8 +15,8 @@ import kotlinx.coroutines.withContext
 import java.util.Collections.synchronizedMap as syncMapOf
 
 class LocationAPIDBRepository(
-    private val locationAPIDataSource: LocationDataSource = LocationAPIDataSource(),
-    private val locationDBDataSource: LocationDBDataSource
+    private val locationRetriever: LocationRetriever,
+    private val locationDataSource: LocationDataSource
 ) : LocationRepository {
     override var allCitiesBoundingBox: BoundingBox? = null
     override var currentLocation: Location? = null
@@ -27,7 +29,7 @@ class LocationAPIDBRepository(
     private var onLocationReady: suspend (location: Location) -> Unit = {}
 
     override suspend fun setup() {
-        locationDBDataSource.setup(onLoaded = ::onLoaded)
+        locationDataSource.setup(onLoaded = ::onLoaded)
     }
 
     private fun log(address: Address, msg: String) {
@@ -55,7 +57,7 @@ class LocationAPIDBRepository(
             forEach { if (currentLocation.regions.contains(it.key)) remove() }
         }
         addRegionLocation(location = locationUpdated)
-        (locationDBDataSource as LocationDBDataSource).updateLocationWithAllRegionsSwitched(
+        locationDataSource.updateLocationWithAllRegionsSwitched(
             location = locationUpdated
         )
         this.currentLocation = locationUpdated
@@ -69,7 +71,7 @@ class LocationAPIDBRepository(
         addRegionLocation(location = locationUpdated)
         regionLocation.remove(region)
         regionLocation[region.switch()] = locationUpdated
-        (locationDBDataSource as LocationDBDataSource).updateLocationWithRegionSwitched(
+        locationDataSource.updateLocationWithRegionSwitched(
             location = locationUpdated,
             region = region
         )
@@ -139,28 +141,28 @@ class LocationAPIDBRepository(
             addressLocation[address]
         } else {
             log(address = address, "Shoot! Time to search in the database")
-            val locationFromDatabase = withContext(Dispatchers.IO) {
-                locationDBDataSource.fetchLocationBy(address = address)
+            val locationFromDataSource = withContext(Dispatchers.IO) {
+                locationDataSource.fetchLocationBy(address = address)
             }
-            if (locationFromDatabase != null) {
+            if (locationFromDataSource != null) {
                 log(address = address, "it's on the database! Returning...")
-                onLoaded(location = locationFromDatabase)
-                locationFromDatabase
+                onLoaded(location = locationFromDataSource)
+                locationFromDataSource
             } else {
                 log(address = address, "Shoot! Time to search in the API")
-                val locationFromAPI = withContext(Dispatchers.IO) {
-                    locationAPIDataSource.fetchLocationBy(address = address)
+                val locationFromRetriever = withContext(Dispatchers.IO) {
+                    locationRetriever.fetchLocationBy(address = address)
                 }
-                if (locationFromAPI != null) {
+                if (locationFromRetriever != null) {
                     log(address = address, "It's on the API! Returning...")
-                    onLoaded(location = locationFromAPI)
+                    onLoaded(location = locationFromRetriever)
                     coroutineScope {
                         launch(Dispatchers.IO) {
-                            locationDBDataSource.insert(location = locationFromAPI)
+                            locationDataSource.insert(location = locationFromRetriever)
                         }
                     }
                 }
-                locationFromAPI
+                locationFromRetriever
             }
         }
     }

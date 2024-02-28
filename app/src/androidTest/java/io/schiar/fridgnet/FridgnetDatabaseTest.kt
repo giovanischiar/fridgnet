@@ -7,7 +7,7 @@ import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.schiar.fridgnet.model.*
 import io.schiar.fridgnet.model.datasource.room.FridgnetDatabase
-import io.schiar.fridgnet.model.repository.location.LocationDBDataSource
+import io.schiar.fridgnet.library.room.LocationRoomDataSource
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.After
 import org.junit.Before
@@ -18,7 +18,7 @@ import java.io.IOException
 @RunWith(AndroidJUnit4::class)
 class FridgnetDatabaseTest {
     private lateinit var database: FridgnetDatabase
-    private lateinit var locationDBDataSource: LocationDBDataSource
+    private lateinit var locationDBDataSource: LocationRoomDataSource
 
     @Before
     fun createDatabase() {
@@ -27,7 +27,7 @@ class FridgnetDatabaseTest {
             context = context,
             klass = FridgnetDatabase::class.java
         ).build()
-        locationDBDataSource = LocationDBDataSource(locationDAO = database.locationDAO())
+        locationDBDataSource = LocationRoomDataSource(locationDAO = database.locationDAO())
     }
 
     @After

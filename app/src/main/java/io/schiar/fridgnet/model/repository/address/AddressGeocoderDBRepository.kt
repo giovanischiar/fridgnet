@@ -8,6 +8,8 @@ import io.schiar.fridgnet.model.AdministrativeUnit.COUNTRY
 import io.schiar.fridgnet.model.AdministrativeUnit.COUNTY
 import io.schiar.fridgnet.model.AdministrativeUnit.STATE
 import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.datasource.AddressDataSource
+import io.schiar.fridgnet.model.datasource.retriever.AddressRetriever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
@@ -15,8 +17,8 @@ import kotlinx.coroutines.withContext
 import java.util.Collections.synchronizedMap as syncMapOf
 
 class AddressGeocoderDBRepository(
-    private val addressGeocoderDataSource: AddressDataSource,
-    private val addressDBDataSource: AddressDBDataSource
+    private val addressRetriever: AddressRetriever,
+    private val addressDataSource: AddressDataSource
 ) : AddressRepository {
     private val coordinateAddress: MutableMap<Coordinate, Address> = syncMapOf(mutableMapOf())
     private val nameAddress: MutableMap<String, Address> = syncMapOf(mutableMapOf())
@@ -31,7 +33,7 @@ class AddressGeocoderDBRepository(
     private var onNewCoordinateWasAdded: suspend () -> Unit = {}
 
     override suspend fun setup() {
-        addressDBDataSource.setup(onLoaded = ::onLoaded)
+        addressDataSource.setup(onLoaded = ::onLoaded)
     }
 
     override fun coordinatesFromAddressName(
@@ -96,31 +98,31 @@ class AddressGeocoderDBRepository(
             coordinateAddress[coordinate]
         } else {
             log(coordinate = coordinate, "Shoot! Time to search in the database")
-            val addressFromDatabase = withContext(Dispatchers.IO) {
-                addressDBDataSource.fetchAddressBy(coordinate = coordinate)
+            val addressFromDataSource = withContext(Dispatchers.IO) {
+                addressDataSource.fetchAddressBy(coordinate = coordinate)
             }
-            if (addressFromDatabase != null) {
+            if (addressFromDataSource != null) {
                 log(coordinate = coordinate, "it's on the database! Returning...")
-                onLoaded(coordinate = coordinate, address = addressFromDatabase)
-                addressFromDatabase
+                onLoaded(coordinate = coordinate, address = addressFromDataSource)
+                addressFromDataSource
             } else {
                 log(coordinate = coordinate, "Shoot! Time to search in the Geocoder")
-                val addressFromGeocoder = withContext(Dispatchers.IO) {
-                    addressGeocoderDataSource.fetchAddressBy(coordinate = coordinate)
+                val addressFromRetriever = withContext(Dispatchers.IO) {
+                    addressRetriever.fetchAddressBy(coordinate = coordinate)
                 }
-                if (addressFromGeocoder != null) {
+                if (addressFromRetriever != null) {
                     log(coordinate = coordinate, "It's on the Geocoder! Returning...")
-                    onLoaded(coordinate = coordinate, address = addressFromGeocoder)
+                    onLoaded(coordinate = coordinate, address = addressFromRetriever)
                     coroutineScope {
                         launch(Dispatchers.IO) {
-                            addressDBDataSource.insert(
+                            addressDataSource.insert(
                                 coordinate = coordinate,
-                                address = addressFromGeocoder
+                                address = addressFromRetriever
                             )
                         }
                     }
                 }
-                addressFromGeocoder
+                addressFromRetriever
             }
         }
     }
