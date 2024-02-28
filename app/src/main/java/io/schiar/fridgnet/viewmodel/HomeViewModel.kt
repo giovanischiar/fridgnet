@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
+class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
     private val _addressLocationImages = MutableStateFlow<List<AddressLocationImagesViewData>>(
         emptyList()
     )
@@ -29,34 +29,34 @@ class HomeViewModel(private val repository: HomeRepository) : ViewModel() {
     val currentAdministrativeUnit: StateFlow<String> = _currentAdministrativeUnit
 
     fun subscribe() {
-        repository.subscribeForNewAddressAdded(callback = ::onAddressReady)
-        repository.subscribeForLocationsReady(callback = ::onLocationReady)
+        homeRepository.subscribeForNewAddressAdded(callback = ::onAddressReady)
+        homeRepository.subscribeForLocationsReady(callback = ::onLocationReady)
     }
 
     suspend fun selectImages(address: String) {
         Log.d("Select Image Feature", "Select $address")
-        repository.selectImagesFrom(addressName = address)
+        homeRepository.selectImagesFrom(addressName = address)
     }
 
     suspend fun changeCurrent(administrativeUnitName: String) {
         _currentAdministrativeUnit.update { administrativeUnitName }
-        repository.changeCurrent(administrativeUnit = valueOf(administrativeUnitName))
+        homeRepository.changeCurrent(administrativeUnit = valueOf(administrativeUnitName))
         onLocationReady()
     }
 
     suspend fun removeAllImages() {
-        repository.removeAllImages()
+        homeRepository.removeAllImages()
     }
 
     private suspend fun onAddressReady() {
         _addressLocationImages.update {
-            repository.locationImages().toAddressLocationImagesViewDataList()
+            homeRepository.locationImages().toAddressLocationImagesViewDataList()
         }
     }
 
     private suspend fun onLocationReady() {
         _addressLocationImages.update {
-            repository.locationImages().toAddressLocationImagesViewDataList()
+            homeRepository.locationImages().toAddressLocationImagesViewDataList()
         }
     }
 }

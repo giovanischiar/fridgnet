@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class MapViewModel(private val repository: MapRepository) : ViewModel() {
+class MapViewModel(private val mapRepository: MapRepository) : ViewModel() {
     private val _visibleImages = MutableStateFlow<List<ImageViewData>>(value = emptyList())
     val visibleImages: StateFlow<List<ImageViewData>> = _visibleImages.asStateFlow()
 
@@ -28,21 +28,21 @@ class MapViewModel(private val repository: MapRepository) : ViewModel() {
 
     fun selectRegion(regionViewData: RegionViewData) {
         val region = regionViewData.toRegion()
-        repository.selectNewLocationFrom(region = region)
+        mapRepository.selectNewLocationFrom(region = region)
     }
 
     fun visibleAreaChanged(boundingBoxViewData: BoundingBoxViewData) {
         val boundingBox = boundingBoxViewData.toBoundingBox()
         _visibleImages.update {
-            repository.visibleImages(boundingBox = boundingBox).toImageViewDataList()
+            mapRepository.visibleImages(boundingBox = boundingBox).toImageViewDataList()
         }
 
         _visibleRegions.update {
-            repository.visibleRegions(boundingBox = boundingBox).toRegionViewDataList()
+            mapRepository.visibleRegions(boundingBox = boundingBox).toRegionViewDataList()
         }
     }
 
     fun zoomToFitAllCities() {
-        _allPhotosBoundingBox.update { repository.boundingBoxCities()?.toBoundingBoxViewData() }
+        _allPhotosBoundingBox.update { mapRepository.boundingBoxCities()?.toBoundingBoxViewData() }
     }
 }

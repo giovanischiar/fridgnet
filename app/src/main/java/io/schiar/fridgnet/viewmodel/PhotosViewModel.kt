@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-class PhotosViewModel(private val repository: PhotosRepository) : ViewModel() {
+class PhotosViewModel(private val photosRepository: PhotosRepository) : ViewModel() {
     private val _selectedImages = MutableStateFlow<Pair<String, List<ImageViewData>>?>(
         value = null
     )
@@ -30,15 +30,15 @@ class PhotosViewModel(private val repository: PhotosRepository) : ViewModel() {
     val selectedImagesBoundingBox: StateFlow<BoundingBoxViewData?> = _selectedImagesBoundingBox
 
     fun subscribe() {
-        repository.subscribeForNewImages(callback = ::updateCurrentImages)
+        photosRepository.subscribeForNewImages(callback = ::updateCurrentImages)
     }
 
     fun updateCurrentImages() {
-        _selectedImages.update { repository.currentImages()?.toAddressImagesViewData() }
-        _selectedLocation.update { repository.selectedLocation()?.toLocationViewData() }
-        _selectedBoundingBox.update { repository.selectedBoundingBox()?.toBoundingBoxViewData() }
+        _selectedImages.update { photosRepository.currentImages()?.toAddressImagesViewData() }
+        _selectedLocation.update { photosRepository.selectedLocation()?.toLocationViewData() }
+        _selectedBoundingBox.update { photosRepository.selectedBoundingBox()?.toBoundingBoxViewData() }
         _selectedImagesBoundingBox.update {
-            repository.selectedImagesBoundingBox()?.toBoundingBoxViewData()
+            photosRepository.selectedImagesBoundingBox()?.toBoundingBoxViewData()
         }
     }
 }

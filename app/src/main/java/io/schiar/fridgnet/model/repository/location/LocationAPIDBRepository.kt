@@ -22,6 +22,7 @@ class LocationAPIDBRepository(
     private val cityAddressLocation: MutableMap<Address, Location> = syncMapOf(mutableMapOf())
     private var locationsBeingFetched: Set<Address> = emptySet()
     private var addressLocation: Map<Address, Location> = emptyMap()
+    override val locationAddress: MutableMap<Address, Location> = syncMapOf(mutableMapOf())
 
     private var onLocationReady: suspend (location: Location) -> Unit = {}
 

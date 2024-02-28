@@ -1,6 +1,7 @@
 package io.schiar.fridgnet.model.repository.image
 
 import io.schiar.fridgnet.Log
+import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.Image
@@ -17,6 +18,7 @@ class ImageAndroidDBRepository(
 ) : ImageRepository {
     private val uriImage: MutableMap<String, Image> = syncMapOf(mutableMapOf())
     private val coordinateImage: MutableMap<Coordinate, Image> = syncMapOf(mutableMapOf())
+    override var currentImages: Pair<Address, Set<Image>>? = null
 
     override suspend fun setup() {
         imageDBDataSource.setup(onLoaded = ::onLoaded)

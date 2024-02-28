@@ -8,6 +8,7 @@ import io.schiar.fridgnet.model.Region
 interface LocationRepository {
     var allCitiesBoundingBox: BoundingBox?
     var currentLocation: Location?
+    val locationAddress: MutableMap<Address, Location>
 
     suspend fun loadRegions(address: Address, onLocationReady: suspend (location: Location) -> Unit)
     suspend fun switchRegion(region: Region)

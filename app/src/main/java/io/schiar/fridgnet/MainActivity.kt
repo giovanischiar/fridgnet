@@ -6,7 +6,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import io.schiar.fridgnet.model.datasource.room.FridgnetDatabase
-import io.schiar.fridgnet.model.repository.MainRepository
+import io.schiar.fridgnet.model.repository.AppRepository
+import io.schiar.fridgnet.model.repository.HomeRepository
+import io.schiar.fridgnet.model.repository.MapRepository
+import io.schiar.fridgnet.model.repository.PhotosRepository
+import io.schiar.fridgnet.model.repository.PolygonsRepository
 import io.schiar.fridgnet.model.repository.address.AddressDBDataSource
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderDBRepository
 import io.schiar.fridgnet.model.repository.address.AddressGeocoderDataSource
@@ -31,9 +35,18 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(saveBundleInstance: Bundle?) {
         super.onCreate(saveBundleInstance)
         Log.fromAndroid = true
+        val (
+            appRepository, homeRepository, mapRepository, polygonsRepository, photosRepository
+        ) = createRepositories()
+
         val viewModelProvider = ViewModelProvider(
-            this, ViewModelFactory(
-                repository = createRepository()
+            owner = this,
+            ViewModelFactory(
+                appRepository = appRepository,
+                homeRepository = homeRepository,
+                mapRepository = mapRepository,
+                polygonsRepository = polygonsRepository,
+                photosRepository = photosRepository
             )
         )
         val appViewModel = viewModelProvider[AppViewModel::class.java]
@@ -53,11 +66,52 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun createRepository(): MainRepository {
-        return MainRepository(
-            locationRepository = createLocationRepository(),
-            addressRepository = createAddressRepository(),
-            imageRepository = createImageRepository()
+    data class Repositories(
+        val appRepository: AppRepository,
+        val homeRepository: HomeRepository,
+        val mapRepository: MapRepository,
+        val polygonsRepository: PolygonsRepository,
+        val photosRepository: PhotosRepository
+    )
+
+    private fun createRepositories(): Repositories {
+        val locationRepository = createLocationRepository()
+        val addressRepository = createAddressRepository()
+        val imageRepository = createImageRepository()
+
+        val polygonsRepository = PolygonsRepository(
+            locationRepository = locationRepository
+        )
+        val mapRepository = MapRepository(
+            locationRepository = locationRepository,
+            imageRepository = imageRepository
+        )
+
+        val photosRepository = PhotosRepository(
+            imageRepository = imageRepository,
+            locationRepository = locationRepository,
+            addressRepository = addressRepository
+        )
+
+        val homeRepository = HomeRepository(
+            addressRepository = addressRepository,
+            locationRepository = locationRepository,
+            imageRepository = imageRepository,
+            onAddressReadyListener = photosRepository,
+            onNewImageAddedListener = photosRepository
+        )
+
+        photosRepository.onLocationReadyListener = homeRepository
+
+        val appRepository = AppRepository(
+            locationRepository = locationRepository,
+            addressRepository = addressRepository,
+            imageRepository = imageRepository,
+            onImageAddedListener = photosRepository
+        )
+
+        return Repositories(
+            appRepository, homeRepository, mapRepository, polygonsRepository, photosRepository
         )
     }
 
