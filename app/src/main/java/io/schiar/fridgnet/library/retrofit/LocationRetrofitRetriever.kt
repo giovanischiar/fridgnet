@@ -18,7 +18,7 @@ class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : Locati
     private var fetchingPlaces: Set<String> = emptySet()
     private var mutex: Mutex = Mutex()
 
-    override suspend fun fetchLocationBy(address: Address): Location? {
+    override suspend fun retrieve(address: Address): Location? {
         return when (address.administrativeUnit) {
             CITY -> fetchCity(address = address)
             COUNTY -> fetchCounty(address = address)

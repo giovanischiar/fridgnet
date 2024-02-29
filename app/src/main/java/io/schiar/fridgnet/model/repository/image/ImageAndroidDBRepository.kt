@@ -43,7 +43,7 @@ class ImageAndroidDBRepository(
         } else {
             log(uri = uri, "Shoot! Time to search in the database")
             val imageFromDataSource = withContext(Dispatchers.IO) {
-                imageDataSource.fetchImageBy(uri = uri)
+                imageDataSource.retrieve(uri = uri)
             }
             if (imageFromDataSource != null) {
                 log(uri = uri, "it's on the database! Returning...")
@@ -52,14 +52,14 @@ class ImageAndroidDBRepository(
             } else {
                 log(uri = uri, "Shoot! Time to search in the Android")
                 val imageFromRetriever = withContext(Dispatchers.IO) {
-                    imageRetriever.fetchImageBy(uri = uri)
+                    imageRetriever.retrieve(uri = uri)
                 }
                 if (imageFromRetriever != null) {
                     log(uri = uri, "It's on the Android! Returning...")
                     onLoaded(image = imageFromRetriever)
                     coroutineScope {
                         launch(Dispatchers.IO) {
-                            imageDataSource.insert(image = imageFromRetriever)
+                            imageDataSource.create(image = imageFromRetriever)
                         }
                     }
                 }
@@ -106,7 +106,7 @@ class ImageAndroidDBRepository(
         } else {
             log(coordinate = coordinate, "Shoot! Time to search in the database")
             val imageFromDatabase = withContext(Dispatchers.IO) {
-                imageDataSource.fetchImageBy(coordinate = coordinate)
+                imageDataSource.retrieve(coordinate = coordinate)
             }
             log(coordinate = coordinate, "it's on the database! Returning...")
             if (imageFromDatabase != null) {
@@ -119,7 +119,7 @@ class ImageAndroidDBRepository(
     override suspend fun removeAllImages() {
         uriImage.clear()
         coordinateImage.clear()
-        imageDataSource.deleteAll()
+        imageDataSource.delete()
     }
 
     private fun log(coordinate: Coordinate, msg: String) {

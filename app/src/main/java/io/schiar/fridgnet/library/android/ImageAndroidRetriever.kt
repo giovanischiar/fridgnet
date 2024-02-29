@@ -14,7 +14,7 @@ import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
 class ImageAndroidRetriever(private val contentResolver: ContentResolver) : ImageRetriever {
-    override suspend fun fetchImageBy(uri: String): Image? {
+    override suspend fun retrieve(uri: String): Image? {
         val systemURI = Uri.parse(uri)
         (contentResolver.openInputStream(systemURI) ?: return null).use { ins ->
             val exifInterface = ExifInterface(ins)

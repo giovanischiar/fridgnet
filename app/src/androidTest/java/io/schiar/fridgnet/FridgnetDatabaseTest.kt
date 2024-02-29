@@ -86,7 +86,7 @@ class FridgnetDatabaseTest {
             zIndex = 1.0f
         )
 
-        locationDBDataSource.insert(location = location)
+        locationDBDataSource.create(location = location)
         val actual = locationDBDataSource.selectLocationByAddress(address = address)
         assertThat(actual, equalTo(location))
     }

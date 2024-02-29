@@ -29,7 +29,7 @@ class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDat
         }
     }
 
-    override suspend fun fetchLocationBy(address: Address): Location? {
+    override suspend fun retrieve(address: Address): Location? {
         return selectLocationByAddress(address = address)
     }
 
@@ -43,7 +43,7 @@ class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDat
         )?.toLocation()
     }
 
-    override fun insert(location: Location) {
+    override fun create(location: Location) {
         val locationID = locationDAO.insert(locationEntity = location.toLocationEntity())
         insertRegions(locationID = locationID, regions = location.regions)
     }
@@ -70,7 +70,7 @@ class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDat
         return locationWithRegions.regions
     }
 
-    override fun updateLocationWithRegionSwitched(location: Location, region: Region) {
+    override fun updateWithRegionSwitched(location: Location, region: Region) {
         val regionsWithPolygonAndHoles = update(location = location) ?: return
         val regionEntity = regionsWithPolygonAndHoles.find {
             it.toRegion().polygon == region.polygon
@@ -78,7 +78,7 @@ class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDat
         locationDAO.update(regionEntity = regionEntity.switch())
     }
 
-    override suspend fun updateLocationWithAllRegionsSwitched(location: Location): Unit = coroutineScope {
+    override suspend fun updateWithAllRegionsSwitched(location: Location): Unit = coroutineScope {
         val regionsWithPolygonAndHoles = update(location = location) ?: return@coroutineScope
         val regionEntities = regionsWithPolygonAndHoles.sortedByDescending {
             it.polygon.coordinates.size

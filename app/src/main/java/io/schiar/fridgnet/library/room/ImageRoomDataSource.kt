@@ -21,21 +21,21 @@ class ImageRoomDataSource(private val imageDAO: ImageDAO) : ImageDataSource {
         return imageDAO.selectImagesWithCoordinate().map { it.toImage() }
     }
 
-    override fun insert(image: Image) {
+    override fun create(image: Image) {
         val coordinateID = imageDAO.insert(coordinateEntity = image.coordinate.toCoordinateEntity())
         imageDAO.insert(imageEntity = image.toImageEntity(coordinateID = coordinateID))
     }
 
-    override suspend fun fetchImageBy(uri: String): Image? {
+    override suspend fun retrieve(uri: String): Image? {
         return imageDAO.selectImageBy(uri = uri)?.toImage()
     }
 
-    override fun fetchImageBy(coordinate: Coordinate): Image? {
+    override fun retrieve(coordinate: Coordinate): Image? {
         val (latitude, longitude) = coordinate
         return imageDAO.selectImageBy(latitude = latitude, longitude = longitude)?.toImage()
     }
 
-    override suspend fun deleteAll(): Unit = coroutineScope {
+    override suspend fun delete(): Unit = coroutineScope {
         launch(Dispatchers.IO) {
             imageDAO.deleteAll()
         }

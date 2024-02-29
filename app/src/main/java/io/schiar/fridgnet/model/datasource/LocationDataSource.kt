@@ -6,7 +6,7 @@ import io.schiar.fridgnet.model.datasource.retriever.LocationRetriever
 
 interface LocationDataSource: LocationRetriever {
     suspend fun setup(onLoaded: (location: Location) -> Unit)
-    fun insert(location: Location)
-    fun updateLocationWithRegionSwitched(location: Location, region: Region)
-    suspend fun updateLocationWithAllRegionsSwitched(location: Location)
+    fun create(location: Location)
+    fun updateWithRegionSwitched(location: Location, region: Region)
+    suspend fun updateWithAllRegionsSwitched(location: Location)
 }

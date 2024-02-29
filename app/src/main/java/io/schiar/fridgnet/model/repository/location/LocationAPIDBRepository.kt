@@ -57,7 +57,7 @@ class LocationAPIDBRepository(
             forEach { if (currentLocation.regions.contains(it.key)) remove() }
         }
         addRegionLocation(location = locationUpdated)
-        locationDataSource.updateLocationWithAllRegionsSwitched(
+        locationDataSource.updateWithAllRegionsSwitched(
             location = locationUpdated
         )
         this.currentLocation = locationUpdated
@@ -71,7 +71,7 @@ class LocationAPIDBRepository(
         addRegionLocation(location = locationUpdated)
         regionLocation.remove(region)
         regionLocation[region.switch()] = locationUpdated
-        locationDataSource.updateLocationWithRegionSwitched(
+        locationDataSource.updateWithRegionSwitched(
             location = locationUpdated,
             region = region
         )
@@ -142,7 +142,7 @@ class LocationAPIDBRepository(
         } else {
             log(address = address, "Shoot! Time to search in the database")
             val locationFromDataSource = withContext(Dispatchers.IO) {
-                locationDataSource.fetchLocationBy(address = address)
+                locationDataSource.retrieve(address = address)
             }
             if (locationFromDataSource != null) {
                 log(address = address, "it's on the database! Returning...")
@@ -151,14 +151,14 @@ class LocationAPIDBRepository(
             } else {
                 log(address = address, "Shoot! Time to search in the API")
                 val locationFromRetriever = withContext(Dispatchers.IO) {
-                    locationRetriever.fetchLocationBy(address = address)
+                    locationRetriever.retrieve(address = address)
                 }
                 if (locationFromRetriever != null) {
                     log(address = address, "It's on the API! Returning...")
                     onLoaded(location = locationFromRetriever)
                     coroutineScope {
                         launch(Dispatchers.IO) {
-                            locationDataSource.insert(location = locationFromRetriever)
+                            locationDataSource.create(location = locationFromRetriever)
                         }
                     }
                 }

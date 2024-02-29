@@ -99,7 +99,7 @@ class AddressGeocoderDBRepository(
         } else {
             log(coordinate = coordinate, "Shoot! Time to search in the database")
             val addressFromDataSource = withContext(Dispatchers.IO) {
-                addressDataSource.fetchAddressBy(coordinate = coordinate)
+                addressDataSource.retrieve(coordinate = coordinate)
             }
             if (addressFromDataSource != null) {
                 log(coordinate = coordinate, "it's on the database! Returning...")
@@ -108,14 +108,14 @@ class AddressGeocoderDBRepository(
             } else {
                 log(coordinate = coordinate, "Shoot! Time to search in the Geocoder")
                 val addressFromRetriever = withContext(Dispatchers.IO) {
-                    addressRetriever.fetchAddressBy(coordinate = coordinate)
+                    addressRetriever.retrieve(coordinate = coordinate)
                 }
                 if (addressFromRetriever != null) {
                     log(coordinate = coordinate, "It's on the Geocoder! Returning...")
                     onLoaded(coordinate = coordinate, address = addressFromRetriever)
                     coroutineScope {
                         launch(Dispatchers.IO) {
-                            addressDataSource.insert(
+                            addressDataSource.create(
                                 coordinate = coordinate,
                                 address = addressFromRetriever
                             )

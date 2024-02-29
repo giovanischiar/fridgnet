@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class AddressRoomDataSource(private val addressDAO: AddressDAO) : AddressDataSource {
-    override fun fetchAddressBy(coordinate: Coordinate): Address? {
+    override fun retrieve(coordinate: Coordinate): Address? {
         val (latitude, longitude) = coordinate
         return selectAddressBy(latitude = latitude, longitude = longitude)
     }
@@ -31,7 +31,7 @@ class AddressRoomDataSource(private val addressDAO: AddressDAO) : AddressDataSou
         }
     }
 
-    override fun insert(coordinate: Coordinate, address: Address) {
+    override fun create(coordinate: Coordinate, address: Address) {
         val addressEntityID = insertOrUpdate(address = address) ?: return
         addressDAO.insert(
             coordinateEntity = coordinate.toCoordinateEntity(addressCoordinatesID = addressEntityID)

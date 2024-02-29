@@ -6,7 +6,7 @@ import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
 
 interface ImageDataSource: ImageRetriever {
     suspend fun setup(onLoaded: (image: Image) -> Unit)
-    fun insert(image: Image)
-    fun fetchImageBy(coordinate: Coordinate): Image?
-    suspend fun deleteAll()
+    fun create(image: Image)
+    fun retrieve(coordinate: Coordinate): Image?
+    suspend fun delete()
 }
