@@ -7,7 +7,9 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import io.schiar.fridgnet.library.android.ImageAndroidRetriever
 import io.schiar.fridgnet.library.geocoder.AddressGeocoderRetriever
-import io.schiar.fridgnet.library.nominatim.LocationRetrofitRetriever
+import io.schiar.fridgnet.library.retrofit.LocationRetrofitRetriever
+import io.schiar.fridgnet.library.retrofit.NominatimAPI
+import io.schiar.fridgnet.library.retrofit.RetrofitHelper
 import io.schiar.fridgnet.library.room.AddressRoomDataSource
 import io.schiar.fridgnet.library.room.FridgnetDatabase
 import io.schiar.fridgnet.library.room.ImageRoomDataSource
@@ -119,8 +121,10 @@ class MainActivity : ComponentActivity() {
     private fun createLocationRepository(): LocationRepository {
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
         val locationDAO = fridgnetDatabase.locationDAO()
+        val retrofitHelper = RetrofitHelper.getInstance()
+        val nominatimAPI = retrofitHelper.create(NominatimAPI::class.java)
         return LocationAPIDBRepository(
-            locationRetriever = LocationRetrofitRetriever(),
+            locationRetriever = LocationRetrofitRetriever(nominatimAPI = nominatimAPI),
             locationDataSource = LocationRoomDataSource(locationDAO = locationDAO)
         )
     }

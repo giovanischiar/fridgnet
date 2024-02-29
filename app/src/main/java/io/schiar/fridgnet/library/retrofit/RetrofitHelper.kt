@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.library.nominatim
+package io.schiar.fridgnet.library.retrofit
 
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
@@ -7,8 +7,7 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitHelper {
     private const val baseUrl = "https://nominatim.openstreetmap.org/"
-    private val resultDocument = object :
-        TypeToken<Result<GeoJsonAttributes>?>() {}.type
+    private val resultDocument = object : TypeToken<JSONResult<GeoJSONAttributes>?>() {}.type
 
     fun getInstance(): Retrofit {
         val gson = GsonBuilder().apply {

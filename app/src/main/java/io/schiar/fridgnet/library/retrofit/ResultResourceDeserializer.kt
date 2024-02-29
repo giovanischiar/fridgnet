@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.library.nominatim
+package io.schiar.fridgnet.library.retrofit
 
 import com.google.gson.JsonDeserializationContext
 import com.google.gson.JsonDeserializer
@@ -6,18 +6,18 @@ import com.google.gson.JsonElement
 import com.google.gson.reflect.TypeToken
 import java.lang.reflect.Type
 
-class ResultResourceDeserializer : JsonDeserializer<Result<GeoJsonAttributes>> {
-    private val pointResource = object : TypeToken<Result<List<Double>>?>() {}.type
-    private val lineStringResource = object : TypeToken<Result<List<List<Double>>>?>() {}.type
-    private val polygonResource = object : TypeToken<Result<List<List<List<Double>>>>?>() {}.type
+class ResultResourceDeserializer : JsonDeserializer<JSONResult<GeoJSONAttributes>> {
+    private val pointResource = object : TypeToken<JSONResult<List<Double>>?>() {}.type
+    private val lineStringResource = object : TypeToken<JSONResult<List<List<Double>>>?>() {}.type
+    private val polygonResource = object : TypeToken<JSONResult<List<List<List<Double>>>>?>() {}.type
     private val multiPolygonResource =
-        object : TypeToken<Result<List<List<List<List<Double>>>>>?>() {}.type
+        object : TypeToken<JSONResult<List<List<List<List<Double>>>>>?>() {}.type
 
     override fun deserialize(
         json: JsonElement?,
         typeOfT: Type?,
         context: JsonDeserializationContext?
-    ): Result<GeoJsonAttributes>? {
+    ): JSONResult<GeoJSONAttributes>? {
         return when (json?.asJsonObject?.get("geojson")?.asJsonObject?.get("type")?.asString) {
             "Point" -> context?.deserialize(json, pointResource)
             "LineString" -> context?.deserialize(json, lineStringResource)
