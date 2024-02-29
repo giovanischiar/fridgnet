@@ -1,6 +1,7 @@
 package io.schiar.fridgnet.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.AdministrativeUnit.valueOf
@@ -11,6 +12,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
     private val _addressLocationImages = MutableStateFlow<List<AddressLocationImagesViewData>>(
@@ -33,28 +35,28 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
         homeRepository.subscribeForLocationsReady(callback = ::onLocationReady)
     }
 
-    suspend fun selectImages(address: String) {
+    fun selectImages(address: String) = viewModelScope.launch {
         Log.d("Select Image Feature", "Select $address")
         homeRepository.selectImagesFrom(addressName = address)
     }
 
-    suspend fun changeCurrent(administrativeUnitName: String) {
+    fun changeCurrent(administrativeUnitName: String) {
         _currentAdministrativeUnit.update { administrativeUnitName }
         homeRepository.changeCurrent(administrativeUnit = valueOf(administrativeUnitName))
         onLocationReady()
     }
 
-    suspend fun removeAllImages() {
+    fun removeAllImages() = viewModelScope.launch {
         homeRepository.removeAllImages()
     }
 
-    private suspend fun onAddressReady() {
+    private fun onAddressReady() {
         _addressLocationImages.update {
             homeRepository.locationImages().toAddressLocationImagesViewDataList()
         }
     }
 
-    private suspend fun onLocationReady() {
+    private fun onLocationReady() {
         _addressLocationImages.update {
             homeRepository.locationImages().toAddressLocationImagesViewDataList()
         }

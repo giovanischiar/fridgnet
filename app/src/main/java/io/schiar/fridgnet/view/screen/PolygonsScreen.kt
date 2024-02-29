@@ -28,11 +28,7 @@ import androidx.compose.ui.unit.dp
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.MapPolygon
 import io.schiar.fridgnet.view.util.ScreenInfo
-import io.schiar.fridgnet.view.viewdata.RegionViewData
 import io.schiar.fridgnet.viewmodel.PolygonsViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 
 @Composable
 fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) -> Unit) {
@@ -41,14 +37,6 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
         it.polygon.coordinates.size
     }.asReversed()
 
-    fun switchAllOtherRegions() = runBlocking {
-        withContext(Dispatchers.IO) { viewModel.switchAll() }
-    }
-
-    fun switchRegion(regionViewData: RegionViewData) = runBlocking {
-        withContext(Dispatchers.IO) { viewModel.switchRegion(regionViewData = regionViewData) }
-    }
-
     info(
         ScreenInfo(
             title = location?.address ?: stringResource(id = R.string.polygons_screen),
@@ -56,7 +44,7 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
                 if (sortedRegions.size > 1) {
                     Button(
                         colors = buttonColors(containerColor = Color.Transparent),
-                        onClick = ::switchAllOtherRegions
+                        onClick = viewModel::switchAll
                     ) {
                         Text("SWITCH ALL")
                     }
@@ -96,7 +84,7 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
                             .fillMaxWidth()
                             .weight(0.25f),
                         region = sortedRegions[1],
-                        onRegionCheckedChange = ::switchRegion
+                        onRegionCheckedChange = viewModel::switchRegion
                     )
                 }
             }
@@ -121,7 +109,7 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
                                     .fillMaxWidth()
                                     .weight(1f),
                                 region = region,
-                                onRegionCheckedChange = ::switchRegion
+                                onRegionCheckedChange = viewModel::switchRegion
                             )
                         }
                     }
@@ -148,7 +136,7 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
                                         .weight(1f)
                                         .height(height * 0.25f),
                                     region = region,
-                                    onRegionCheckedChange = ::switchRegion
+                                    onRegionCheckedChange = viewModel::switchRegion
                                 )
                             }
                         }
@@ -162,7 +150,7 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
                                 MapPolygon(
                                     modifier = Modifier.height(height * 0.125f),
                                     region = region,
-                                    onRegionCheckedChange = ::switchRegion
+                                    onRegionCheckedChange = viewModel::switchRegion
                                 )
                             }
                         }

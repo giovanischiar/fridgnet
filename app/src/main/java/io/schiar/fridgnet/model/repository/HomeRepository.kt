@@ -10,8 +10,6 @@ import io.schiar.fridgnet.model.repository.listeners.OnAddressReadyListener
 import io.schiar.fridgnet.model.repository.listeners.OnLocationReadyListener
 import io.schiar.fridgnet.model.repository.listeners.OnNewImageAddedListener
 import io.schiar.fridgnet.model.repository.location.LocationRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class HomeRepository(
     private val addressRepository: AddressRepository,
@@ -20,20 +18,20 @@ class HomeRepository(
     private val onAddressReadyListener: OnAddressReadyListener,
     private val onNewImageAddedListener: OnNewImageAddedListener
 ): OnLocationReadyListener {
-    private var onLocationReadyCallback: suspend () -> Unit = {}
+    private var onLocationReadyCallback: () -> Unit = {}
 
-    fun subscribeForNewAddressAdded(callback: suspend () -> Unit) {
+    fun subscribeForNewAddressAdded(callback: () -> Unit) {
         addressRepository.subscribeForNewAddressAdded { address ->
             onNewAddressAdded(address = address, callback = callback)
         }
     }
 
-    private suspend fun onNewAddressAdded(address: Address, callback: suspend () -> Unit) {
+    private suspend fun onNewAddressAdded(address: Address, callback: () -> Unit) {
         onAddressReadyListener.onAddressReady(address)
         callback()
     }
 
-    fun subscribeForLocationsReady(callback: suspend () -> Unit) {
+    fun subscribeForLocationsReady(callback: () -> Unit) {
         onLocationReadyCallback = callback
     }
 
@@ -51,13 +49,13 @@ class HomeRepository(
         onNewImageAddedListener.onNewImageAdded()
     }
 
-    suspend fun locationImages(): List<AddressLocationImages> {
+    fun locationImages(): List<AddressLocationImages> {
         Log.d("Add Image Feature", "Updating Location Images")
         return addressRepository.currentAddressCoordinates()
             .map { (address, coordinates) ->
                 AddressLocationImages(
                     address = address,
-                    location = withContext(Dispatchers.IO) { locationRepository.locationAddress[address] },
+                    location = locationRepository.locationAddress[address],
                     initialCoordinate = coordinates.first()
                 )
             }

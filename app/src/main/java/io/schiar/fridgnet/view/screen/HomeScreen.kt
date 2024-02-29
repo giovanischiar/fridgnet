@@ -29,7 +29,6 @@ import io.schiar.fridgnet.view.component.AdministrativeUnitDropdown
 import io.schiar.fridgnet.view.component.MapPhotoItem
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.viewmodel.HomeViewModel
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun HomeScreen(
@@ -48,10 +47,9 @@ fun HomeScreen(
             actions = {
                 AdministrativeUnitDropdown(
                     administrativeUnits = administrativeUnits,
-                    currentAdministrativeUnit = currentAdministrativeUnit
-                ) {
-                    runBlocking { viewModel.changeCurrent(administrativeUnitName = it) }
-                }
+                    currentAdministrativeUnit = currentAdministrativeUnit,
+                    onDropdown = viewModel::changeCurrent
+                )
 
                 Box {
                     IconButton(onClick = { expanded = !expanded }) {
@@ -69,7 +67,7 @@ fun HomeScreen(
                         DropdownMenuItem(
                             text = { Text("Remove All Images") },
                             onClick = {
-                                runBlocking { viewModel.removeAllImages() }
+                                viewModel.removeAllImages()
                                 expanded = false
                             }
                         )
@@ -108,7 +106,7 @@ fun HomeScreen(
                     location = location,
                     columnCount = columnCount
                 ) {
-                    runBlocking { viewModel.selectImages(address) }
+                    viewModel.selectImages(address)
                     onNavigateImage()
                 }
             }

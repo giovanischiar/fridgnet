@@ -5,8 +5,22 @@ import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
@@ -23,9 +37,12 @@ import io.schiar.fridgnet.view.component.PhotoPicker
 import io.schiar.fridgnet.view.util.BottomNavScreen
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether
-import io.schiar.fridgnet.viewmodel.*
+import io.schiar.fridgnet.viewmodel.AppViewModel
+import io.schiar.fridgnet.viewmodel.HomeViewModel
+import io.schiar.fridgnet.viewmodel.MapViewModel
+import io.schiar.fridgnet.viewmodel.PhotosViewModel
+import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -184,10 +201,8 @@ fun AppScreen(
         }
     }
 
-    val coroutineScope = rememberCoroutineScope()
-
     fun onURIsReady(uris: List<String>) {
-        coroutineScope.launch { appViewModel.addURIs(uris = uris) }
+        appViewModel.addURIs(uris = uris)
         photoPickerShowing = false
     }
 
