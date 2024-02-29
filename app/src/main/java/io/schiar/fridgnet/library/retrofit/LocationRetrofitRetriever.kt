@@ -90,25 +90,34 @@ class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : Locati
         val country = address.countryName ?: ""
         mutex.lock()
         val jsonResult = withContext(Dispatchers.IO) {
-            when (administrativeUnit) {
-                CITY -> {
-                    searchCity(city = city, state = state, country = country)
-                }
+            try {
+                when (administrativeUnit) {
+                    CITY -> {
+                        searchCity(city = city, state = state, country = country)
+                    }
 
-                COUNTY -> {
-                    nominatimAPI.getResultsCounty(county = county, state = state, country = country)
-                        .getOrNull(index = 0)
-                }
+                    COUNTY -> {
+                        nominatimAPI.getResultsCounty(
+                            county = county,
+                            state = state,
+                            country = country
+                        )
+                            .getOrNull(index = 0)
+                    }
 
-                STATE -> {
-                    nominatimAPI.getResultsState(state = state, country = country)
-                        .getOrNull(index = 0)
-                }
+                    STATE -> {
+                        nominatimAPI.getResultsState(state = state, country = country)
+                            .getOrNull(index = 0)
+                    }
 
-                COUNTRY -> {
-                    nominatimAPI.getResultsCountry(country = country)
-                        .getOrNull(index = 0)
+                    COUNTRY -> {
+                        nominatimAPI.getResultsCountry(country = country)
+                            .getOrNull(index = 0)
+                    }
                 }
+            } catch (exception: Exception) {
+                Log.d("API Result", "error: $exception")
+                null
             }
         }
         delay(1000) //Requests to Nominatim API should be limit to one per second
