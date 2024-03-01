@@ -1,16 +1,30 @@
 package io.schiar.fridgnet.library.room
 
+import io.schiar.fridgnet.library.room.relationentity.AddressWithCoordinates
 import io.schiar.fridgnet.library.room.relationentity.ImageWithCoordinate
 import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
 import io.schiar.fridgnet.library.room.relationentity.PolygonWithCoordinates
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
 import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AddressCoordinates
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
+
+
+fun List<AddressWithCoordinates>.toAddressesCoordinates(): List<AddressCoordinates> {
+    return map { AddressCoordinates(
+        address = it.addressEntity.toAddress(),
+        coordinates = it.coordinates.map { it.toCoordinate() }
+    )}
+}
+
+fun List<ImageWithCoordinate>.toImages(): List<Image>{
+    return map { it.toImage() }
+}
 
 fun ImageWithCoordinate.toImage(): Image {
     return Image(
@@ -19,6 +33,10 @@ fun ImageWithCoordinate.toImage(): Image {
         date = imageEntity.date,
         coordinate = coordinate.toCoordinate()
     )
+}
+
+fun List<LocationWithRegions>.toLocations(): List<Location> {
+    return map { it.toLocation() }
 }
 
 fun LocationWithRegions.toLocation(): Location {

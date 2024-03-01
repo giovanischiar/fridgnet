@@ -1,9 +1,11 @@
 package io.schiar.fridgnet.model.repository
 
+import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.repository.address.AddressRepository
 import io.schiar.fridgnet.model.repository.image.ImageRepository
 import io.schiar.fridgnet.model.repository.listeners.OnImageAddedListener
 import io.schiar.fridgnet.model.repository.location.LocationRepository
+import kotlin.system.measureTimeMillis
 
 class AppRepository(
     private val locationRepository: LocationRepository,
@@ -12,9 +14,15 @@ class AppRepository(
     private val onImageAddedListener: OnImageAddedListener
 ) {
     suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) {
-        imageRepository.setup()
-        addressRepository.setup()
-        locationRepository.setup()
+        Log.d(tag = "Load Database",
+            msg = "database Loaded! time elapsed: ${
+                measureTimeMillis { 
+                    imageRepository.setup()
+                    addressRepository.setup()
+                    locationRepository.setup() 
+                }
+            }"
+        )
         onDatabaseLoaded()
     }
 

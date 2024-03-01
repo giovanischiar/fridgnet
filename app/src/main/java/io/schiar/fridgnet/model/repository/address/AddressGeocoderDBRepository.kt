@@ -10,6 +10,8 @@ import io.schiar.fridgnet.model.AdministrativeUnit.STATE
 import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.datasource.AddressDataSource
 import io.schiar.fridgnet.model.datasource.retriever.AddressRetriever
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import java.util.Collections.synchronizedMap as syncMapOf
 
 class AddressGeocoderDBRepository(
@@ -27,10 +29,16 @@ class AddressGeocoderDBRepository(
     private var currentAddress: Address? = null
     private var onNewAddressAdded: suspend (address: Address) -> Unit = {}
     private var onNewCoordinateWasAdded: suspend () -> Unit = {}
+    private val addressesCoordinates = addressDataSource.retrieve()
+        .onEach { addressesCoordinates ->
+            addressesCoordinates.forEach { addressCoordinates ->
+                addressCoordinates.coordinates.forEach { coordinate ->
+                    onLoaded(coordinate = coordinate, address = addressCoordinates.address)
+                }
+            }
+        }
 
-    override suspend fun setup() {
-        addressDataSource.setup(onLoaded = ::onLoaded)
-    }
+    override suspend fun setup() { addressesCoordinates.first() }
 
     override fun coordinatesFromAddressName(
         addressName: String, onNewCoordinateWasAdded: suspend () -> Unit

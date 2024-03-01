@@ -1,10 +1,12 @@
 package io.schiar.fridgnet.library.room
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.library.room.relationentity.AddressWithCoordinates
 import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AddressCoordinates
 import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.datasource.AddressDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class AddressRoomDataSource(private val addressDAO: AddressDAO) : AddressDataSource {
     override suspend fun retrieve(coordinate: Coordinate): Address? {
@@ -12,16 +14,16 @@ class AddressRoomDataSource(private val addressDAO: AddressDAO) : AddressDataSou
         return selectAddressBy(latitude = latitude, longitude = longitude)
     }
 
-    override suspend fun setup(onLoaded: suspend (coordinate: Coordinate, address: Address) -> Unit) {
-        selectAddresses()
-            .forEach { addressWithCoordinates ->
-                addressWithCoordinates.coordinates.forEach { coordinateEntity ->
-                    val coordinate = coordinateEntity.toCoordinate()
-                    val address = addressWithCoordinates.addressEntity.toAddress()
-                    onLoaded(coordinate, address)
-                }
-            }
-    }
+//    override suspend fun setup(onLoaded: suspend (coordinate: Coordinate, address: Address) -> Unit) {
+//        selectAddresses()
+//            .forEach { addressWithCoordinates ->
+//                addressWithCoordinates.coordinates.forEach { coordinateEntity ->
+//                    val coordinate = coordinateEntity.toCoordinate()
+//                    val address = addressWithCoordinates.addressEntity.toAddress()
+//                    onLoaded(coordinate, address)
+//                }
+//            }
+//    }
 
     override suspend fun create(coordinate: Coordinate, address: Address) {
         val addressEntityID = insertOrUpdate(address = address) ?: return
@@ -66,10 +68,8 @@ class AddressRoomDataSource(private val addressDAO: AddressDAO) : AddressDataSou
         }
     }
 
-    private suspend fun selectAddresses(): List<AddressWithCoordinates> {
-        return addressDAO.selectAddressesWithCoordinates().map { addressWithCoordinates ->
-            addressWithCoordinates
-        }
+    override fun retrieve(): Flow<List<AddressCoordinates>> {
+        return addressDAO.selectAddressesWithCoordinates().map { it.toAddressesCoordinates() }
     }
 
     private suspend fun selectAddressBy(latitude: Double, longitude: Double): Address? {

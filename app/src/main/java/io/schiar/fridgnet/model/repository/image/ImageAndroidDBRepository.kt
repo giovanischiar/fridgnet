@@ -7,6 +7,8 @@ import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlin.system.measureTimeMillis
 import java.util.Collections.synchronizedMap as syncMapOf
 
@@ -17,10 +19,10 @@ class ImageAndroidDBRepository(
     private val uriImage: MutableMap<String, Image> = syncMapOf(mutableMapOf())
     private val coordinateImage: MutableMap<Coordinate, Image> = syncMapOf(mutableMapOf())
     override var currentImages: Pair<Address, Set<Image>>? = null
+    private val images = imageDataSource.retrieve()
+        .onEach { it.forEach(::onLoaded) }
 
-    override suspend fun setup() {
-        imageDataSource.setup(onLoaded = ::onLoaded)
-    }
+    override suspend fun setup() { images.first() }
 
     override suspend fun addImagesFromDatabase(onReady: suspend (image: Image) -> Unit) {
         uriImage.values.forEach { image -> onReady(image) }

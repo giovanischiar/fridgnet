@@ -8,6 +8,7 @@ import androidx.room.Transaction
 import io.schiar.fridgnet.library.room.entity.CoordinateEntity
 import io.schiar.fridgnet.library.room.entity.ImageEntity
 import io.schiar.fridgnet.library.room.relationentity.ImageWithCoordinate
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ImageDAO {
@@ -33,7 +34,7 @@ interface ImageDAO {
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Image")
-    suspend fun selectImagesWithCoordinate(): List<ImageWithCoordinate>
+    fun selectImagesWithCoordinate(): Flow<List<ImageWithCoordinate>>
 
     @Query("DELETE FROM Image")
     suspend fun deleteAll()

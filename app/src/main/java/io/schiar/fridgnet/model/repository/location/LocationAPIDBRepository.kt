@@ -10,6 +10,8 @@ import io.schiar.fridgnet.model.datasource.LocationDataSource
 import io.schiar.fridgnet.model.datasource.retriever.LocationRetriever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.util.Collections.synchronizedMap as syncMapOf
 
@@ -27,9 +29,10 @@ class LocationAPIDBRepository(
 
     private var onLocationReady: suspend (location: Location) -> Unit = {}
 
-    override suspend fun setup() {
-        locationDataSource.setup(onLoaded = ::onLoaded)
-    }
+    private val locations = locationDataSource.retrieve()
+        .onEach { it.forEach(::onLoaded) }
+
+    override suspend fun setup() { locations.first() }
 
     private fun log(address: Address, msg: String) {
         Log.d("Add Regions Feature", "Fetching ${address.name()}: $msg")

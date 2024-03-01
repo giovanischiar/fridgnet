@@ -8,6 +8,7 @@ import androidx.room.Update
 import io.schiar.fridgnet.library.room.entity.AddressEntity
 import io.schiar.fridgnet.library.room.entity.CoordinateEntity
 import io.schiar.fridgnet.library.room.relationentity.AddressWithCoordinates
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface AddressDAO {
@@ -21,7 +22,7 @@ interface AddressDAO {
     suspend fun update(addressEntity: AddressEntity)
 
     @Query("SELECT * FROM Address")
-    suspend fun selectAddressesWithCoordinates(): List<AddressWithCoordinates>
+    fun selectAddressesWithCoordinates(): Flow<List<AddressWithCoordinates>>
 
     @Query(
         "SELECT * FROM Address JOIN Coordinate ON Address.id is Coordinate.addressCoordinatesID " +

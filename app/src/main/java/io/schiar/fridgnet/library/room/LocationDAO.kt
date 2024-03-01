@@ -11,6 +11,7 @@ import io.schiar.fridgnet.library.room.entity.LocationEntity
 import io.schiar.fridgnet.library.room.entity.PolygonEntity
 import io.schiar.fridgnet.library.room.entity.RegionEntity
 import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface LocationDAO {
@@ -28,7 +29,7 @@ interface LocationDAO {
 
     @Transaction
     @Query("SELECT * FROM Location")
-    suspend fun selectLocationsWithRegions(): List<LocationWithRegions>
+    fun selectLocationsWithRegions(): Flow<List<LocationWithRegions>>
 
     @Update
     suspend fun update(locationEntity: LocationEntity)

@@ -9,15 +9,13 @@ import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.LocationDataSource
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDataSource {
-    override suspend fun setup(onLoaded: (location: Location) -> Unit) {
-        selectLocations().forEach { location -> onLoaded(location) }
-    }
-
-    private suspend fun selectLocations(): List<Location> {
-        return locationDAO.selectLocationsWithRegions().map { locationWithRegion ->
-            locationWithRegion.toLocation()
+    override fun retrieve(): Flow<List<Location>> {
+        return locationDAO.selectLocationsWithRegions().map { locationsWithRegion ->
+            locationsWithRegion.toLocations()
         }
     }
 
