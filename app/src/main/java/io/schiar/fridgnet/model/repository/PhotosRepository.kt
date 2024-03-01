@@ -62,9 +62,7 @@ class PhotosRepository(
             "Add Image Feature",
             "Image added! getting the address of the image located at $coordinate"
         )
-        val address = withContext(Dispatchers.IO) {
-            addressRepository.fetchAddressBy(coordinate = coordinate)
-        } ?: return
+        val address = addressRepository.fetchAddressBy(coordinate = coordinate) ?: return
 
         address.allAddresses().forEach { subAddress -> onAddressReady(address = subAddress) }
     }

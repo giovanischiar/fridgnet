@@ -3,8 +3,6 @@ package io.schiar.fridgnet.model.repository
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.repository.location.LocationRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 
 class PolygonsRepository(private val locationRepository: LocationRepository) {
     fun currentLocation(): Location? {
@@ -12,12 +10,12 @@ class PolygonsRepository(private val locationRepository: LocationRepository) {
     }
 
     suspend fun switchRegion(region: Region, onCurrentLocationChanged: () -> Unit) {
-        withContext(Dispatchers.IO) { locationRepository.switchRegion(region = region) }
+        locationRepository.switchRegion(region = region)
         onCurrentLocationChanged()
     }
 
     suspend fun switchAll(onCurrentLocationChanged: () -> Unit) {
-        withContext(Dispatchers.IO) { locationRepository.switchAll() }
+        locationRepository.switchAll()
         onCurrentLocationChanged()
     }
 }

@@ -11,7 +11,6 @@ import io.schiar.fridgnet.model.datasource.retriever.LocationRetriever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Collections.synchronizedMap as syncMapOf
 
 class LocationAPIDBRepository(
@@ -97,9 +96,7 @@ class LocationAPIDBRepository(
             coroutineScope {
                 launch(Dispatchers.IO) {
                     log(address, "Job started")
-                    val location = withContext(Dispatchers.IO) {
-                        fetchLocationBy(address = address)
-                    }
+                    val location = fetchLocationBy(address = address)
                     if (location != null) {
                         onLocationReady(location)
                         addRegionLocation(location = location)
@@ -109,17 +106,15 @@ class LocationAPIDBRepository(
         }
     }
 
-    private suspend fun addRegionLocation(location: Location) = coroutineScope {
+    private fun addRegionLocation(location: Location) {
         if (location.address.administrativeUnit == CITY) {
             log(location.address, "Location is a city! Add to cityAddressLocation map")
             cityAddressLocation[location.address] = location
-            launch {
-                synchronized(this) {
-                    allCitiesBoundingBox = if (allCitiesBoundingBox == null) {
-                        location.boundingBox
-                    } else {
-                        allCitiesBoundingBox!! + location.boundingBox
-                    }
+            synchronized(this) {
+                allCitiesBoundingBox = if (allCitiesBoundingBox == null) {
+                    location.boundingBox
+                } else {
+                    allCitiesBoundingBox!! + location.boundingBox
                 }
             }
         }
@@ -141,26 +136,18 @@ class LocationAPIDBRepository(
             addressLocation[address]
         } else {
             log(address = address, "Shoot! Time to search in the database")
-            val locationFromDataSource = withContext(Dispatchers.IO) {
-                locationDataSource.retrieve(address = address)
-            }
+            val locationFromDataSource = locationDataSource.retrieve(address = address)
             if (locationFromDataSource != null) {
                 log(address = address, "it's on the database! Returning...")
                 onLoaded(location = locationFromDataSource)
                 locationFromDataSource
             } else {
                 log(address = address, "Shoot! Time to search in the API")
-                val locationFromRetriever = withContext(Dispatchers.IO) {
-                    locationRetriever.retrieve(address = address)
-                }
+                val locationFromRetriever = locationRetriever.retrieve(address = address)
                 if (locationFromRetriever != null) {
                     log(address = address, "It's on the API! Returning...")
                     onLoaded(location = locationFromRetriever)
-                    coroutineScope {
-                        launch(Dispatchers.IO) {
-                            locationDataSource.create(location = locationFromRetriever)
-                        }
-                    }
+                    locationDataSource.create(location = locationFromRetriever)
                 }
                 locationFromRetriever
             }

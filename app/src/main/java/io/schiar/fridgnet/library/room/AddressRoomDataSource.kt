@@ -5,40 +5,32 @@ import io.schiar.fridgnet.library.room.relationentity.AddressWithCoordinates
 import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.datasource.AddressDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class AddressRoomDataSource(private val addressDAO: AddressDAO) : AddressDataSource {
-    override fun retrieve(coordinate: Coordinate): Address? {
+    override suspend fun retrieve(coordinate: Coordinate): Address? {
         val (latitude, longitude) = coordinate
         return selectAddressBy(latitude = latitude, longitude = longitude)
     }
 
     override suspend fun setup(onLoaded: suspend (coordinate: Coordinate, address: Address) -> Unit) {
-        coroutineScope {
-            launch {
-                withContext(Dispatchers.IO) { selectAddresses() }
-                    .forEach { addressWithCoordinates ->
-                        addressWithCoordinates.coordinates.forEach { coordinateEntity ->
-                            val coordinate = coordinateEntity.toCoordinate()
-                            val address = addressWithCoordinates.addressEntity.toAddress()
-                            onLoaded(coordinate, address)
-                        }
-                    }
+        selectAddresses()
+            .forEach { addressWithCoordinates ->
+                addressWithCoordinates.coordinates.forEach { coordinateEntity ->
+                    val coordinate = coordinateEntity.toCoordinate()
+                    val address = addressWithCoordinates.addressEntity.toAddress()
+                    onLoaded(coordinate, address)
+                }
             }
-        }
     }
 
-    override fun create(coordinate: Coordinate, address: Address) {
+    override suspend fun create(coordinate: Coordinate, address: Address) {
         val addressEntityID = insertOrUpdate(address = address) ?: return
         addressDAO.insert(
             coordinateEntity = coordinate.toCoordinateEntity(addressCoordinatesID = addressEntityID)
         )
     }
 
-    private fun insertOrUpdate(address: Address): Long? {
+    private suspend fun insertOrUpdate(address: Address): Long? {
         val (locality, subAdminArea, adminArea) = address
         val storedAddressEntity = addressDAO.selectAddressBy(
             locality = locality ?: return null,
@@ -74,13 +66,13 @@ class AddressRoomDataSource(private val addressDAO: AddressDAO) : AddressDataSou
         }
     }
 
-    private fun selectAddresses(): List<AddressWithCoordinates> {
+    private suspend fun selectAddresses(): List<AddressWithCoordinates> {
         return addressDAO.selectAddressesWithCoordinates().map { addressWithCoordinates ->
             addressWithCoordinates
         }
     }
 
-    private fun selectAddressBy(latitude: Double, longitude: Double): Address? {
+    private suspend fun selectAddressBy(latitude: Double, longitude: Double): Address? {
         return addressDAO.selectAddressEntityBy(
             latitude = latitude, longitude = longitude
         )?.toAddress()

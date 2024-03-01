@@ -13,28 +13,28 @@ import io.schiar.fridgnet.library.room.entity.RegionEntity
 import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
 
 @Dao
-abstract class LocationDAO {
+interface LocationDAO {
     @Insert(onConflict = REPLACE)
-    abstract fun insert(locationEntity: LocationEntity): Long
+    suspend fun insert(locationEntity: LocationEntity): Long
 
     @Insert(onConflict = REPLACE)
-    abstract fun insert(regionEntity: RegionEntity): Long
+    suspend fun insert(regionEntity: RegionEntity): Long
 
     @Insert(onConflict = REPLACE)
-    abstract fun insert(polygonEntity: PolygonEntity): Long
+    suspend fun insert(polygonEntity: PolygonEntity): Long
 
     @Insert(onConflict = REPLACE)
-    abstract fun insertCoordinates(coordinateEntities: List<CoordinateEntity>): List<Long>
+    suspend fun insertCoordinates(coordinateEntities: List<CoordinateEntity>): List<Long>
 
     @Transaction
     @Query("SELECT * FROM Location")
-    abstract fun selectLocationsWithRegions(): List<LocationWithRegions>
+    suspend fun selectLocationsWithRegions(): List<LocationWithRegions>
 
     @Update
-    abstract fun update(locationEntity: LocationEntity)
+    suspend fun update(locationEntity: LocationEntity)
 
     @Update
-    abstract fun update(regionEntity: RegionEntity)
+    suspend fun update(regionEntity: RegionEntity)
 
     @Query(
         "SELECT * FROM Location WHERE " +
@@ -43,7 +43,7 @@ abstract class LocationDAO {
                 "Location.adminArea is :adminArea AND " +
                 "Location.countryName is :countryName "
     )
-    abstract fun selectLocationWithRegionsByAddress(
+    suspend fun selectLocationWithRegionsByAddress(
         locality: String?,
         subAdminArea: String?,
         adminArea: String?,

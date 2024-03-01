@@ -7,10 +7,6 @@ import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import kotlin.system.measureTimeMillis
 import java.util.Collections.synchronizedMap as syncMapOf
 
@@ -42,26 +38,18 @@ class ImageAndroidDBRepository(
             uriImage[uri]
         } else {
             log(uri = uri, "Shoot! Time to search in the database")
-            val imageFromDataSource = withContext(Dispatchers.IO) {
-                imageDataSource.retrieve(uri = uri)
-            }
+            val imageFromDataSource = imageDataSource.retrieve(uri = uri)
             if (imageFromDataSource != null) {
                 log(uri = uri, "it's on the database! Returning...")
                 onLoaded(image = imageFromDataSource)
                 imageFromDataSource
             } else {
                 log(uri = uri, "Shoot! Time to search in the Android")
-                val imageFromRetriever = withContext(Dispatchers.IO) {
-                    imageRetriever.retrieve(uri = uri)
-                }
+                val imageFromRetriever = imageRetriever.retrieve(uri = uri)
                 if (imageFromRetriever != null) {
                     log(uri = uri, "It's on the Android! Returning...")
                     onLoaded(image = imageFromRetriever)
-                    coroutineScope {
-                        launch(Dispatchers.IO) {
-                            imageDataSource.create(image = imageFromRetriever)
-                        }
-                    }
+                    imageDataSource.create(image = imageFromRetriever)
                 }
                 imageFromRetriever
             }
@@ -71,16 +59,10 @@ class ImageAndroidDBRepository(
     override suspend fun addImages(uris: List<String>, onReady: suspend (image: Image) -> Unit) {
         Log.d("Add Image Feature", "Adding images")
         val elapsed = measureTimeMillis {
-            withContext(Dispatchers.IO) {
-                coroutineScope {
-                    launch(Dispatchers.IO) {
-                        for (uri in uris) {
-                            val image = fetchImageBy(uri = uri) ?: continue
-                            Log.d("Add Image Feature", "Adding $image")
-                            onReady(image)
-                        }
-                    }
-                }
+            for (uri in uris) {
+                val image = fetchImageBy(uri = uri) ?: continue
+                Log.d("Add Image Feature", "Adding $image")
+                onReady(image)
             }
         }
         Log.d("Add Image Feature", "All Images Added! time elapsed: $elapsed")
@@ -105,9 +87,7 @@ class ImageAndroidDBRepository(
             coordinateImage[coordinate]
         } else {
             log(coordinate = coordinate, "Shoot! Time to search in the database")
-            val imageFromDatabase = withContext(Dispatchers.IO) {
-                imageDataSource.retrieve(coordinate = coordinate)
-            }
+            val imageFromDatabase = imageDataSource.retrieve(coordinate = coordinate)
             log(coordinate = coordinate, "it's on the database! Returning...")
             if (imageFromDatabase != null) {
                 onLoaded(image = imageFromDatabase)

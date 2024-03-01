@@ -10,6 +10,8 @@ import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
@@ -23,9 +25,10 @@ class ImageAndroidRetriever(private val contentResolver: ContentResolver) : Imag
 
             @SuppressLint("RestrictedApi")
             val date = exifInterface.dateTime ?: 0L
+            val byteArray = withContext(Dispatchers.Default) { systemURI.toByteArray() }
             return Image(
                 uri = uri,
-                byteArray = systemURI.toByteArray(),
+                byteArray = byteArray,
                 date = date,
                 coordinate = coordinate
             )

@@ -10,10 +10,6 @@ import io.schiar.fridgnet.model.AdministrativeUnit.STATE
 import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.datasource.AddressDataSource
 import io.schiar.fridgnet.model.datasource.retriever.AddressRetriever
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.util.Collections.synchronizedMap as syncMapOf
 
 class AddressGeocoderDBRepository(
@@ -98,29 +94,21 @@ class AddressGeocoderDBRepository(
             coordinateAddress[coordinate]
         } else {
             log(coordinate = coordinate, "Shoot! Time to search in the database")
-            val addressFromDataSource = withContext(Dispatchers.IO) {
-                addressDataSource.retrieve(coordinate = coordinate)
-            }
+            val addressFromDataSource = addressDataSource.retrieve(coordinate = coordinate)
             if (addressFromDataSource != null) {
                 log(coordinate = coordinate, "it's on the database! Returning...")
                 onLoaded(coordinate = coordinate, address = addressFromDataSource)
                 addressFromDataSource
             } else {
                 log(coordinate = coordinate, "Shoot! Time to search in the Geocoder")
-                val addressFromRetriever = withContext(Dispatchers.IO) {
-                    addressRetriever.retrieve(coordinate = coordinate)
-                }
+                val addressFromRetriever = addressRetriever.retrieve(coordinate = coordinate)
                 if (addressFromRetriever != null) {
                     log(coordinate = coordinate, "It's on the Geocoder! Returning...")
                     onLoaded(coordinate = coordinate, address = addressFromRetriever)
-                    coroutineScope {
-                        launch(Dispatchers.IO) {
-                            addressDataSource.create(
-                                coordinate = coordinate,
-                                address = addressFromRetriever
-                            )
-                        }
-                    }
+                    addressDataSource.create(
+                        coordinate = coordinate,
+                        address = addressFromRetriever
+                    )
                 }
                 addressFromRetriever
             }

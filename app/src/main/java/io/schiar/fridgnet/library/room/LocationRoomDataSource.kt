@@ -9,21 +9,13 @@ import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.LocationDataSource
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDataSource {
-    override suspend fun setup(onLoaded: (location: Location) -> Unit): Unit = coroutineScope {
-        launch {
-            withContext(Dispatchers.IO) { selectLocations() }.forEach { location ->
-                onLoaded(location)
-            }
-        }
+    override suspend fun setup(onLoaded: (location: Location) -> Unit) {
+        selectLocations().forEach { location -> onLoaded(location) }
     }
 
-    private fun selectLocations(): List<Location> {
+    private suspend fun selectLocations(): List<Location> {
         return locationDAO.selectLocationsWithRegions().map { locationWithRegion ->
             locationWithRegion.toLocation()
         }
@@ -33,7 +25,7 @@ class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDat
         return selectLocationByAddress(address = address)
     }
 
-    fun selectLocationByAddress(address: Address): Location? {
+    suspend fun selectLocationByAddress(address: Address): Location? {
         val (locality, subAdminArea, adminArea, countryName) = address
         return locationDAO.selectLocationWithRegionsByAddress(
             locality = locality,
@@ -43,21 +35,19 @@ class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDat
         )?.toLocation()
     }
 
-    override fun create(location: Location) {
+    override suspend fun create(location: Location) {
         val locationID = locationDAO.insert(locationEntity = location.toLocationEntity())
         insertRegions(locationID = locationID, regions = location.regions)
     }
 
-    private fun update(location: Location): List<RegionWithPolygonAndHoles>? {
+    private suspend fun update(location: Location): List<RegionWithPolygonAndHoles>? {
         val (locality, subAdminArea, adminArea, countryName) = location.address
-        val locationWithRegions = synchronized(this) {
-            locationDAO.selectLocationWithRegionsByAddress(
-                locality = locality,
-                subAdminArea = subAdminArea,
-                adminArea = adminArea,
-                countryName = countryName
-            ) ?: return null
-        }
+        val locationWithRegions = locationDAO.selectLocationWithRegionsByAddress(
+            locality = locality,
+            subAdminArea = subAdminArea,
+            adminArea = adminArea,
+            countryName = countryName
+        ) ?: return null
         val locationEntity = locationWithRegions.locationEntity
         locationDAO.update(
             locationEntity.boundingBoxUpdated(
@@ -70,7 +60,7 @@ class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDat
         return locationWithRegions.regions
     }
 
-    override fun updateWithRegionSwitched(location: Location, region: Region) {
+    override suspend fun updateWithRegionSwitched(location: Location, region: Region) {
         val regionsWithPolygonAndHoles = update(location = location) ?: return
         val regionEntity = regionsWithPolygonAndHoles.find {
             it.toRegion().polygon == region.polygon
@@ -78,28 +68,26 @@ class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDat
         locationDAO.update(regionEntity = regionEntity.switch())
     }
 
-    override suspend fun updateWithAllRegionsSwitched(location: Location): Unit = coroutineScope {
-        val regionsWithPolygonAndHoles = update(location = location) ?: return@coroutineScope
+    override suspend fun updateWithAllRegionsSwitched(location: Location) {
+        val regionsWithPolygonAndHoles = update(location = location) ?: return
         val regionEntities = regionsWithPolygonAndHoles.sortedByDescending {
             it.polygon.coordinates.size
         }.map { it.regionEntity }
 
         regionEntities.subList(1, regionEntities.size).forEach { regionEntity ->
-            launch(Dispatchers.IO) {
-                Log.d("LocationDBDataSource", "|${Thread.currentThread().name}|Updating Region")
-                locationDAO.update(regionEntity = regionEntity.switch())
-                Log.d("LocationDBDataSource", "|${Thread.currentThread().name}|Region Updated!")
-            }
+            Log.d("LocationDBDataSource", "|${Thread.currentThread().name}|Updating Region")
+            locationDAO.update(regionEntity = regionEntity.switch())
+            Log.d("LocationDBDataSource", "|${Thread.currentThread().name}|Region Updated!")
         }
     }
 
-    private fun insertRegions(locationID: Long, regions: List<Region>) {
+    private suspend fun insertRegions(locationID: Long, regions: List<Region>) {
         regions.forEach { region ->
             insertRegion(locationID = locationID, region = region)
         }
     }
 
-    private fun insertRegion(locationID: Long, region: Region) {
+    private suspend fun insertRegion(locationID: Long, region: Region) {
         val (polygon, holes, _) = region
         val polygonID = insertPolygon(polygon)
         val regionEntity = region.toRegionEntity(regionsID = locationID, polygonID = polygonID)
@@ -107,20 +95,20 @@ class LocationRoomDataSource(private val locationDAO: LocationDAO) : LocationDat
         insertHoles(regionID = regionID, holes)
     }
 
-    private fun insertPolygon(polygon: Polygon): Long {
+    private suspend fun insertPolygon(polygon: Polygon): Long {
         val polygonID = locationDAO.insert(polygonEntity = PolygonEntity())
         insertCoordinates(coordinatesID = polygonID, coordinates = polygon.coordinates)
         return polygonID
     }
 
-    private fun insertHoles(regionID: Long, holes: List<Polygon>) {
+    private suspend fun insertHoles(regionID: Long, holes: List<Polygon>) {
         for (hole in holes) {
             val holeID = locationDAO.insert(polygonEntity = PolygonEntity(holesID = regionID))
             insertCoordinates(coordinatesID = holeID, coordinates = hole.coordinates)
         }
     }
 
-    private fun insertCoordinates(coordinatesID: Long, coordinates: List<Coordinate>) {
+    private suspend fun insertCoordinates(coordinatesID: Long, coordinates: List<Coordinate>) {
         val coordinateEntities = coordinates.toCoordinateEntities(coordinatesID = coordinatesID)
         locationDAO.insertCoordinates(coordinateEntities)
     }

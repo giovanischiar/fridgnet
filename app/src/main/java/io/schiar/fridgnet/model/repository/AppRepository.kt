@@ -4,9 +4,6 @@ import io.schiar.fridgnet.model.repository.address.AddressRepository
 import io.schiar.fridgnet.model.repository.image.ImageRepository
 import io.schiar.fridgnet.model.repository.listeners.OnImageAddedListener
 import io.schiar.fridgnet.model.repository.location.LocationRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.coroutineScope
-import kotlinx.coroutines.withContext
 
 class AppRepository(
     private val locationRepository: LocationRepository,
@@ -14,12 +11,10 @@ class AppRepository(
     private val imageRepository: ImageRepository,
     private val onImageAddedListener: OnImageAddedListener
 ) {
-    suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) = coroutineScope {
-        withContext(Dispatchers.IO) {
-            imageRepository.setup()
-            addressRepository.setup()
-            locationRepository.setup()
-        }
+    suspend fun loadDatabase(onDatabaseLoaded: () -> Unit) {
+        imageRepository.setup()
+        addressRepository.setup()
+        locationRepository.setup()
         onDatabaseLoaded()
     }
 

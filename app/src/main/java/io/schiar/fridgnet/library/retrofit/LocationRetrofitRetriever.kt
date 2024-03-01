@@ -9,10 +9,8 @@ import io.schiar.fridgnet.model.AdministrativeUnit.COUNTY
 import io.schiar.fridgnet.model.AdministrativeUnit.STATE
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.datasource.retriever.LocationRetriever
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.sync.Mutex
-import kotlinx.coroutines.withContext
 
 class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : LocationRetriever {
     private var fetchingPlaces: Set<String> = emptySet()
@@ -89,36 +87,34 @@ class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : Locati
         val state = address.adminArea ?: ""
         val country = address.countryName ?: ""
         mutex.lock()
-        val jsonResult = withContext(Dispatchers.IO) {
-            try {
-                when (administrativeUnit) {
-                    CITY -> {
-                        searchCity(city = city, state = state, country = country)
-                    }
-
-                    COUNTY -> {
-                        nominatimAPI.getResultsCounty(
-                            county = county,
-                            state = state,
-                            country = country
-                        )
-                            .getOrNull(index = 0)
-                    }
-
-                    STATE -> {
-                        nominatimAPI.getResultsState(state = state, country = country)
-                            .getOrNull(index = 0)
-                    }
-
-                    COUNTRY -> {
-                        nominatimAPI.getResultsCountry(country = country)
-                            .getOrNull(index = 0)
-                    }
+        val jsonResult = try {
+            when (administrativeUnit) {
+                CITY -> {
+                    searchCity(city = city, state = state, country = country)
                 }
-            } catch (exception: Exception) {
-                Log.d("API Result", "error: $exception")
-                null
+
+                COUNTY -> {
+                    nominatimAPI.getResultsCounty(
+                        county = county,
+                        state = state,
+                        country = country
+                    )
+                        .getOrNull(index = 0)
+                }
+
+                STATE -> {
+                    nominatimAPI.getResultsState(state = state, country = country)
+                        .getOrNull(index = 0)
+                }
+
+                COUNTRY -> {
+                    nominatimAPI.getResultsCountry(country = country)
+                        .getOrNull(index = 0)
+                }
             }
+        } catch (exception: Exception) {
+            Log.d("API Result", "error: $exception")
+            null
         }
         delay(1000) //Requests to Nominatim API should be limit to one per second
         mutex.unlock()

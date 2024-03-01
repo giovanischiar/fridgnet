@@ -4,5 +4,5 @@ import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.Coordinate
 
 interface AddressRetriever {
-    fun retrieve(coordinate: Coordinate): Address?
+    suspend fun retrieve(coordinate: Coordinate): Address?
 }
