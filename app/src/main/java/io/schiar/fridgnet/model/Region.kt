@@ -1,6 +1,7 @@
 package io.schiar.fridgnet.model
 
 data class Region(
+    val id: Long = 0,
     val polygon: Polygon,
     val holes: List<Polygon>,
     val active: Boolean = true,
@@ -8,6 +9,6 @@ data class Region(
     val zIndex: Float
 ) {
     fun switch(): Region {
-        return Region(polygon, holes, !active, boundingBox, zIndex)
+        return Region(id, polygon, holes, !active, boundingBox, zIndex)
     }
 }

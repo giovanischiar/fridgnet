@@ -25,9 +25,9 @@ fun MapScreen(
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
     var moveCamera by remember { mutableStateOf(false) }
-    val visibleImages by viewModel.visibleImages.collectAsState()
-    val visibleRegions by viewModel.visibleRegions.collectAsState()
-    val allPhotosBoundingBox by viewModel.allPhotosBoundingBox.collectAsState()
+    val visibleImages by viewModel.visibleImages.collectAsState(initial = emptyList())
+    val visibleRegions by viewModel.visibleRegions.collectAsState(initial = emptyList())
+    val boundingBoxImages by viewModel.boundingBoxImages.collectAsState(initial = null)
 
     info(
         ScreenInfo(
@@ -38,7 +38,6 @@ fun MapScreen(
                     description = "Zoom to fit",
                     enabled = !moveCamera
                 ) {
-                    viewModel.zoomToFitAllCities()
                     moveCamera = true
                 }
             }
@@ -51,12 +50,13 @@ fun MapScreen(
                 modifier = Modifier.fillMaxSize(),
                 visibleImages = visibleImages,
                 visibleRegions = visibleRegions,
-                boundingBox = allPhotosBoundingBox,
+                boundingBox = boundingBoxImages,
                 moveCamera = moveCamera,
                 onMoveFinished = { moveCamera = false },
-                onClickRegion = { region ->
-                    viewModel.selectRegion(regionViewData = region)
-                    onNavigatePolygons()
+                regionPressedAt = { index -> run {
+                        viewModel.selectRegionAt(index = index)
+                        onNavigatePolygons()
+                    }
                 }
             ) { latLngBounds ->
                 if (latLngBounds != null) {

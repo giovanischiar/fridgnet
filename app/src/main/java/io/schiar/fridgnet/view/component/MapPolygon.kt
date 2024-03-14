@@ -23,7 +23,7 @@ import io.schiar.fridgnet.view.viewdata.RegionViewData
 fun MapPolygon(
     modifier: Modifier,
     region: RegionViewData,
-    onRegionCheckedChange: ((region: RegionViewData) -> Unit)? = null
+    onRegionCheckedChangeAt: ((region: RegionViewData) -> Unit)? = null
 ) {
     val cameraPositionState = rememberCameraPositionState {
         position = CameraPosition.fromLatLngZoom(region.center.toLatLng(), 10f)
@@ -46,11 +46,11 @@ fun MapPolygon(
             )
         }
 
-        if (onRegionCheckedChange != null) {
+        if (onRegionCheckedChangeAt != null) {
             Checkbox(
                 modifier = Modifier.align(Alignment.TopEnd),
                 checked = region.active,
-                onCheckedChange = { onRegionCheckedChange(region) }
+                onCheckedChange = { onRegionCheckedChangeAt(region) }
             )
         }
     }

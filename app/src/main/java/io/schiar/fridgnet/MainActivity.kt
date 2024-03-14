@@ -10,21 +10,23 @@ import io.schiar.fridgnet.library.geocoder.AddressGeocoderRetriever
 import io.schiar.fridgnet.library.retrofit.LocationRetrofitRetriever
 import io.schiar.fridgnet.library.retrofit.NominatimAPI
 import io.schiar.fridgnet.library.retrofit.RetrofitHelper
-import io.schiar.fridgnet.library.room.AddressRoomDataSource
+import io.schiar.fridgnet.library.room.AddressRoomService
 import io.schiar.fridgnet.library.room.FridgnetDatabase
-import io.schiar.fridgnet.library.room.ImageRoomDataSource
-import io.schiar.fridgnet.library.room.LocationRoomDataSource
+import io.schiar.fridgnet.library.room.ImageRoomService
+import io.schiar.fridgnet.library.room.LocationRoomService
+import io.schiar.fridgnet.model.datasource.AddressDataSource
+import io.schiar.fridgnet.model.datasource.ImageDataSource
+import io.schiar.fridgnet.model.datasource.LocationDataSource
+import io.schiar.fridgnet.model.datasource.local.AddressCoordinatesDataSource
+import io.schiar.fridgnet.model.datasource.local.CurrentAddressLocationCoordinateLocalDataSource
+import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
+import io.schiar.fridgnet.model.datasource.local.ImageAndroidDBDataSource
+import io.schiar.fridgnet.model.datasource.local.LocationAPIDBDataSource
 import io.schiar.fridgnet.model.repository.AppRepository
 import io.schiar.fridgnet.model.repository.HomeRepository
 import io.schiar.fridgnet.model.repository.MapRepository
 import io.schiar.fridgnet.model.repository.PhotosRepository
 import io.schiar.fridgnet.model.repository.PolygonsRepository
-import io.schiar.fridgnet.model.repository.address.AddressGeocoderDBRepository
-import io.schiar.fridgnet.model.repository.address.AddressRepository
-import io.schiar.fridgnet.model.repository.image.ImageAndroidDBRepository
-import io.schiar.fridgnet.model.repository.image.ImageRepository
-import io.schiar.fridgnet.model.repository.location.LocationAPIDBRepository
-import io.schiar.fridgnet.model.repository.location.LocationRepository
 import io.schiar.fridgnet.view.screen.AppScreen
 import io.schiar.fridgnet.viewmodel.AppViewModel
 import io.schiar.fridgnet.viewmodel.HomeViewModel
@@ -78,74 +80,70 @@ class MainActivity : ComponentActivity() {
     )
 
     private fun createRepositories(): Repositories {
-        val locationRepository = createLocationRepository()
-        val addressRepository = createAddressRepository()
-        val imageRepository = createImageRepository()
+        val imageDataSource = createImageDataSource()
+        val addressCoordinatesDataSource = createAddressDataSource()
+        val locationDataSource = createLocationDataSource()
+        val currentRegionDataSource = CurrentRegionLocalDataSource()
+        val currentAddressLocationCoordinateDataSource = CurrentAddressLocationCoordinateLocalDataSource()
 
         val polygonsRepository = PolygonsRepository(
-            locationRepository = locationRepository
+            currentRegionDataSource = currentRegionDataSource,
+            locationDataSource = locationDataSource
         )
         val mapRepository = MapRepository(
-            locationRepository = locationRepository,
-            imageRepository = imageRepository
+            locationDataSource = locationDataSource,
+            imageDataSource = imageDataSource,
+            currentRegionDataSource = currentRegionDataSource
         )
 
         val photosRepository = PhotosRepository(
-            imageRepository = imageRepository,
-            locationRepository = locationRepository,
-            addressRepository = addressRepository
+            currentAddressLocationCoordinateDataSource = currentAddressLocationCoordinateDataSource,
+            imageDataSource = imageDataSource,
+            addressCoordinatesDataSource = addressCoordinatesDataSource
         )
 
         val homeRepository = HomeRepository(
-            addressRepository = addressRepository,
-            locationRepository = locationRepository,
-            imageRepository = imageRepository,
-            onAddressReadyListener = photosRepository,
-            onNewImageAddedListener = photosRepository
+            addressDataSource = addressCoordinatesDataSource,
+            locationDataSource = locationDataSource,
+            imageDataSource = imageDataSource,
+            currentAddressLocationCoordinateLocalDataSource = currentAddressLocationCoordinateDataSource
         )
 
-        photosRepository.onLocationReadyListener = homeRepository
-
-        val appRepository = AppRepository(
-            locationRepository = locationRepository,
-            addressRepository = addressRepository,
-            imageRepository = imageRepository,
-            onImageAddedListener = photosRepository
-        )
+        val appRepository = AppRepository(imageDataSource = imageDataSource)
 
         return Repositories(
             appRepository, homeRepository, mapRepository, polygonsRepository, photosRepository
         )
     }
 
-    private fun createLocationRepository(): LocationRepository {
+    private fun createImageDataSource(): ImageDataSource {
+        val contentResolver = applicationContext.contentResolver
+        val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
+        val imageDAO = fridgnetDatabase.imageDAO()
+        return ImageAndroidDBDataSource(
+            imageRetriever = ImageAndroidRetriever(contentResolver = contentResolver),
+            imageService = ImageRoomService(imageDAO = imageDAO)
+        )
+    }
+
+    private fun createAddressDataSource(): AddressDataSource {
+        val geocoder = Geocoder(applicationContext, Locale.US)
+        val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
+        val addressDAO = fridgnetDatabase.addressDAO()
+        return AddressCoordinatesDataSource(
+            addressRetriever = AddressGeocoderRetriever(geocoder = geocoder),
+            addressService = AddressRoomService(addressDAO = addressDAO)
+        )
+    }
+
+    private fun createLocationDataSource(): LocationDataSource {
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
         val locationDAO = fridgnetDatabase.locationDAO()
         val retrofitHelper = RetrofitHelper.getInstance()
         val nominatimAPI = retrofitHelper.create(NominatimAPI::class.java)
-        return LocationAPIDBRepository(
+        return LocationAPIDBDataSource(
             locationRetriever = LocationRetrofitRetriever(nominatimAPI = nominatimAPI),
-            locationDataSource = LocationRoomDataSource(locationDAO = locationDAO)
-        )
-    }
-
-    private fun createAddressRepository(): AddressRepository {
-        val geocoder = Geocoder(applicationContext, Locale.US)
-        val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
-        val addressDAO = fridgnetDatabase.addressDAO()
-        return AddressGeocoderDBRepository(
-            addressRetriever = AddressGeocoderRetriever(geocoder = geocoder),
-            addressDataSource = AddressRoomDataSource(addressDAO = addressDAO)
-        )
-    }
-
-    private fun createImageRepository(): ImageRepository {
-        val contentResolver = applicationContext.contentResolver
-        val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
-        val imageDAO = fridgnetDatabase.imageDAO()
-        return ImageAndroidDBRepository(
-            imageRetriever = ImageAndroidRetriever(contentResolver = contentResolver),
-            imageDataSource = ImageRoomDataSource(imageDAO = imageDAO)
+            locationService = LocationRoomService(locationDAO = locationDAO)
         )
     }
 }

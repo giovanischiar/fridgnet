@@ -9,6 +9,7 @@ fun List<CoordinateEntity>.toCoordinates(): List<Coordinate> {
 
 fun CoordinateEntity.toCoordinate(): Coordinate {
     return Coordinate(
+        id = id,
         latitude = latitude,
         longitude = longitude
     )

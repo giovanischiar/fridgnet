@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.model
 
-data class Polygon(val coordinates: List<Coordinate>) {
+data class Polygon(val id: Long = 0, val coordinates: List<Coordinate>) {
     fun findBoundingBox(): BoundingBox {
         var maxLatitude = Double.NEGATIVE_INFINITY
         var maxLongitude = Double.NEGATIVE_INFINITY
@@ -14,7 +14,7 @@ data class Polygon(val coordinates: List<Coordinate>) {
 
         for (i in this.coordinates.indices) {
             val coordinate = this.coordinates[i]
-            val (latitude, longitude) = coordinate
+            val (_, latitude, longitude) = coordinate
 
             if (latitude > maxLatitude) {
                 maxLatitude = latitude

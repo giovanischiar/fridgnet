@@ -13,3 +13,15 @@ fun Region.toRegionEntity(regionsID: Long, polygonID: Long): RegionEntity {
         zIndex = zIndex,
     )
 }
+
+fun Region.toRegionEntity(id: Long, regionsID: Long, polygonID: Long): RegionEntity {
+    return RegionEntity(
+        id = id,
+        regionsID = regionsID,
+        polygonID = polygonID,
+        active = active,
+        boundingBoxSouthwest = boundingBox.southwest.toCoordinateEntity(),
+        boundingBoxNortheast = boundingBox.northeast.toCoordinateEntity(),
+        zIndex = zIndex,
+    )
+}

@@ -12,7 +12,7 @@ import android.location.Address as AndroidAddress
 class AddressGeocoderRetriever(private val geocoder: Geocoder) : AddressRetriever {
 
     override suspend fun retrieve(coordinate: Coordinate): Address? {
-        val (latitude, longitude) = coordinate
+        val (_, latitude, longitude) = coordinate
         Log.d("Add Image Feature", "Getting address for ($latitude, $longitude)")
         val androidAddress = withContext(Dispatchers.IO) {
             getAndroidAddress(latitude = latitude, longitude = longitude)

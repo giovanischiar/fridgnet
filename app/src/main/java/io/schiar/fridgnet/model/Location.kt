@@ -1,6 +1,7 @@
 package io.schiar.fridgnet.model
 
 data class Location(
+    val id: Long = 0,
     val address: Address,
     val regions: List<Region>,
     val boundingBox: BoundingBox,
@@ -8,6 +9,7 @@ data class Location(
 ) {
     fun switchAll(): Location {
         return Location(
+            id = id,
             address = address,
             regions = regions
                 .sortedBy { region -> region.polygon.coordinates.size }
@@ -20,11 +22,16 @@ data class Location(
         ).updateBoundingBox()
     }
 
+    fun switchRegionAt(index: Int): Location {
+        return switch(region = regions[index])
+    }
+
     fun switch(region: Region): Location {
         val mutableRegions = regions.toMutableList()
         val index = regions.indexOf(region)
         mutableRegions[index] = regions[index].switch()
         return Location(
+            id = id,
             address = address,
             regions = mutableRegions.toList(),
             boundingBox = boundingBox,
@@ -34,6 +41,7 @@ data class Location(
 
     private fun updateBoundingBox(): Location {
         return Location(
+            id = id,
             address = address,
             regions = regions,
             boundingBox = regions

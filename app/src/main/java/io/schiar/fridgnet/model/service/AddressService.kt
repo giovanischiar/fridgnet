@@ -1,13 +1,13 @@
-package io.schiar.fridgnet.model.datasource
+package io.schiar.fridgnet.model.service
 
 import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.AddressCoordinates
 import io.schiar.fridgnet.model.Coordinate
 import kotlinx.coroutines.flow.Flow
 
-interface AddressDataSource {
+interface AddressService {
     suspend fun create(coordinate: Coordinate, address: Address)
-    suspend fun createFrom(coordinate: Coordinate)
     fun retrieve(): Flow<List<AddressCoordinates>>
     fun retrieveCoordinates(address: Address): Flow<List<Coordinate>>
+    suspend fun retrieve(coordinate: Coordinate): AddressCoordinates?
 }

@@ -1,28 +1,87 @@
 package io.schiar.fridgnet.model.repository
 
+import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Region
-import io.schiar.fridgnet.model.repository.image.ImageRepository
-import io.schiar.fridgnet.model.repository.location.LocationRepository
+import io.schiar.fridgnet.model.datasource.CurrentRegionDataSource
+import io.schiar.fridgnet.model.datasource.ImageDataSource
+import io.schiar.fridgnet.model.datasource.LocationDataSource
+import io.schiar.fridgnet.model.mergeToBoundingBox
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.withContext
+import kotlin.time.measureTime
 
 class MapRepository(
-    private val locationRepository: LocationRepository,
-    private val imageRepository: ImageRepository
+    locationDataSource: LocationDataSource,
+    imageDataSource: ImageDataSource,
+    private val currentRegionDataSource: CurrentRegionDataSource
 ) {
-    fun selectNewLocationFrom(region: Region) {
-        locationRepository.selectNewLocationFrom(region = region)
+    private val currentBoundingBoxFlow = MutableStateFlow<BoundingBox?>(value = null)
+    private val _regionsMutableSet = mutableSetOf<Region>()
+    private var _visibleRegions = emptyList<Region>()
+
+    val visibleRegions = locationDataSource.retrieveRegions().flowOn(Dispatchers.IO).combine(
+        flow = currentBoundingBoxFlow,
+        transform = ::combineRegionsCurrentBoundingBox
+    )
+    val visibleImages = imageDataSource.retrieve().combine(
+        flow = currentBoundingBoxFlow,
+        transform = ::combineImagesCurrentBoundingBox
+    )
+    private val boundingBoxPhotosFlow = MutableStateFlow<BoundingBox?>(value = null)
+    val boundingBoxImages: Flow<BoundingBox?> = boundingBoxPhotosFlow
+
+    private fun combineImagesCurrentBoundingBox(
+        images: List<Image>, currentBoundingBox: BoundingBox?
+    ): List<Image> {
+        return if (currentBoundingBox == null) {
+            emptyList()
+        } else {
+            boundingBoxPhotosFlow.update { images.mergeToBoundingBox() }
+            images.filter { currentBoundingBox.contains(coordinate = it.coordinate) }
+        }
     }
 
-    fun visibleImages(boundingBox: BoundingBox): List<Image> {
-        return imageRepository.imagesThatIntersect(boundingBox = boundingBox)
+    private suspend fun combineRegionsCurrentBoundingBox(
+        regions: List<Region>, currentBoundingBox: BoundingBox?
+    ): List<Region> {
+        Log.d("", "Combining regions")
+        return if (currentBoundingBox == null) {
+            emptyList()
+        } else {
+            withContext(Dispatchers.Default) {
+                Log.d("", "there are ${regions.size} regions")
+                val time = measureTime {
+                    for (region in regions) {
+                        if (region.active && currentBoundingBox.contains(region.boundingBox)) {
+                            _regionsMutableSet.add(element = region)
+                        } else {
+                            _regionsMutableSet.remove(element = region)
+                        }
+                    }
+
+                    _visibleRegions = _regionsMutableSet.toList()
+                }
+                Log.d("", "there are ${_visibleRegions.size} visible regions")
+                Log.d("", "combineLocationsCurrentBoundingBox took $time")
+            }
+            _visibleRegions
+        }
     }
 
-    fun visibleRegions(boundingBox: BoundingBox): List<Region> {
-        return locationRepository.regionsThatIntersect(boundingBox = boundingBox)
+    fun updateBoundingBox(boundingBox: BoundingBox) {
+        Log.d("", "updateBoundingBox")
+        currentBoundingBoxFlow.update { boundingBox }
     }
 
-    fun boundingBoxCities(): BoundingBox? {
-        return locationRepository.allCitiesBoundingBox
+    fun selectVisibleRegionAt(index: Int) {
+        Log.d("", "selectNewLocationFrom($index)")
+        currentRegionDataSource.update(region = _visibleRegions[index])
     }
 }

@@ -9,6 +9,10 @@ fun List<Coordinate>.toCoordinateEntities(coordinatesID: Long): List<CoordinateE
     return map { it.toCoordinateEntity(coordinatesID = coordinatesID) }
 }
 
+fun List<Coordinate>.toCoordinateEntitiesWithID(coordinatesID: Long): List<CoordinateEntity> {
+    return map { it.toCoordinateEntity(id = it.id, coordinatesID = coordinatesID) }
+}
+
 fun Location.toLocationEntity(): LocationEntity {
     return LocationEntity(
         locality = address.locality,
@@ -22,9 +26,9 @@ fun Location.toLocationEntity(): LocationEntity {
     )
 }
 
-fun Location.toLocationEntity(locationID: Long): LocationEntity {
+fun Location.toLocationEntity(id: Long): LocationEntity {
     return LocationEntity(
-        id = locationID,
+        id = id,
         locality = address.locality,
         subAdminArea = address.subAdminArea,
         adminArea = address.adminArea,

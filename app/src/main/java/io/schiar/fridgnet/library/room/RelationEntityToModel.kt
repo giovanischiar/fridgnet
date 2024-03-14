@@ -16,14 +16,18 @@ import io.schiar.fridgnet.model.Region
 
 
 fun List<AddressWithCoordinates>.toAddressesCoordinates(): List<AddressCoordinates> {
-    return map { AddressCoordinates(
-        address = it.addressEntity.toAddress(),
-        coordinates = it.coordinates.map { it.toCoordinate() }
-    )}
+    return map { it.toAddressCoordinates() }
 }
 
 fun List<ImageWithCoordinate>.toImages(): List<Image>{
     return map { it.toImage() }
+}
+
+fun AddressWithCoordinates.toAddressCoordinates(): AddressCoordinates {
+    return AddressCoordinates(
+        address = addressEntity.toAddress(),
+        coordinates = coordinates.toCoordinates()
+    )
 }
 
 fun ImageWithCoordinate.toImage(): Image {
@@ -41,6 +45,7 @@ fun List<LocationWithRegions>.toLocations(): List<Location> {
 
 fun LocationWithRegions.toLocation(): Location {
     return Location(
+        id = locationEntity.id,
         address = Address(
             locality = locationEntity.locality,
             subAdminArea = locationEntity.subAdminArea,
@@ -58,11 +63,16 @@ fun LocationWithRegions.toLocation(): Location {
 }
 
 fun PolygonWithCoordinates.toPolygon(): Polygon {
-    return Polygon(coordinates = coordinates.map { it.toCoordinate() })
+    return Polygon(id = polygon.id, coordinates = coordinates.map { it.toCoordinate() })
+}
+
+fun List<RegionWithPolygonAndHoles>.toRegions(): List<Region> {
+    return map { it.toRegion() }
 }
 
 fun RegionWithPolygonAndHoles.toRegion(): Region {
     return Region(
+        id = regionEntity.id,
         polygon = polygon.toPolygon(),
         holes = holes.map { it.toPolygon() },
         active = regionEntity.active,

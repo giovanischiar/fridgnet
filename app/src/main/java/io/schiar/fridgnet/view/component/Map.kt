@@ -24,6 +24,7 @@ import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.view.component.debug.MapPolygonInfo
 import io.schiar.fridgnet.view.util.debug.BoundsTestCreator
 import io.schiar.fridgnet.view.util.debug.generatePolygonsAppCreatedUnitTest
@@ -38,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.time.measureTime
 import java.util.Collections.synchronizedMap as syncMapOf
 
 @Composable
@@ -48,7 +50,7 @@ fun Map(
     boundingBox: BoundingBoxViewData?,
     moveCamera: Boolean,
     onMoveFinished: () -> Unit,
-    onClickRegion: (region: RegionViewData) -> Unit,
+    regionPressedAt: (index: Int) -> Unit,
     onBoundsChange: (LatLngBounds?) -> Unit,
 ) {
     var mapLoaded by remember { mutableStateOf(value = false) }
@@ -94,7 +96,13 @@ fun Map(
                 }
             }
 
-            visibleRegions.map { RegionDrawer(region = it) { region -> onClickRegion(region) } }
+            val time = measureTime {
+                visibleRegions.mapIndexed { index, region ->
+                    RegionDrawer(region = region, index = index, onClick = regionPressedAt )
+                }
+            }
+            
+            Log.d("", "it took $time to draw all of the ${visibleRegions.size} regions")
 
             visibleImages.map {
                 if (!(bitmaps.containsKey(it.uri) || jobs.containsKey(it.uri))) {

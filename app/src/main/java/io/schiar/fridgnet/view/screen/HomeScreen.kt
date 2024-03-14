@@ -14,7 +14,6 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -36,8 +35,10 @@ fun HomeScreen(
     onNavigateImage: () -> Unit,
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
-    val administrativeUnits by viewModel.administrativeUnits.collectAsState()
-    val currentAdministrativeUnit by viewModel.currentAdministrativeUnit.collectAsState()
+    val administrativeUnits by viewModel.administrativeUnits.collectAsState(initial = emptyList())
+    val currentAdministrativeUnit by viewModel.currentAdministrativeUnit.collectAsState(
+        initial = ""
+    )
 
     var expanded by remember { mutableStateOf(false) }
 
@@ -48,7 +49,7 @@ fun HomeScreen(
                 AdministrativeUnitDropdown(
                     administrativeUnits = administrativeUnits,
                     currentAdministrativeUnit = currentAdministrativeUnit,
-                    onDropdown = viewModel::changeCurrent
+                    onDropdown = viewModel::changeCurrentAdministrativeUnit
                 )
 
                 Box {
@@ -77,9 +78,9 @@ fun HomeScreen(
         )
     )
 
-    LaunchedEffect(Unit) { viewModel.subscribe() }
-
-    val addressLocationImages by viewModel.addressLocationImages.collectAsState()
+    val addressLocationCoordinates by viewModel.addressLocationImages.collectAsState(
+        initial = emptyList()
+    )
 
     fun getColumnSize(): Int {
         return when (currentAdministrativeUnit) {
@@ -99,14 +100,14 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyVerticalGrid(columns = GridCells.Fixed(columnCount)) {
-            items(count = addressLocationImages.size) {
-                val (address, location, initialCoordinate) = addressLocationImages[it]
+            items(count = addressLocationCoordinates.size) { index ->
+                val (_, location, initialCoordinate) = addressLocationCoordinates[index]
                 MapPhotoItem(
                     initialCoordinate = initialCoordinate,
                     location = location,
                     columnCount = columnCount
                 ) {
-                    viewModel.selectImages(address)
+                    viewModel.selectAddressLocationCoordinateAt(index = index)
                     onNavigateImage()
                 }
             }

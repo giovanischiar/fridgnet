@@ -9,7 +9,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,14 +50,13 @@ fun PhotosScreen(
     var mapLoaded by remember { mutableStateOf(false) }
     var zoomedOut by remember { mutableStateOf(true) }
 
-    val selectedImages by viewModel.selectedImages.collectAsState()
-    val selectedLocation by viewModel.selectedLocation.collectAsState()
-    val selectedBoundingBox by viewModel.selectedBoundingBox.collectAsState()
-    val selectedImagesBoundingBox by viewModel.selectedImagesBoundingBox.collectAsState()
+    val addressLocationImages by viewModel.addressLocationImages.collectAsState(
+        initial = null
+    )
     val coroutineScope = rememberCoroutineScope()
 
 
-    val (title, images) = selectedImages ?: return
+    val (address, location, images, imagesBondingBox) = addressLocationImages ?: return
 
     val missionDoloresPark = LatLng(37.759773, -122.427063)
     val cameraPositionState = rememberCameraPositionState {
@@ -66,8 +64,6 @@ fun PhotosScreen(
     }
 
     val weight = remember { 0.65f }
-
-    LaunchedEffect(Unit) { viewModel.subscribe() }
 
     fun moveCamera(boundingBox: BoundingBoxViewData, animate: Boolean = false, padding: Int = 2) {
         if (mapLoaded) {
@@ -84,7 +80,7 @@ fun PhotosScreen(
     }
 
     info(
-        ScreenInfo(title = title)
+        ScreenInfo(title = address)
     )
     Column {
         Box(
@@ -95,17 +91,15 @@ fun PhotosScreen(
             GoogleMap(
                 cameraPositionState = cameraPositionState,
                 properties = MapProperties(
-                    latLngBoundsForCameraTarget = selectedBoundingBox?.toLatLngBounds()
+                    latLngBoundsForCameraTarget = location.boundingBox.toLatLngBounds()
                 ),
                 uiSettings = MapUiSettings(zoomControlsEnabled = false),
                 onMapLoaded = {
                     mapLoaded = true
-                    selectedLocation?.let { location ->
-                        moveCamera(boundingBox = location.boundingBox)
-                    }
+                    moveCamera(boundingBox = location.boundingBox)
                 }
             ) {
-                selectedLocation?.let { LocationDrawer(location = it) }
+                LocationDrawer(location = location)
                 images.map {
                     Marker(
                         state = MarkerState(position = it.coordinate.toLatLng()),
@@ -124,13 +118,12 @@ fun PhotosScreen(
                     elevation = FloatingActionButtonDefaults.elevation(0.dp),
                     onClick = {
                         val imagesBoundingBox =
-                            selectedImagesBoundingBox ?: return@FloatingActionButton
-                        val location = selectedLocation ?: return@FloatingActionButton
-                        val boundingBox = if (zoomedOut) {
+                            imagesBondingBox ?: return@FloatingActionButton
+                        val boundingBox = (if (zoomedOut) {
                             imagesBoundingBox
                         } else {
                             location.boundingBox
-                        }
+                        })
                         moveCamera(boundingBox = boundingBox, animate = true, padding = 27)
                         zoomedOut = !zoomedOut
                     }

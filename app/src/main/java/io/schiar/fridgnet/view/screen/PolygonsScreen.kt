@@ -32,8 +32,9 @@ import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 
 @Composable
 fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) -> Unit) {
-    val location by viewModel.currentLocation.collectAsState()
-    val sortedRegions = (location ?: return).regions.sortedBy {
+    val location by viewModel.currentLocation.collectAsState(initial = null)
+    val regions = (location ?: return).regions
+    val sortedRegions = regions.sortedBy {
         it.polygon.coordinates.size
     }.asReversed()
 
@@ -84,7 +85,11 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
                             .fillMaxWidth()
                             .weight(0.25f),
                         region = sortedRegions[1],
-                        onRegionCheckedChange = viewModel::switchRegion
+                        onRegionCheckedChangeAt = {
+                            viewModel.switchRegionAt(index = regions.indexOf(
+                                element = it
+                            ))
+                        }
                     )
                 }
             }
@@ -109,7 +114,11 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
                                     .fillMaxWidth()
                                     .weight(1f),
                                 region = region,
-                                onRegionCheckedChange = viewModel::switchRegion
+                                onRegionCheckedChangeAt = {
+                                    viewModel.switchRegionAt(index = regions.indexOf(
+                                        element = it
+                                    ))
+                                }
                             )
                         }
                     }
@@ -136,7 +145,11 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
                                         .weight(1f)
                                         .height(height * 0.25f),
                                     region = region,
-                                    onRegionCheckedChange = viewModel::switchRegion
+                                    onRegionCheckedChangeAt = {
+                                        viewModel.switchRegionAt(index = regions.indexOf(
+                                            element = it
+                                        ))
+                                    }
                                 )
                             }
                         }
@@ -150,7 +163,11 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
                                 MapPolygon(
                                     modifier = Modifier.height(height * 0.125f),
                                     region = region,
-                                    onRegionCheckedChange = viewModel::switchRegion
+                                    onRegionCheckedChangeAt = {
+                                        viewModel.switchRegionAt(index = regions.indexOf(
+                                            element = it
+                                        ))
+                                    }
                                 )
                             }
                         }

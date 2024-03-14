@@ -1,8 +1,17 @@
 package io.schiar.fridgnet.view.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -10,7 +19,7 @@ import androidx.compose.ui.Modifier
 fun AdministrativeUnitDropdown(
     administrativeUnits: List<String>,
     currentAdministrativeUnit: String,
-    onDropdown: (administrativeUnit: String) -> Unit
+    onDropdown: (index: Int) -> Unit
 ) {
     fun textOf(administrativeUnit: String): String {
         return when (administrativeUnit) {
@@ -36,13 +45,13 @@ fun AdministrativeUnitDropdown(
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            administrativeUnits.map { administrativeUnit ->
+            administrativeUnits.mapIndexed { index, administrativeUnit ->
                 DropdownMenuItem(
                     modifier = Modifier.fillMaxWidth(),
                     text = { Text(textOf(administrativeUnit)) },
                     onClick = {
                         expanded = false
-                        onDropdown(administrativeUnit)
+                        onDropdown(index)
                     }
                 )
             }

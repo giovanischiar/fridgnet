@@ -1,83 +1,50 @@
 package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.BoundingBox
+import io.schiar.fridgnet.model.AddressLocationCoordinate
+import io.schiar.fridgnet.model.AddressLocationImages
+import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.Image
-import io.schiar.fridgnet.model.Location
-import io.schiar.fridgnet.model.Polygon
-import io.schiar.fridgnet.model.repository.address.AddressRepository
-import io.schiar.fridgnet.model.repository.image.ImageRepository
-import io.schiar.fridgnet.model.repository.listeners.OnAddressReadyListener
-import io.schiar.fridgnet.model.repository.listeners.OnImageAddedListener
-import io.schiar.fridgnet.model.repository.listeners.OnLocationReadyListener
-import io.schiar.fridgnet.model.repository.listeners.OnNewImageAddedListener
-import io.schiar.fridgnet.model.repository.location.LocationRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
+import io.schiar.fridgnet.model.datasource.AddressDataSource
+import io.schiar.fridgnet.model.datasource.CurrentAddressLocationCoordinateDataSource
+import io.schiar.fridgnet.model.datasource.ImageDataSource
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.onEach
 
 class PhotosRepository(
-    private val imageRepository: ImageRepository,
-    private val locationRepository: LocationRepository,
-    private val addressRepository: AddressRepository,
-): OnImageAddedListener, OnAddressReadyListener, OnNewImageAddedListener {
-    private var onNewImageAddedCallback: suspend () -> Unit = {}
-    var onLocationReadyListener: OnLocationReadyListener? = null
+    currentAddressLocationCoordinateDataSource: CurrentAddressLocationCoordinateDataSource,
+    imageDataSource: ImageDataSource,
+    addressCoordinatesDataSource: AddressDataSource
+)  {
+    private var addressLocationCoordinate: AddressLocationCoordinate? = null
 
-    fun subscribeForNewImages(callback: suspend () -> Unit) {
-        onNewImageAddedCallback = callback
-    }
-
-    fun currentImages(): Pair<Address, List<Image>>? {
-        val first = imageRepository.currentImages?.first ?: return null
-        val second = imageRepository.currentImages?.second ?: return null
-        return (first to second.toList())
-    }
-
-    fun selectedLocation(): Location? {
-        return locationRepository.locationAddress[imageRepository.currentImages?.first]
-    }
-
-    fun selectedBoundingBox(): BoundingBox? {
-        val location = locationRepository.locationAddress[imageRepository.currentImages?.first] ?: return null
-        var boundingBox = location.boundingBox
-        for (image in (imageRepository.currentImages ?: return null).second.stream()) {
-            if (!boundingBox.contains(image.coordinate)) {
-                boundingBox += image.coordinate
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val addressLocationImages = currentAddressLocationCoordinateDataSource
+        .retrieve()
+        .onEach { addressLocationCoordinate = it }
+        .flatMapLatest {
+            if (it?.address == null) {
+                return@flatMapLatest flowOf(value = emptyList())
+            } else {
+                addressCoordinatesDataSource.retrieveCoordinates(address = it.address)
             }
-        }
-        return boundingBox
-    }
+        }.combine(
+            flow = imageDataSource.retrieve(),
+            transform = ::combineCoordinatesImages
+        ).filterNotNull()
 
-    fun selectedImagesBoundingBox(): BoundingBox? {
-        val coordinates = (imageRepository.currentImages ?: return null).second.stream().map {
-            it.coordinate
-        }.toList()
-        return Polygon(coordinates = coordinates).findBoundingBox()
-    }
-
-    override suspend fun onImageAdded(image: Image) {
-        val coordinate = image.coordinate
-        Log.d(
-            "Add Image Feature",
-            "Image added! getting the address of the image located at $coordinate"
+    private fun combineCoordinatesImages(
+        coordinates: List<Coordinate>, images: List<Image>
+    ): AddressLocationImages? {
+        Log.d("", "combineCoordinatesImages(coordinates = $coordinates, image coordinates = ${images.map { it.coordinate }} )")
+        return AddressLocationImages(
+            address = addressLocationCoordinate?.address ?: return null,
+            location = addressLocationCoordinate?.location ?: return null,
+            images = images.filter { image -> coordinates.contains(element = image.coordinate) }
         )
-        val address = addressRepository.fetchAddressBy(coordinate = coordinate) ?: return
-
-        address.allAddresses().forEach { subAddress -> onAddressReady(address = subAddress) }
     }
-
-    override suspend fun onAddressReady(address: Address) {
-        locationRepository.loadRegions(address = address) { location ->
-            addLocationToAddress(location = location)
-            onLocationReadyListener?.onLocationReady()
-        }
-    }
-
-    private fun addLocationToAddress(location: Location) {
-        Log.d("Add Image Feature", "add ${location.address} to $location")
-        locationRepository.locationAddress[location.address] = location
-    }
-
-    override suspend fun onNewImageAdded() { onNewImageAddedCallback() }
 }

@@ -10,13 +10,10 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,7 +39,6 @@ import io.schiar.fridgnet.viewmodel.HomeViewModel
 import io.schiar.fridgnet.viewmodel.MapViewModel
 import io.schiar.fridgnet.viewmodel.PhotosViewModel
 import io.schiar.fridgnet.viewmodel.PolygonsViewModel
-import kotlinx.coroutines.flow.collectLatest
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,22 +55,7 @@ fun AppScreen(
     var currentScreenInfo by remember { mutableStateOf(ScreenInfo(BottomNavScreen.Home.route)) }
     var photoPickerShowing by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) { appViewModel.loadDatabase() }
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    LaunchedEffect(Unit) {
-        appViewModel.databaseLoaded.collectLatest {
-            if (it) {
-                snackbarHostState.showSnackbar(message = "Database Loaded!")
-            }
-        }
-    }
-
     Scaffold(
-        snackbarHost = {
-            SnackbarHost(hostState = snackbarHostState)
-        },
-
         topBar = {
             TopAppBar(
                 title = { Text(currentScreenInfo.title) },
@@ -166,10 +147,7 @@ fun AppScreen(
             composable(route = BottomNavScreen.Home.route) {
                 HomeScreen(
                     viewModel = homeViewModel,
-                    onNavigateImage = {
-                        photosViewModel.updateCurrentImages()
-                        navController.navigate("Photos")
-                    },
+                    onNavigateImage = { navController.navigate("Photos") },
                     info = { screenInfo -> currentScreenInfo = screenInfo }
                 )
             }
@@ -177,10 +155,7 @@ fun AppScreen(
             composable(route = BottomNavScreen.Map.route) {
                 MapScreen(
                     viewModel = mapViewModel,
-                    onNavigatePolygons = {
-                        polygonsViewModel.updateCurrentLocation()
-                        navController.navigate("Polygons")
-                    },
+                    onNavigatePolygons = { navController.navigate("Polygons") },
                     info = { screenInfo -> currentScreenInfo = screenInfo }
                 )
             }
