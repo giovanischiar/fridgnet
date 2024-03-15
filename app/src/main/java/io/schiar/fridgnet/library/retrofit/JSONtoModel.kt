@@ -93,9 +93,10 @@ fun JSONResult<GeoJSONAttributes>.toLocation(
     }
 
     return Location(
-        address = address.addressAccordingTo(administrativeUnit),
+        address = address,
         regions = regions,
         boundingBox = boundingBox.toBoundingBox(),
-        zIndex = administrativeUnit.zIndex()
+        zIndex = administrativeUnit.zIndex(),
+        administrativeUnit = administrativeUnit
     )
 }

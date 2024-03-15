@@ -114,6 +114,9 @@ abstract class LocationDAO {
         updateCoordinates(coordinateEntities)
     }
 
+    @Query("SELECT * FROM Location Where addressLocationsID = :addressID")
+    abstract fun selectLocationWithRegionsByAddress(addressID: Long): Flow<LocationWithRegions?>
+
     @Query("SELECT * FROM Location WHERE id IN (SELECT regionsID FROM Region WHERE id = :regionID)")
     abstract fun select(regionID: Long): Flow<LocationWithRegions?>
 
@@ -135,18 +138,4 @@ abstract class LocationDAO {
 
     @Update
     abstract suspend fun updateCoordinates(coordinateEntities: List<CoordinateEntity>)
-
-    @Query(
-        "SELECT * FROM Location WHERE " +
-                "Location.locality is :locality AND " +
-                "Location.subAdminArea is :subAdminArea AND " +
-                "Location.adminArea is :adminArea AND " +
-                "Location.countryName is :countryName "
-    )
-    abstract fun selectLocationWithRegionsByAddress(
-        locality: String?,
-        subAdminArea: String?,
-        adminArea: String?,
-        countryName: String?
-    ): Flow<LocationWithRegions?>
 }

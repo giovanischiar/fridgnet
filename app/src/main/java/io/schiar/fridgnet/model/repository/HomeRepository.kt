@@ -1,22 +1,23 @@
 package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AddressCoordinates
-import io.schiar.fridgnet.model.AddressLocationCoordinate
+import io.schiar.fridgnet.model.AddressLocationsCoordinates
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Location
+import io.schiar.fridgnet.model.LocationCoordinate
 import io.schiar.fridgnet.model.datasource.AddressDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.LocationDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentAddressLocationCoordinateLocalDataSource
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import java.util.Collections.synchronizedMap as syncMapOf
 
 class HomeRepository(
@@ -24,128 +25,131 @@ class HomeRepository(
     private val locationDataSource: LocationDataSource,
     private val imageDataSource: ImageDataSource,
     private val currentAddressLocationCoordinateLocalDataSource
-        : CurrentAddressLocationCoordinateLocalDataSource
+        : CurrentAddressLocationCoordinateLocalDataSource,
+    private val externalScope: CoroutineScope
 ) {
     private var _currentAdministrativeUnit = AdministrativeUnit.CITY
     private val _currentAdministrativeUnitStateFlow = MutableStateFlow(_currentAdministrativeUnit)
     private val _administrativeUnits = AdministrativeUnit.entries.toList()
     private val _administrativeUnitsStateFlow = MutableStateFlow(_administrativeUnits)
-    private var _currentAddressLocationCoordinates: List<AddressLocationCoordinate> = emptyList()
+    private var _currentLocationCoordinates: List<LocationCoordinate> = emptyList()
 
     val administrativeUnits: Flow<List<AdministrativeUnit>> = _administrativeUnitsStateFlow
     val currentAdministrativeUnit: Flow<AdministrativeUnit> = _currentAdministrativeUnitStateFlow
 
-    private val administrativeUnitAddressLocationCoordinate = syncMapOf(
-        mutableMapOf<AdministrativeUnit, MutableMap<Address, AddressLocationCoordinate>>()
+    private val administrativeUnitLocationCoordinate = syncMapOf(
+        mutableMapOf<AdministrativeUnit, MutableMap<String, LocationCoordinate>>()
     )
 
-    val addressLocationCoordinate = merge(
-        imageDataSource.retrieve().onEach { images ->
-            Log.d("", "Receiving ${images.size} images from database")
-            images.forEach { onEachImage(image = it)
-            } },
-        addressDataSource.retrieve().onEach { addressesCoordinates ->
-            Log.d("", "Addresses from Addresses ${addressesCoordinates.map { it.address }}")
-            Log.d("", "Receiving ${addressesCoordinates.size} addresses from database")
-            addressesCoordinates.forEach { onEachAddressCoordinates(addressCoordinates = it) }
+    val locationCoordinates = merge(
+        imageDataSource.retrieve().onEach { images -> images.forEach(::onEachImage) },
+        addressDataSource.retrieve().onEach { addressesLocationsCoordinatesList ->
+            addressesLocationsCoordinatesList.forEach(::onEachAddressLocationsCoordinates)
         },
-        locationDataSource.retrieve().onEach { locations ->
-            Log.d("", "Receiving ${locations.size} locations from database")
-            Log.d("", "Addresses from Locations ${locations.map { it.address }}")
-            locations.forEach(::onEachLocation)
-        },
+        locationDataSource.retrieve().onEach { locations -> locations.forEach(::onEachLocation) },
         _currentAdministrativeUnitStateFlow.onEach { _currentAdministrativeUnit = it }
     ).map {
-        _currentAddressLocationCoordinates = administrativeUnitAddressLocationCoordinate[
+        _currentLocationCoordinates = administrativeUnitLocationCoordinate[
             _currentAdministrativeUnit
         ]?.values?.toList() ?: emptyList()
-        _currentAddressLocationCoordinates
+        _currentLocationCoordinates
     }
 
-    private suspend fun onEachImage(image: Image) {
-        addressDataSource.createFrom(coordinate = image.coordinate)
+    private fun onEachImage(image: Image) {
+        externalScope.launch { addressDataSource.createFrom(coordinate = image.coordinate) }
     }
 
-    private suspend fun onEachAddressCoordinates(addressCoordinates: AddressCoordinates) {
-        for (address in addressCoordinates.address.allAddresses()) {
-            val addressAddressLocationCoordinate = administrativeUnitAddressLocationCoordinate[
-                address.administrativeUnit
+    private fun onEachAddressLocationsCoordinates(
+        addressLocationsCoordinates: AddressLocationsCoordinates
+    ) {
+        val address = addressLocationsCoordinates.address
+        val initialCoordinate = addressLocationsCoordinates.coordinates[0]
+        val administrativeUnitLocation = addressLocationsCoordinates.administrativeUnitLocation
+        for (administrativeUnit in AdministrativeUnit.entries.toList()) {
+            val addressName = address.name(administrativeUnit = administrativeUnit)
+            val addressAddressLocationCoordinate = administrativeUnitLocationCoordinate[
+                administrativeUnit
             ]
-            val addressLocationImages = addressAddressLocationCoordinate?.get(address)
+            val locationCoordinate = addressAddressLocationCoordinate?.get(addressName)
 
-            if (addressLocationImages?.address != null) { continue }
+            if (locationCoordinate?.initialCoordinate != null) { return }
 
-            val newAddressLocationCoordinate = AddressLocationCoordinate(
-                address = address,
-                initialCoordinate = addressCoordinates.coordinates[0]
+            val newAddressLocationCoordinate = LocationCoordinate(
+                location = administrativeUnitLocation[administrativeUnit],
+                initialCoordinate = initialCoordinate
             )
 
             if (addressAddressLocationCoordinate == null) {
-                administrativeUnitAddressLocationCoordinate[
-                    address.administrativeUnit
-                ] = mutableMapOf(address to newAddressLocationCoordinate)
-                Log.d("onEachAddressCoordinates", "Create the first key pair [${address.name()} to (${address.name()}, null ${addressCoordinates.coordinates[0]})] and assign to ${address.administrativeUnit}")
-                Log.d("onEachAddressCoordinates", "Create location from ${address.name()}")
-                locationDataSource.createFrom(address = address)
+                administrativeUnitLocationCoordinate[
+                    administrativeUnit
+                ] = mutableMapOf(addressName to newAddressLocationCoordinate)
+                Log.d("onEachAddressCoordinates", "Create the first key pair [$addressName to (${newAddressLocationCoordinate.location?.id}, ${initialCoordinate})] and assign to $administrativeUnit")
+                if (newAddressLocationCoordinate.location == null) {
+                    Log.d("onEachAddressCoordinates", "Create location from $addressName")
+                    externalScope.launch {
+                        locationDataSource.createFrom(
+                            address = address,
+                            administrativeUnit = administrativeUnit
+                        )
+                    }
+                }
                 continue
             }
 
-            if (addressLocationImages == null) {
-                Log.d("onEachAddressCoordinates", "Create a (${address.name()}, null ${addressCoordinates.coordinates[0]}), assign to ${address.name()} and then assign to ${address.administrativeUnit}")
-                administrativeUnitAddressLocationCoordinate[
-                    address.administrativeUnit
-                ]?.set(address, newAddressLocationCoordinate)
-                Log.d("onEachAddressCoordinates", "Create location from ${address.name()}")
-                locationDataSource.createFrom(address = address)
+            if (locationCoordinate == null) {
+                Log.d("onEachAddressCoordinates", "Create a key pair [$addressName to (${newAddressLocationCoordinate.location?.id}, ${initialCoordinate})] and assign to $administrativeUnit")
+                administrativeUnitLocationCoordinate[
+                    administrativeUnit
+                ]?.set(addressName, newAddressLocationCoordinate)
+                if (newAddressLocationCoordinate.location == null) {
+                    Log.d("onEachAddressCoordinates", "Create location from $addressName")
+                    externalScope.launch {
+                        locationDataSource.createFrom(
+                            address = address,
+                            administrativeUnit = administrativeUnit
+                        )
+                    }
+                }
                 continue
             }
-
-            Log.d("onEachAddressCoordinates", "Address is null that means on onEachLocation was created an AddressLocationCoordinate with just a location. So let's just add ${address.name()} to this object")
-            administrativeUnitAddressLocationCoordinate[
-                address.administrativeUnit
-            ]?.set(address, addressLocationImages.with(
-                address = address,
-                initialCoordinate = addressCoordinates.coordinates[0]
-            ))
         }
     }
 
     private fun onEachLocation(location: Location) {
-        val address = location.address
-        val addressAddressLocationCoordinate = administrativeUnitAddressLocationCoordinate[
-            address.administrativeUnit
+        val addressName = location.addressName()
+        val initialCoordinate = location.boundingBox.center()
+        val administrativeUnit = location.administrativeUnit
+        val addressAddressLocationCoordinate = administrativeUnitLocationCoordinate[
+            administrativeUnit
         ]
-        val addressLocationCoordinate = addressAddressLocationCoordinate?.get(address)
+        val addressLocationCoordinate = addressAddressLocationCoordinate?.get(addressName)
 
         if (addressLocationCoordinate?.location != null) { return }
 
-        val newAddressLocationCoordinate = AddressLocationCoordinate(location = location)
+        val newAddressLocationCoordinate = LocationCoordinate(
+            location = location,
+            initialCoordinate = initialCoordinate
+        )
 
         if (addressAddressLocationCoordinate == null) {
-            administrativeUnitAddressLocationCoordinate[
-                address.administrativeUnit
-            ] = mutableMapOf(address to newAddressLocationCoordinate)
-            Log.d("onEachLocation", "Create the first key pair (${address.name()} to (null, ${location.id}, null)) and assign to ${address.administrativeUnit}")
+            administrativeUnitLocationCoordinate[
+                administrativeUnit
+            ] = mutableMapOf(addressName to newAddressLocationCoordinate)
+            Log.d("onEachLocation", "Create the first key pair ($addressName to (${location.id}, $initialCoordinate)) and assign to $administrativeUnit")
             return
         }
 
-        if (addressLocationCoordinate == null) {
-            Log.d("onEachLocation", "Create a (null, ${location.id}, null), assign to ${address.name()} and then assign to ${address.administrativeUnit}")
-            administrativeUnitAddressLocationCoordinate[
-                address.administrativeUnit
-            ]?.set(address, newAddressLocationCoordinate)
-            return
-        }
-
-        Log.d("onEachLocation", "(${address.name()}, null, ${addressLocationCoordinate.initialCoordinate}) exists so let's assign the location of id ${location.id} to it")
-        administrativeUnitAddressLocationCoordinate[
-            address.administrativeUnit
-        ]?.set(address, addressLocationCoordinate.with(location = location))
+        Log.d("onEachLocation", "Create a (${location.id}, $initialCoordinate), assign to $addressName and then assign to $administrativeUnit")
+        administrativeUnitLocationCoordinate[
+            administrativeUnit
+        ]?.set(addressName, newAddressLocationCoordinate)
     }
 
     fun selectAddressLocationCoordinateAt(index: Int) {
+        val locationCoordinate = _currentLocationCoordinates[index]
+        Log.d("", "LocationCoordinate at $index is $locationCoordinate")
         currentAddressLocationCoordinateLocalDataSource.update(
-            addressLocationCoordinate = _currentAddressLocationCoordinates[index]
+            addressLocationCoordinate = locationCoordinate
         )
     }
 

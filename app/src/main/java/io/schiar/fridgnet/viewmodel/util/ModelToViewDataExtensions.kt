@@ -1,20 +1,20 @@
 package io.schiar.fridgnet.viewmodel.util
 
 import android.net.Uri
-import io.schiar.fridgnet.model.AddressLocationCoordinate
-import io.schiar.fridgnet.model.AddressLocationImages
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Location
+import io.schiar.fridgnet.model.LocationCoordinate
+import io.schiar.fridgnet.model.LocationImages
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.mergeToBoundingBox
-import io.schiar.fridgnet.view.viewdata.AddressLocationCoordinateViewData
-import io.schiar.fridgnet.view.viewdata.AddressLocationImagesViewData
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.CoordinateViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
+import io.schiar.fridgnet.view.viewdata.LocationCoordinateViewData
+import io.schiar.fridgnet.view.viewdata.LocationImagesViewData
 import io.schiar.fridgnet.view.viewdata.LocationViewData
 import io.schiar.fridgnet.view.viewdata.PolygonViewData
 import io.schiar.fridgnet.view.viewdata.RegionViewData
@@ -57,7 +57,7 @@ fun List<Image>.toImageViewDataList(): List<ImageViewData> {
 // Location
 fun Location.toLocationViewData(): LocationViewData {
     return LocationViewData(
-        address = address.name(),
+        address = addressName(),
         regions = regions.map { it.toRegionViewData() },
         boundingBox = boundingBox.toBoundingBoxViewData(),
         center = boundingBox.center().toCoordinateViewData(),
@@ -87,23 +87,21 @@ fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
 }
 
 // AddressLocationCoordinate
-fun AddressLocationCoordinate.toAddressLocationImagesViewData(): AddressLocationCoordinateViewData {
-    return AddressLocationCoordinateViewData(
-        addressName = address?.name() ?: "",
+fun LocationCoordinate.toLocationImagesViewData(): LocationCoordinateViewData {
+    return LocationCoordinateViewData(
         location = location?.toLocationViewData(),
         initialCoordinate = initialCoordinate?.toCoordinateViewData() ?: CoordinateViewData()
     )
 }
 
-fun List<AddressLocationCoordinate>.toAddressLocationImagesViewDataList()
-        : List<AddressLocationCoordinateViewData> {
-    return map { it.toAddressLocationImagesViewData() }
+fun List<LocationCoordinate>.toLocationCoordinateViewDataList()
+        : List<LocationCoordinateViewData> {
+    return map { it.toLocationImagesViewData() }
 }
 
 // AddressLocationImages
-fun AddressLocationImages.toAddressLocationImagesViewData(): AddressLocationImagesViewData {
-    return AddressLocationImagesViewData(
-        address = address.name(),
+fun LocationImages.toLocationImagesViewData(): LocationImagesViewData {
+    return LocationImagesViewData(
         location = location.toLocationViewData(),
         images = images.toImageViewDataList(),
         imagesBoundingBox = images.mergeToBoundingBox()?.toBoundingBoxViewData()

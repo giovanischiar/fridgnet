@@ -2,18 +2,14 @@ package io.schiar.fridgnet.model.datasource.local
 
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AddressCoordinates
+import io.schiar.fridgnet.model.AddressLocationsCoordinates
+import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.Coordinate
 import io.schiar.fridgnet.model.datasource.AddressDataSource
 import io.schiar.fridgnet.model.datasource.retriever.AddressRetriever
 import io.schiar.fridgnet.model.service.AddressService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
-import java.util.Collections.synchronizedMap as syncMapOf
 import java.util.Collections.synchronizedSet as syncSetOf
 
 class AddressCoordinatesDataSource(
@@ -21,31 +17,14 @@ class AddressCoordinatesDataSource(
     private val addressService: AddressService
 ): AddressDataSource {
     private val coordinateSet = syncSetOf(mutableSetOf<Coordinate>())
-    private val addressAddressCoordinateCache = syncMapOf(
-        mutableMapOf<Address, AddressCoordinates>()
-    )
-    private val addressesCoordinatesCacheFlow = MutableStateFlow(
-        addressAddressCoordinateCache.values.toList()
-    )
 
     override suspend fun create(coordinate: Coordinate, address: Address) {
         log(coordinate, "creating address ${address.name()}")
-        addressAddressCoordinateCache[address] = addressAddressCoordinateCache[address]
-            ?.with(coordinate = coordinate) ?: AddressCoordinates(
-            address = address,
-            coordinates = listOf(coordinate)
-        )
-        addressesCoordinatesCacheFlow.update { addressAddressCoordinateCache.values.toList() }
         addressService.create(coordinate = coordinate, address = address)
     }
 
-    private fun updateCache(addressCoordinates: AddressCoordinates) {
-        addressAddressCoordinateCache[addressCoordinates.address] = addressCoordinates
-    }
-
-    private fun updateCacheFromService(addressesCoordinates: List<AddressCoordinates>) {
+    private fun updateCacheFromService(addressesCoordinates: List<AddressLocationsCoordinates>) {
         addressesCoordinates.forEach { addressCoordinates ->
-            updateCache(addressCoordinates = addressCoordinates)
             coordinateSet.addAll(elements = addressCoordinates.coordinates)
         }
     }
@@ -62,15 +41,16 @@ class AddressCoordinatesDataSource(
         log(coordinate = coordinate, "It's not on the Geocoder!")
     }
 
-    override fun retrieve(): Flow<List<AddressCoordinates>> {
-        return merge(
-            addressesCoordinatesCacheFlow,
-            addressService.retrieve().onEach(::updateCacheFromService)
-        ).distinctUntilChanged()
+    override fun retrieve(): Flow<List<AddressLocationsCoordinates>> {
+        return addressService.retrieve().onEach(::updateCacheFromService)
     }
 
-    override fun retrieveCoordinates(address: Address): Flow<List<Coordinate>> {
-        return addressService.retrieveCoordinates(address = address)
+    override fun retrieveCoordinates(
+        address: Address, administrativeUnit: AdministrativeUnit
+    ): Flow<List<Coordinate>> {
+        return addressService.retrieveCoordinates(
+            address = address, administrativeUnit = administrativeUnit
+        )
     }
 
     private fun log(coordinate: Coordinate, msg: String) {

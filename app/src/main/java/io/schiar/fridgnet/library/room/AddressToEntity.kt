@@ -5,10 +5,20 @@ import io.schiar.fridgnet.model.Address
 
 fun Address.toAddressEntity(): AddressEntity {
     return AddressEntity(
+        id = id,
         locality = locality,
         subAdminArea = subAdminArea,
         adminArea = adminArea,
-        countryName = countryName,
-        administrativeUnit = administrativeUnit.toString()
+        countryName = countryName
+    )
+}
+
+fun Address.toAddressEntity(id: Long): AddressEntity {
+    return AddressEntity(
+        id = id,
+        locality = locality,
+        subAdminArea = subAdminArea,
+        adminArea = adminArea,
+        countryName = countryName
     )
 }

@@ -1,6 +1,5 @@
 package io.schiar.fridgnet.view.component
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -26,7 +25,7 @@ fun MapPhotoItem(
     initialCoordinate: CoordinateViewData?,
     location: LocationViewData?,
     columnCount: Int,
-    onMapClick: (latLng: LatLng) -> Unit
+    onMapClick: (LatLng) -> Unit
 ) {
     val cameraPositionState = rememberCameraPositionState {
         var coordinate = location?.center
@@ -40,18 +39,14 @@ fun MapPhotoItem(
     var mapLoaded by remember { mutableStateOf(value = false) }
 
     GoogleMap(
-        modifier = Modifier.size(Dp(100f * 4 / columnCount)).clickable {
-            if (location != null) {
-                onMapClick(location.center.toLatLng())
-            }
-        },
+        modifier = Modifier.size(Dp(100f * 4 / columnCount)),
         uiSettings = MapUiSettings().static(),
         cameraPositionState = cameraPositionState,
         onMapClick = onMapClick,
         onMapLoaded = { mapLoaded = true }
     ) {
         if (location != null && mapLoaded) {
-            LocationDrawer(location = location) { onMapClick(location.center.toLatLng()) }
+            LocationDrawer(location = location)
             val boundingBox = location.boundingBox.toLatLngBounds()
             val cu = CameraUpdateFactory.newLatLngBounds(boundingBox, 2)
             cameraPositionState.move(cu)

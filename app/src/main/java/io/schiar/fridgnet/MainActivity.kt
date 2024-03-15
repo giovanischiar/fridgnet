@@ -34,6 +34,8 @@ import io.schiar.fridgnet.viewmodel.MapViewModel
 import io.schiar.fridgnet.viewmodel.PhotosViewModel
 import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 import io.schiar.fridgnet.viewmodel.util.ViewModelFactory
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
 import java.util.Locale
 
 class MainActivity : ComponentActivity() {
@@ -79,6 +81,7 @@ class MainActivity : ComponentActivity() {
         val photosRepository: PhotosRepository
     )
 
+    @OptIn(DelicateCoroutinesApi::class)
     private fun createRepositories(): Repositories {
         val imageDataSource = createImageDataSource()
         val addressCoordinatesDataSource = createAddressDataSource()
@@ -106,7 +109,8 @@ class MainActivity : ComponentActivity() {
             addressDataSource = addressCoordinatesDataSource,
             locationDataSource = locationDataSource,
             imageDataSource = imageDataSource,
-            currentAddressLocationCoordinateLocalDataSource = currentAddressLocationCoordinateDataSource
+            currentAddressLocationCoordinateLocalDataSource = currentAddressLocationCoordinateDataSource,
+            externalScope = GlobalScope
         )
 
         val appRepository = AppRepository(imageDataSource = imageDataSource)

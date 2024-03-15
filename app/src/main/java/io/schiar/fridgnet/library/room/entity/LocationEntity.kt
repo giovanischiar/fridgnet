@@ -8,10 +8,7 @@ import androidx.room.PrimaryKey
 data class LocationEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val locality: String?,
-    val subAdminArea: String?,
-    val adminArea: String?,
-    val countryName: String?,
+    val addressLocationsID: Long,
     val administrativeUnit: String,
     @Embedded(prefix = "boundingBoxSouthwest_")
     var boundingBoxSouthwest: CoordinateEntity,
@@ -27,10 +24,7 @@ data class LocationEntity(
     ): LocationEntity {
         return LocationEntity(
             id = id,
-            locality = locality,
-            subAdminArea = subAdminArea,
-            adminArea = adminArea,
-            countryName = countryName,
+            addressLocationsID = addressLocationsID,
             administrativeUnit = administrativeUnit,
             boundingBoxSouthwest = CoordinateEntity(
                 id = boundingBoxSouthwest.id,

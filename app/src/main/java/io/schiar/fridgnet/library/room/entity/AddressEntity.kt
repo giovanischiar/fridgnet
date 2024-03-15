@@ -10,6 +10,5 @@ data class AddressEntity(
     val locality: String?,
     val subAdminArea: String?,
     val adminArea: String?,
-    val countryName: String?,
-    val administrativeUnit: String
+    val countryName: String?
 )

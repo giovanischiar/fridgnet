@@ -9,7 +9,7 @@ import androidx.room.Update
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.library.room.entity.AddressEntity
 import io.schiar.fridgnet.library.room.entity.CoordinateEntity
-import io.schiar.fridgnet.library.room.relationentity.AddressWithCoordinates
+import io.schiar.fridgnet.library.room.relationentity.AddressWithLocationsAndCoordinates
 import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.Coordinate
 import kotlinx.coroutines.flow.Flow
@@ -26,7 +26,9 @@ abstract class AddressDAO {
     open suspend fun insert(coordinate: Coordinate, address: Address) {
         val addressEntityID = insertOrUpdate(address = address) ?: return
         insert(
-            coordinateEntity = coordinate.toCoordinateEntity(addressCoordinatesID = addressEntityID)
+            coordinateEntity = coordinate.toCoordinateEntity(
+                addressCoordinatesID = addressEntityID
+            )
         )
     }
 
@@ -69,56 +71,80 @@ abstract class AddressDAO {
     abstract fun selectCoordinates(countryName: String?): Flow<List<CoordinateEntity>>
 
     private suspend fun insertOrUpdate(address: Address): Long? {
-        val (locality, subAdminArea, adminArea) = address
-        val storedAddressEntity = selectAddressBy(
+        val (_, locality, subAdminArea, adminArea) = address
+
+        val storedAddressEntities = selectAddressesBy(
             locality = locality ?: return null,
             adminArea = adminArea ?: return null
         )
 
-        return if (storedAddressEntity != null) {
-            if (storedAddressEntity.subAdminArea == null) {
-                Log.d("Store Address", "Updating $locality county to $subAdminArea")
-                update(storedAddressEntity.updateSubAdminArea(subAdminArea))
-                storedAddressEntity.id
-            }
-
-            if (storedAddressEntity.subAdminArea != subAdminArea) {
-                if (subAdminArea == null) {
-                    Log.d(
-                        "Store Address",
-                        "Setting $locality to ${storedAddressEntity.subAdminArea}"
-                    )
-                    storedAddressEntity.id
-                } else {
-                    Log.d(
-                        "Store Address",
-                        "$locality is in ${storedAddressEntity.subAdminArea} or $subAdminArea?"
-                    )
-                    insert(addressEntity = address.toAddressEntity())
-                }
-            } else {
-                storedAddressEntity.id
-            }
-        } else {
-            insert(addressEntity = address.toAddressEntity())
+        if (storedAddressEntities.isEmpty()) {
+            return insert(addressEntity = address.toAddressEntity())
         }
+
+        if (storedAddressEntities.size > 1) {
+            val multipleCounties = storedAddressEntities.map {
+                it.subAdminArea
+            }.joinToString(", ")
+            val addressID = storedAddressEntities.filter { addressEntity ->
+                addressEntity.subAdminArea == subAdminArea
+            }.getOrNull(index = 0)?.id ?: 0
+            return if (addressID != 0L) {
+                addressID
+            } else {
+                Log.d(
+                    "Store Address",
+                    "Can't assume if $locality is in one of these counties: $multipleCounties, or $subAdminArea. Create a new Address"
+                )
+                insert(addressEntity = address.toAddressEntity(id = addressID))
+            }
+        }
+
+        val storedAddressEntity = storedAddressEntities[0]
+
+        if (storedAddressEntity.subAdminArea == null && subAdminArea != null) {
+            Log.d(
+                "Store Address",
+                "Assuming ${storedAddressEntity.locality} is in $subAdminArea. Updating stored address"
+            )
+            update(storedAddressEntity.updateSubAdminArea(subAdminArea))
+            return storedAddressEntity.id
+        }
+
+        if (subAdminArea == null && storedAddressEntity.subAdminArea != null) {
+            Log.d(
+                "Store Address",
+                "Assuming ${address.locality} is in ${storedAddressEntity.subAdminArea}"
+            )
+            return storedAddressEntity.id
+        }
+
+        if (subAdminArea != storedAddressEntity.subAdminArea) {
+            Log.d(
+                "Store Address",
+                "Can't assume if $locality is in ${storedAddressEntity.subAdminArea} or $subAdminArea. Inserting a new Address"
+            )
+            return insert(addressEntity = address.toAddressEntity())
+        }
+
+        return if (storedAddressEntity.id == 0L) null else storedAddressEntity.id
     }
 
     @Update
     abstract suspend fun update(addressEntity: AddressEntity)
 
     @Query("SELECT * FROM Address")
-    abstract fun selectAddressesWithCoordinates(): Flow<List<AddressWithCoordinates>>
+    abstract fun selectAddressesWithCoordinates(): Flow<List<AddressWithLocationsAndCoordinates>>
 
     @Query(
         "SELECT * FROM Address JOIN Coordinate ON Address.id is Coordinate.addressCoordinatesID " +
                 "WHERE Coordinate.latitude == :latitude AND Coordinate.longitude == :longitude LIMIT 1"
     )
-    abstract suspend fun selectAddressEntityBy(latitude: Double, longitude: Double): AddressWithCoordinates?
+    abstract suspend fun selectAddressEntityBy(latitude: Double, longitude: Double): AddressWithLocationsAndCoordinates?
 
     @Query(
         "SELECT * FROM Address WHERE " +
                 "Address.locality is :locality AND Address.adminArea = :adminArea"
     )
-    abstract suspend fun selectAddressBy(locality: String, adminArea: String): AddressEntity?
+    abstract suspend fun selectAddressesBy(locality: String, adminArea: String): List<AddressEntity>
 }

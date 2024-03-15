@@ -1,12 +1,11 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.library.room.relationentity.AddressWithCoordinates
+import io.schiar.fridgnet.library.room.relationentity.AddressWithLocationsAndCoordinates
 import io.schiar.fridgnet.library.room.relationentity.ImageWithCoordinate
 import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
 import io.schiar.fridgnet.library.room.relationentity.PolygonWithCoordinates
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
-import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AddressCoordinates
+import io.schiar.fridgnet.model.AddressLocationsCoordinates
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Image
@@ -15,7 +14,7 @@ import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 
 
-fun List<AddressWithCoordinates>.toAddressesCoordinates(): List<AddressCoordinates> {
+fun List<AddressWithLocationsAndCoordinates>.toAddressesCoordinates(): List<AddressLocationsCoordinates> {
     return map { it.toAddressCoordinates() }
 }
 
@@ -23,9 +22,10 @@ fun List<ImageWithCoordinate>.toImages(): List<Image>{
     return map { it.toImage() }
 }
 
-fun AddressWithCoordinates.toAddressCoordinates(): AddressCoordinates {
-    return AddressCoordinates(
+fun AddressWithLocationsAndCoordinates.toAddressCoordinates(): AddressLocationsCoordinates {
+    return AddressLocationsCoordinates(
         address = addressEntity.toAddress(),
+        administrativeUnitLocation = locations.toAdministrativeUnitLocation(),
         coordinates = coordinates.toCoordinates()
     )
 }
@@ -39,6 +39,13 @@ fun ImageWithCoordinate.toImage(): Image {
     )
 }
 
+fun List<LocationWithRegions>.toAdministrativeUnitLocation(): Map<AdministrativeUnit, Location> {
+    return associate {
+        AdministrativeUnit.valueOf(value = it.locationEntity.administrativeUnit) to it.toLocation()
+    }
+}
+
+
 fun List<LocationWithRegions>.toLocations(): List<Location> {
     return map { it.toLocation() }
 }
@@ -46,19 +53,14 @@ fun List<LocationWithRegions>.toLocations(): List<Location> {
 fun LocationWithRegions.toLocation(): Location {
     return Location(
         id = locationEntity.id,
-        address = Address(
-            locality = locationEntity.locality,
-            subAdminArea = locationEntity.subAdminArea,
-            adminArea = locationEntity.adminArea,
-            countryName = locationEntity.countryName,
-            administrativeUnit = AdministrativeUnit.valueOf(value = locationEntity.administrativeUnit)
-        ),
+        address = addressEntity.toAddress(),
         regions = regions.map { it.toRegion() },
         boundingBox = BoundingBox(
             southwest = locationEntity.boundingBoxSouthwest.toCoordinate(),
             northeast = locationEntity.boundingBoxNortheast.toCoordinate(),
         ),
-        zIndex = locationEntity.zIndex
+        zIndex = locationEntity.zIndex,
+        administrativeUnit = AdministrativeUnit.valueOf(value = locationEntity.administrativeUnit)
     )
 }
 

@@ -1,7 +1,8 @@
 package io.schiar.fridgnet.library.room
 
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AddressCoordinates
+import io.schiar.fridgnet.model.AddressLocationsCoordinates
+import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.AdministrativeUnit.CITY
 import io.schiar.fridgnet.model.AdministrativeUnit.COUNTRY
 import io.schiar.fridgnet.model.AdministrativeUnit.COUNTY
@@ -12,8 +13,10 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class AddressRoomService(private val addressDAO: AddressDAO) : AddressService {
-    override fun retrieveCoordinates(address: Address): Flow<List<Coordinate>> {
-        val (locality, subAdminArea, adminArea, countryName, administrativeUnit) = address
+    override fun retrieveCoordinates(
+        address: Address, administrativeUnit: AdministrativeUnit
+    ): Flow<List<Coordinate>> {
+        val (_, locality, subAdminArea, adminArea, countryName) = address
         return when(administrativeUnit) {
             CITY -> addressDAO.selectCoordinates(
                 locality = locality,
@@ -22,9 +25,7 @@ class AddressRoomService(private val addressDAO: AddressDAO) : AddressService {
                 countryName = countryName
             )
             COUNTY -> addressDAO.selectCoordinates(
-                subAdminArea = subAdminArea,
-                adminArea = adminArea,
-                countryName = countryName
+                subAdminArea = subAdminArea, adminArea = adminArea, countryName = countryName
             )
             STATE -> addressDAO.selectCoordinates(adminArea = adminArea, countryName = countryName)
             COUNTRY -> addressDAO.selectCoordinates(countryName = countryName)
@@ -35,11 +36,11 @@ class AddressRoomService(private val addressDAO: AddressDAO) : AddressService {
         addressDAO.insert(coordinate = coordinate, address = address)
     }
 
-    override fun retrieve(): Flow<List<AddressCoordinates>> {
+    override fun retrieve(): Flow<List<AddressLocationsCoordinates>> {
         return addressDAO.selectAddressesWithCoordinates().map { it.toAddressesCoordinates() }
     }
 
-    override suspend fun retrieve(coordinate: Coordinate): AddressCoordinates? {
+    override suspend fun retrieve(coordinate: Coordinate): AddressLocationsCoordinates? {
         val (_, latitude, longitude) = coordinate
         return addressDAO.selectAddressEntityBy(
             latitude = latitude, longitude = longitude

@@ -15,11 +15,8 @@ fun List<Coordinate>.toCoordinateEntitiesWithID(coordinatesID: Long): List<Coord
 
 fun Location.toLocationEntity(): LocationEntity {
     return LocationEntity(
-        locality = address.locality,
-        subAdminArea = address.subAdminArea,
-        adminArea = address.adminArea,
-        countryName = address.countryName,
-        administrativeUnit = address.administrativeUnit.toString(),
+        addressLocationsID = address.id,
+        administrativeUnit = administrativeUnit.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toCoordinateEntity(),
         boundingBoxNortheast = boundingBox.northeast.toCoordinateEntity(),
         zIndex = zIndex
@@ -29,11 +26,8 @@ fun Location.toLocationEntity(): LocationEntity {
 fun Location.toLocationEntity(id: Long): LocationEntity {
     return LocationEntity(
         id = id,
-        locality = address.locality,
-        subAdminArea = address.subAdminArea,
-        adminArea = address.adminArea,
-        countryName = address.countryName,
-        administrativeUnit = address.administrativeUnit.toString(),
+        addressLocationsID = address.id,
+        administrativeUnit = administrativeUnit.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toCoordinateEntity(),
         boundingBoxNortheast = boundingBox.northeast.toCoordinateEntity(),
         zIndex = zIndex

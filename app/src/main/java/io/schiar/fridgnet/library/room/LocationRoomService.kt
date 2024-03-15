@@ -27,12 +27,8 @@ class LocationRoomService(private val locationDAO: LocationDAO) : LocationServic
     }
 
     fun selectLocationByAddress(address: Address): Flow<Location?> {
-        val (locality, subAdminArea, adminArea, countryName) = address
         return locationDAO.selectLocationWithRegionsByAddress(
-            locality = locality,
-            subAdminArea = subAdminArea,
-            adminArea = adminArea,
-            countryName = countryName
+            addressID = address.id
         ).map { it?.toLocation() }
     }
 

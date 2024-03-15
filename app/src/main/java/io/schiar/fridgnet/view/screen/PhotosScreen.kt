@@ -50,13 +50,12 @@ fun PhotosScreen(
     var mapLoaded by remember { mutableStateOf(false) }
     var zoomedOut by remember { mutableStateOf(true) }
 
-    val addressLocationImages by viewModel.addressLocationImages.collectAsState(
+    val locationImages by viewModel.locationImages.collectAsState(
         initial = null
     )
     val coroutineScope = rememberCoroutineScope()
 
-
-    val (address, location, images, imagesBondingBox) = addressLocationImages ?: return
+    val (location, images, imagesBondingBox) = locationImages ?: return
 
     val missionDoloresPark = LatLng(37.759773, -122.427063)
     val cameraPositionState = rememberCameraPositionState {
@@ -80,7 +79,7 @@ fun PhotosScreen(
     }
 
     info(
-        ScreenInfo(title = address)
+        ScreenInfo(title = location.address)
     )
     Column {
         Box(

@@ -16,16 +16,7 @@ class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : Locati
     private var fetchingPlaces: Set<String> = emptySet()
     private var mutex: Mutex = Mutex()
 
-    override suspend fun retrieve(address: Address): Location? {
-        return when (address.administrativeUnit) {
-            CITY -> fetchCity(address = address)
-            COUNTY -> fetchCounty(address = address)
-            STATE -> fetchState(address = address)
-            COUNTRY -> fetchCountry(address = address)
-        }
-    }
-
-    private suspend fun fetchCity(address: Address): Location? {
+    override suspend fun retrieveLocality(address: Address): Location? {
         val newAddress = if (address.locality == null) {
             extractAddress(address = address)
         } else {
@@ -37,28 +28,28 @@ class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : Locati
         return fetchLocation(address = newAddress, administrativeUnit = CITY)
     }
 
-    private suspend fun fetchCounty(address: Address): Location? {
+    override suspend fun retrieveSubAdmin(address: Address): Location? {
         address.subAdminArea ?: return null
         address.adminArea ?: return null
         address.countryName ?: return null
-        val countyAddressName = address.name()
+        val countyAddressName = address.name(administrativeUnit = COUNTY)
         if (fetchingPlaces.contains(countyAddressName)) return null
         fetchingPlaces = fetchingPlaces + countyAddressName
         return fetchLocation(address = address, administrativeUnit = COUNTY)
     }
 
-    private suspend fun fetchState(address: Address): Location? {
+    override suspend fun retrieveAdmin(address: Address): Location? {
         address.adminArea ?: return null
         address.countryName ?: return null
-        val stateAddressName = address.name()
+        val stateAddressName = address.name(administrativeUnit = STATE)
         if (fetchingPlaces.contains(stateAddressName)) return null
         fetchingPlaces = fetchingPlaces + stateAddressName
         return fetchLocation(address = address, administrativeUnit = STATE)
     }
 
-    private suspend fun fetchCountry(address: Address): Location? {
+    override suspend fun retrieveCountry(address: Address): Location? {
         address.countryName ?: return null
-        val countryAddressName = address.name()
+        val countryAddressName = address.name(administrativeUnit = COUNTRY)
         if (fetchingPlaces.contains(countryAddressName)) return null
         fetchingPlaces = fetchingPlaces + countryAddressName
         return fetchLocation(address = address, administrativeUnit = COUNTRY)
