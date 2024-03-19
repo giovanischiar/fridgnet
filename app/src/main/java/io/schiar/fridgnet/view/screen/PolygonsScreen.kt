@@ -35,7 +35,7 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
     val location by viewModel.currentLocation.collectAsState(initial = null)
     val regions = (location ?: return).regions
     val sortedRegions = regions.sortedBy {
-        it.polygon.coordinates.size
+        it.polygon.geoLocations.size
     }.asReversed()
 
     info(

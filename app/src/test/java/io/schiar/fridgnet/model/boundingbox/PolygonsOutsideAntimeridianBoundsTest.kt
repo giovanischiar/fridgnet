@@ -1,24 +1,24 @@
 package io.schiar.fridgnet.model.boundingbox
 
 import io.schiar.fridgnet.model.BoundingBox
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.GeoLocation
 import org.junit.Assert
 import org.junit.Test
 
 class PolygonsOutsideAntimeridianBoundsTest {
     private val bounds = BoundingBox(
-        southwest = Coordinate(latitude = 0.0, longitude = 160.0),
-        northeast = Coordinate(latitude = 20.0, longitude = -160.0)
+        southwest = GeoLocation(latitude = 0.0, longitude = 160.0),
+        northeast = GeoLocation(latitude = 20.0, longitude = -160.0)
     )
 
     @Test
     fun `Polygon with southwest latitude equals bounds southwest latitude west of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude,
                 longitude = bounds.southwest.longitude - 10
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude + 5,
                 longitude = bounds.southwest.longitude - 5
             )
@@ -30,11 +30,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest latitude equals bounds southwest latitude east of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude,
                 longitude = bounds.northeast.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude + 5,
                 longitude = bounds.northeast.longitude + 10
             )
@@ -46,11 +46,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest longitude equals bounds southwest longitude south of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude - 10,
                 longitude = bounds.southwest.longitude
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude - 5,
                 longitude = bounds.southwest.longitude - 5
             )
@@ -62,11 +62,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest longitude equals bounds southwest longitude north of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.southwest.longitude
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 10,
                 longitude = bounds.southwest.longitude + 5
             )
@@ -78,11 +78,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest latitude equals bounds northeast latitude west of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude,
                 longitude = bounds.southwest.longitude - 10
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.southwest.longitude - 5
             )
@@ -94,11 +94,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest latitude equals bounds northeast latitude east of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude,
                 longitude = bounds.northeast.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.northeast.longitude + 10
             )
@@ -110,11 +110,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest longitude equals bounds northeast longitude south of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude - 10,
                 longitude = bounds.northeast.longitude
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude - 5,
                 longitude = bounds.northeast.longitude + 5
             )
@@ -126,11 +126,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest longitude equals bounds northeast longitude north of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.northeast.longitude
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 10,
                 longitude = bounds.northeast.longitude + 5
             )
@@ -142,11 +142,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with northeast latitude equals bounds southwest latitude west of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude - 5,
                 longitude = bounds.southwest.longitude - 10
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude,
                 longitude = bounds.southwest.longitude - 5
             )
@@ -158,11 +158,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with northeast latitude equals bounds southwest latitude east of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.northeast.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude,
                 longitude = bounds.northeast.longitude + 10
             )
@@ -174,11 +174,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with northeast longitude equals bounds southwest longitude south of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude - 10,
                 longitude = bounds.southwest.longitude - 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude - 5,
                 longitude = bounds.southwest.longitude
             )
@@ -190,11 +190,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with northeast longitude equals bounds southwest longitude north of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.southwest.longitude - 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 10,
                 longitude = bounds.southwest.longitude
             )
@@ -206,11 +206,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with northeast latitude equals bounds northeast latitude east of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude - 5,
                 longitude = bounds.northeast.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude,
                 longitude = bounds.northeast.longitude + 10
             )
@@ -222,11 +222,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with northeast latitude equals bounds northeast latitude west of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude - 5,
                 longitude = bounds.northeast.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude,
                 longitude = bounds.northeast.longitude + 10
             )
@@ -238,11 +238,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with northeast longitude equals bounds northeast longitude south of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude - 10,
                 longitude = bounds.northeast.longitude - 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude - 5,
                 longitude = bounds.northeast.longitude
             )
@@ -254,11 +254,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with northeast longitude equals bounds northeast longitude north of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.northeast.longitude - 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 10,
                 longitude = bounds.northeast.longitude
             )
@@ -270,11 +270,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest and northeast latitude equals bounds southwest and northeast latitude east of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude,
                 longitude = bounds.northeast.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude,
                 longitude = bounds.northeast.longitude + 10
             )
@@ -286,11 +286,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest and northeast longitude equals bounds southwest and northeast longitude south of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude - 10,
                 longitude = bounds.southwest.longitude
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude - 5,
                 longitude = bounds.northeast.longitude
             )
@@ -302,11 +302,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest and northeast longitude equals bounds southwest and northeast longitude north of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.southwest.longitude
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 10,
                 longitude = bounds.northeast.longitude
             )
@@ -318,11 +318,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon southwest of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude - 10,
                 longitude = bounds.southwest.longitude - 10
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude - 5,
                 longitude = bounds.southwest.longitude - 5
             )
@@ -334,11 +334,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon northeast of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.northeast.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 10,
                 longitude = bounds.northeast.longitude + 10
             )
@@ -350,11 +350,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon southeast of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude + 10,
                 longitude = bounds.northeast.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude + 5,
                 longitude = bounds.northeast.longitude + 10
             )
@@ -366,11 +366,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon northwest of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.southwest.longitude + 10
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 10,
                 longitude = bounds.southwest.longitude + 5
             )
@@ -382,11 +382,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest and northeast different from bounds west of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude + 5,
                 longitude = bounds.southwest.longitude - 10
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude + 10,
                 longitude = bounds.southwest.longitude - 5
             )
@@ -398,11 +398,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest and northeast different from bounds east of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.northeast.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 10,
                 longitude = bounds.northeast.longitude + 10
             )
@@ -415,11 +415,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest and northeast different from bounds south of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.southwest.latitude - 10,
                 longitude = bounds.southwest.longitude + 5
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.southwest.latitude - 5,
                 longitude = bounds.southwest.longitude + 10
             )
@@ -431,11 +431,11 @@ class PolygonsOutsideAntimeridianBoundsTest {
     @Test
     fun `Polygon with southwest and northeast different from bounds north of bounds`() {
         val polygon = BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = bounds.northeast.latitude + 5,
                 longitude = bounds.northeast.longitude - 10
             ),
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = bounds.northeast.latitude + 10,
                 longitude = bounds.northeast.longitude - 5
             )

@@ -2,7 +2,7 @@ package io.schiar.fridgnet.model
 
 import kotlin.math.abs
 
-data class Coordinate(val id: Long = 0, val latitude: Double, val longitude: Double) {
+data class GeoLocation(val id: Long = 0, val latitude: Double, val longitude: Double) {
     constructor(latitude: Int, longitude: Int) :
             this(latitude = latitude.toDouble(), longitude = longitude.toDouble())
 
@@ -17,7 +17,7 @@ data class Coordinate(val id: Long = 0, val latitude: Double, val longitude: Dou
     }
 
     override fun equals(other: Any?): Boolean {
-        if (other !is Coordinate) return false
+        if (other !is GeoLocation) return false
         return latitude == other.latitude && longitude == other.longitude
     }
 

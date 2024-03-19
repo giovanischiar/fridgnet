@@ -12,9 +12,9 @@ data class RegionEntity(
     val polygonID: Long,
     val active: Boolean,
     @Embedded(prefix = "boundingBoxSouthwest_")
-    var boundingBoxSouthwest: CoordinateEntity,
+    var boundingBoxSouthwest: GeoLocationEntity,
     @Embedded(prefix = "boundingBoxNortheast_")
-    var boundingBoxNortheast: CoordinateEntity,
+    var boundingBoxNortheast: GeoLocationEntity,
     val zIndex: Float
 ) {
     fun switch(): RegionEntity {

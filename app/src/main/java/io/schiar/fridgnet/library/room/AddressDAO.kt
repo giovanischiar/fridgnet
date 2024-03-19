@@ -8,10 +8,10 @@ import androidx.room.Transaction
 import androidx.room.Update
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.library.room.entity.AddressEntity
-import io.schiar.fridgnet.library.room.entity.CoordinateEntity
-import io.schiar.fridgnet.library.room.relationentity.AddressWithLocationsAndCoordinates
+import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
+import io.schiar.fridgnet.library.room.relationentity.AddressWithLocationsAndGeoLocations
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.GeoLocation
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -20,55 +20,55 @@ abstract class AddressDAO {
     abstract suspend fun insert(addressEntity: AddressEntity): Long
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    abstract suspend fun insert(coordinateEntity: CoordinateEntity): Long
+    abstract suspend fun insert(geoLocationEntity: GeoLocationEntity): Long
 
     @Transaction
-    open suspend fun insert(coordinate: Coordinate, address: Address) {
+    open suspend fun insert(geoLocation: GeoLocation, address: Address) {
         val addressEntityID = insertOrUpdate(address = address) ?: return
         insert(
-            coordinateEntity = coordinate.toCoordinateEntity(
-                addressCoordinatesID = addressEntityID
+            geoLocationEntity = geoLocation.toGeoLocationEntity(
+                addressGeoLocationsID = addressEntityID
             )
         )
     }
 
-    @Query("SELECT * FROM Coordinate " +
-           "WHERE addressCoordinatesID = (SELECT id FROM Address " +
+    @Query("SELECT * FROM GeoLocation " +
+            "WHERE addressGeoLocationsID = (SELECT id FROM Address " +
               "WHERE locality = :locality AND " +
                     "subAdminArea = :subAdminArea AND " +
                     "adminArea = :adminArea AND " +
                     "countryName = :countryName LIMIT 1)")
-    abstract fun selectCoordinates(
+    abstract fun selectGeoLocations(
         locality: String?,
         subAdminArea: String?,
         adminArea: String?,
         countryName: String?
-    ): Flow<List<CoordinateEntity>>
+    ): Flow<List<GeoLocationEntity>>
 
-    @Query("SELECT * FROM Coordinate " +
-            "WHERE addressCoordinatesID IN (SELECT id FROM Address " +
+    @Query("SELECT * FROM GeoLocation " +
+            "WHERE addressGeoLocationsID IN (SELECT id FROM Address " +
             "WHERE subAdminArea = :subAdminArea AND " +
                   "adminArea = :adminArea AND " +
                   "countryName = :countryName)")
-    abstract fun selectCoordinates(
+    abstract fun selectGeoLocations(
         subAdminArea: String?,
         adminArea: String?,
         countryName: String?
-    ): Flow<List<CoordinateEntity>>
+    ): Flow<List<GeoLocationEntity>>
 
-    @Query("SELECT * FROM Coordinate " +
-            "WHERE addressCoordinatesID IN (SELECT id FROM Address " +
+    @Query("SELECT * FROM GeoLocation " +
+            "WHERE addressGeoLocationsID IN (SELECT id FROM Address " +
             "WHERE adminArea = :adminArea AND " +
             "countryName = :countryName)")
-    abstract fun selectCoordinates(
+    abstract fun selectGeoLocations(
         adminArea: String?,
         countryName: String?
-    ): Flow<List<CoordinateEntity>>
+    ): Flow<List<GeoLocationEntity>>
 
-    @Query("SELECT * FROM Coordinate " +
-            "WHERE addressCoordinatesID IN (SELECT id FROM Address " +
+    @Query("SELECT * FROM GeoLocation " +
+            "WHERE addressGeoLocationsID IN (SELECT id FROM Address " +
             "WHERE countryName = :countryName)")
-    abstract fun selectCoordinates(countryName: String?): Flow<List<CoordinateEntity>>
+    abstract fun selectGeoLocations(countryName: String?): Flow<List<GeoLocationEntity>>
 
     private suspend fun insertOrUpdate(address: Address): Long? {
         val (_, locality, subAdminArea, adminArea) = address
@@ -134,13 +134,13 @@ abstract class AddressDAO {
     abstract suspend fun update(addressEntity: AddressEntity)
 
     @Query("SELECT * FROM Address")
-    abstract fun selectAddressesWithCoordinates(): Flow<List<AddressWithLocationsAndCoordinates>>
+    abstract fun selectAddressesWithGeoLocations(): Flow<List<AddressWithLocationsAndGeoLocations>>
 
     @Query(
-        "SELECT * FROM Address JOIN Coordinate ON Address.id is Coordinate.addressCoordinatesID " +
-                "WHERE Coordinate.latitude == :latitude AND Coordinate.longitude == :longitude LIMIT 1"
+        "SELECT * FROM Address JOIN GeoLocation ON Address.id is GeoLocation.addressGeoLocationsID " +
+                "WHERE GeoLocation.latitude == :latitude AND GeoLocation.longitude == :longitude LIMIT 1"
     )
-    abstract suspend fun selectAddressEntityBy(latitude: Double, longitude: Double): AddressWithLocationsAndCoordinates?
+    abstract suspend fun selectAddressEntityBy(latitude: Double, longitude: Double): AddressWithLocationsAndGeoLocations?
 
     @Query(
         "SELECT * FROM Address WHERE " +

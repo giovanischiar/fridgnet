@@ -101,7 +101,7 @@ fun PhotosScreen(
                 LocationDrawer(location = location)
                 images.map {
                     Marker(
-                        state = MarkerState(position = it.coordinate.toLatLng()),
+                        state = MarkerState(position = it.geoLocation.toLatLng()),
                         icon = it.byteArray.toBitmapDescriptor()
                     )
                 }

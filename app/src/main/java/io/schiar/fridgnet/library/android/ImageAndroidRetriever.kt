@@ -7,7 +7,7 @@ import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.exifinterface.media.ExifInterface
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +21,7 @@ class ImageAndroidRetriever(private val contentResolver: ContentResolver) : Imag
         (contentResolver.openInputStream(systemURI) ?: return null).use { ins ->
             val exifInterface = ExifInterface(ins)
             val latLng = exifInterface.latLong ?: return null
-            val coordinate = Coordinate(latitude = latLng[0], longitude = latLng[1])
+            val geoLocation = GeoLocation(latitude = latLng[0], longitude = latLng[1])
 
             @SuppressLint("RestrictedApi")
             val date = exifInterface.dateTime ?: 0L
@@ -30,7 +30,7 @@ class ImageAndroidRetriever(private val contentResolver: ContentResolver) : Imag
                 uri = uri,
                 byteArray = byteArray,
                 date = date,
-                coordinate = coordinate
+                geoLocation = geoLocation
             )
         }
     }

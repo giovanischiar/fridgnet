@@ -2,18 +2,18 @@ package io.schiar.fridgnet.viewmodel.util
 
 import android.net.Uri
 import io.schiar.fridgnet.model.BoundingBox
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Location
-import io.schiar.fridgnet.model.LocationCoordinate
+import io.schiar.fridgnet.model.LocationGeoLocation
 import io.schiar.fridgnet.model.LocationImages
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.mergeToBoundingBox
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
-import io.schiar.fridgnet.view.viewdata.CoordinateViewData
+import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
-import io.schiar.fridgnet.view.viewdata.LocationCoordinateViewData
+import io.schiar.fridgnet.view.viewdata.LocationGeoLocationViewData
 import io.schiar.fridgnet.view.viewdata.LocationImagesViewData
 import io.schiar.fridgnet.view.viewdata.LocationViewData
 import io.schiar.fridgnet.view.viewdata.PolygonViewData
@@ -22,14 +22,14 @@ import io.schiar.fridgnet.view.viewdata.RegionViewData
 // BoundingBox
 fun BoundingBox.toBoundingBoxViewData(): BoundingBoxViewData {
     return BoundingBoxViewData(
-        southwest = southwest.toCoordinateViewData(),
-        northeast = northeast.toCoordinateViewData()
+        southwest = southwest.toGeoLocationViewData(),
+        northeast = northeast.toGeoLocationViewData()
     )
 }
 
-// Coordinate
-fun Coordinate.toCoordinateViewData(): CoordinateViewData {
-    return CoordinateViewData(
+// GeoLocation
+fun GeoLocation.toGeoLocationViewData(): GeoLocationViewData {
+    return GeoLocationViewData(
         latitude = latitude,
         longitude = longitude
     )
@@ -37,13 +37,13 @@ fun Coordinate.toCoordinateViewData(): CoordinateViewData {
 
 // Image
 fun Image.toViewData(): ImageViewData {
-    val (uri, byteArray, date, location) = this
-    val (_, latitude, longitude) = location
+    val (uri, byteArray, date, geoLocation) = this
+    val (_, latitude, longitude) = geoLocation
     return ImageViewData(
         uri = Uri.parse(uri),
         byteArray = byteArray,
         date = date.toString(),
-        coordinate = CoordinateViewData(
+        geoLocation = GeoLocationViewData(
             latitude = latitude,
             longitude = longitude,
         )
@@ -60,14 +60,14 @@ fun Location.toLocationViewData(): LocationViewData {
         address = addressName(),
         regions = regions.map { it.toRegionViewData() },
         boundingBox = boundingBox.toBoundingBoxViewData(),
-        center = boundingBox.center().toCoordinateViewData(),
+        center = boundingBox.center().toGeoLocationViewData(),
         zIndex = zIndex
     )
 }
 
 // Polygon
 fun Polygon.toPolygonViewData(): PolygonViewData {
-    return PolygonViewData(coordinates = this.coordinates.map { it.toCoordinateViewData() })
+    return PolygonViewData(geoLocations = this.geoLocations.map { it.toGeoLocationViewData() })
 }
 
 // Region
@@ -77,7 +77,7 @@ fun Region.toRegionViewData(): RegionViewData {
         holes = holes.map { it.toPolygonViewData() },
         active = active,
         boundingBox = boundingBox.toBoundingBoxViewData(),
-        center = boundingBox.center().toCoordinateViewData(),
+        center = boundingBox.center().toGeoLocationViewData(),
         zIndex = zIndex
     )
 }
@@ -86,20 +86,20 @@ fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
     return map { it.toRegionViewData() }
 }
 
-// AddressLocationCoordinate
-fun LocationCoordinate.toLocationImagesViewData(): LocationCoordinateViewData {
-    return LocationCoordinateViewData(
+// LocationGeoLocation
+fun LocationGeoLocation.toLocationImagesViewData(): LocationGeoLocationViewData {
+    return LocationGeoLocationViewData(
         location = location?.toLocationViewData(),
-        initialCoordinate = initialCoordinate?.toCoordinateViewData() ?: CoordinateViewData()
+        initialGeoLocation = initialGeoLocation?.toGeoLocationViewData() ?: GeoLocationViewData()
     )
 }
 
-fun List<LocationCoordinate>.toLocationCoordinateViewDataList()
-        : List<LocationCoordinateViewData> {
+fun List<LocationGeoLocation>.toLocationGeoLocationViewDataList()
+        : List<LocationGeoLocationViewData> {
     return map { it.toLocationImagesViewData() }
 }
 
-// AddressLocationImages
+// LocationImages
 fun LocationImages.toLocationImagesViewData(): LocationImagesViewData {
     return LocationImagesViewData(
         location = location.toLocationViewData(),

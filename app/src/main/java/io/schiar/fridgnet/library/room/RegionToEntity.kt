@@ -8,8 +8,8 @@ fun Region.toRegionEntity(regionsID: Long, polygonID: Long): RegionEntity {
         regionsID = regionsID,
         polygonID = polygonID,
         active = active,
-        boundingBoxSouthwest = boundingBox.southwest.toCoordinateEntity(),
-        boundingBoxNortheast = boundingBox.northeast.toCoordinateEntity(),
+        boundingBoxSouthwest = boundingBox.southwest.toGeoLocationEntity(),
+        boundingBoxNortheast = boundingBox.northeast.toGeoLocationEntity(),
         zIndex = zIndex,
     )
 }
@@ -20,8 +20,8 @@ fun Region.toRegionEntity(id: Long, regionsID: Long, polygonID: Long): RegionEnt
         regionsID = regionsID,
         polygonID = polygonID,
         active = active,
-        boundingBoxSouthwest = boundingBox.southwest.toCoordinateEntity(),
-        boundingBoxNortheast = boundingBox.northeast.toCoordinateEntity(),
+        boundingBoxSouthwest = boundingBox.southwest.toGeoLocationEntity(),
+        boundingBoxNortheast = boundingBox.northeast.toGeoLocationEntity(),
         zIndex = zIndex,
     )
 }

@@ -5,9 +5,9 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
-import io.schiar.fridgnet.library.room.entity.CoordinateEntity
+import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.library.room.entity.ImageEntity
-import io.schiar.fridgnet.library.room.relationentity.ImageWithAddressAndCoordinate
+import io.schiar.fridgnet.library.room.relationentity.ImageWithAddressAndGeoLocation
 import io.schiar.fridgnet.model.Image
 import kotlinx.coroutines.flow.Flow
 
@@ -17,33 +17,33 @@ abstract class ImageDAO {
     abstract suspend fun insert(imageEntity: ImageEntity)
 
     @Insert
-    abstract suspend fun insert(coordinateEntity: CoordinateEntity): Long
+    abstract suspend fun insert(geoLocationEntity: GeoLocationEntity): Long
 
     @Transaction
     open suspend fun insert(image: Image) {
-        val coordinateID = insert(coordinateEntity = image.coordinate.toCoordinateEntity())
-        insert(imageEntity = image.toImageEntity(coordinateID = coordinateID))
+        val geoLocationID = insert(geoLocationEntity = image.geoLocation.toGeoLocationEntity())
+        insert(imageEntity = image.toImageEntity(geoLocationID = geoLocationID))
     }
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query(
-        "SELECT * FROM Image JOIN Coordinate ON Image.coordinateID is Coordinate.id " +
-                "WHERE Coordinate.latitude is :latitude AND Coordinate.longitude is :longitude"
+        "SELECT * FROM Image JOIN GeoLocation ON Image.geoLocationID is GeoLocation.id " +
+                "WHERE GeoLocation.latitude is :latitude AND GeoLocation.longitude is :longitude"
     )
     abstract suspend fun selectImageBy(
         latitude: Double, longitude: Double
-    ): ImageWithAddressAndCoordinate?
+    ): ImageWithAddressAndGeoLocation?
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Image")
-    abstract fun selectImagesWithCoordinateAndAddress(): Flow<List<ImageWithAddressAndCoordinate>>
+    abstract fun selectImagesWithGeoLocationAndAddress(): Flow<List<ImageWithAddressAndGeoLocation>>
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Image")
-    abstract fun selectImagesWithCoordinate(): Flow<List<ImageWithAddressAndCoordinate>>
+    abstract fun selectImagesWithAddressAndGeoLocation(): Flow<List<ImageWithAddressAndGeoLocation>>
 
     @Query("DELETE FROM Image")
     abstract suspend fun deleteAll()

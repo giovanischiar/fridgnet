@@ -17,8 +17,8 @@ import io.schiar.fridgnet.library.room.LocationRoomService
 import io.schiar.fridgnet.model.datasource.AddressDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.LocationDataSource
-import io.schiar.fridgnet.model.datasource.local.AddressCoordinatesDataSource
-import io.schiar.fridgnet.model.datasource.local.CurrentLocationCoordinateDataSource
+import io.schiar.fridgnet.model.datasource.local.AddressGeoLocationsDataSource
+import io.schiar.fridgnet.model.datasource.local.CurrentLocationGeoLocationDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
 import io.schiar.fridgnet.model.datasource.local.ImageAndroidDBDataSource
 import io.schiar.fridgnet.model.datasource.local.LocationAPIDBDataSource
@@ -84,10 +84,10 @@ class MainActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     private fun createRepositories(): Repositories {
         val imageDataSource = createImageDataSource()
-        val addressCoordinatesDataSource = createAddressDataSource()
+        val addressLocationsGeoLocationsDataSource = createAddressGeoLocationsDataSource()
         val locationDataSource = createLocationDataSource()
         val currentRegionDataSource = CurrentRegionLocalDataSource()
-        val currentAddressLocationCoordinateDataSource = CurrentLocationCoordinateDataSource()
+        val currentAddressLocationsGeoLocationsDataSource = CurrentLocationGeoLocationDataSource()
 
         val polygonsRepository = PolygonsRepository(
             currentRegionDataSource = currentRegionDataSource,
@@ -100,16 +100,17 @@ class MainActivity : ComponentActivity() {
         )
 
         val photosRepository = PhotosRepository(
-            currentAddressLocationCoordinateDataSource = currentAddressLocationCoordinateDataSource,
+            currentAddressLocationsGeoLocationsDataSource
+                = currentAddressLocationsGeoLocationsDataSource,
             imageDataSource = imageDataSource,
-            addressCoordinatesDataSource = addressCoordinatesDataSource
+            addressLocationsGeoLocationsDataSource = addressLocationsGeoLocationsDataSource
         )
 
         val homeRepository = HomeRepository(
-            addressDataSource = addressCoordinatesDataSource,
+            addressDataSource = addressLocationsGeoLocationsDataSource,
             locationDataSource = locationDataSource,
             imageDataSource = imageDataSource,
-            currentLocationCoordinateDataSource = currentAddressLocationCoordinateDataSource,
+            currentLocationGeoLocationDataSource = currentAddressLocationsGeoLocationsDataSource,
             externalScope = GlobalScope
         )
 
@@ -130,11 +131,11 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun createAddressDataSource(): AddressDataSource {
+    private fun createAddressGeoLocationsDataSource(): AddressDataSource {
         val geocoder = Geocoder(applicationContext, Locale.US)
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
         val addressDAO = fridgnetDatabase.addressDAO()
-        return AddressCoordinatesDataSource(
+        return AddressGeoLocationsDataSource(
             addressRetriever = AddressGeocoderRetriever(geocoder = geocoder),
             addressService = AddressRoomService(addressDAO = addressDAO)
         )

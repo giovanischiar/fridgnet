@@ -2,17 +2,17 @@ package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AddressLocationsCoordinates
+import io.schiar.fridgnet.model.AddressLocationsGeoLocations
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.AdministrativeUnit.CITY
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.ImageAddress
 import io.schiar.fridgnet.model.Location
-import io.schiar.fridgnet.model.LocationCoordinate
+import io.schiar.fridgnet.model.LocationGeoLocation
 import io.schiar.fridgnet.model.datasource.AddressDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.LocationDataSource
-import io.schiar.fridgnet.model.datasource.local.CurrentLocationCoordinateDataSource
+import io.schiar.fridgnet.model.datasource.local.CurrentLocationGeoLocationDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -28,82 +28,82 @@ class HomeRepository(
     private val addressDataSource: AddressDataSource,
     private val locationDataSource: LocationDataSource,
     private val imageDataSource: ImageDataSource,
-    private val currentLocationCoordinateDataSource : CurrentLocationCoordinateDataSource,
+    private val currentLocationGeoLocationDataSource : CurrentLocationGeoLocationDataSource,
     private val externalScope: CoroutineScope
 ) {
     private var _currentAdministrativeUnit = CITY
     private val _administrativeUnits = AdministrativeUnit.entries
     private val _currentAdministrativeUnitStateFlow = MutableStateFlow(_currentAdministrativeUnit)
-    private var _currentLocationCoordinates: List<LocationCoordinate> = emptyList()
+    private var _currentLocationGeoLocations: List<LocationGeoLocation> = emptyList()
 
     val administrativeUnits: Flow<List<AdministrativeUnit>> = MutableStateFlow(_administrativeUnits)
     val currentAdministrativeUnit: Flow<AdministrativeUnit> = _currentAdministrativeUnitStateFlow
 
-    private val coordinateRetrievingAddressSet = syncSetOf(mutableSetOf<Coordinate>())
+    private val geoLocationRetrievingAddressSet = syncSetOf(mutableSetOf<GeoLocation>())
     private val addressRetrievingLocationSet = syncSetOf(mutableSetOf<String>())
 
-    private val administrativeUnitAddressNameLocationCoordinate = run {
-        syncMapOf(_administrativeUnits.associateWith { mutableMapOf<String, LocationCoordinate>() })
+    private val administrativeUnitAddressNameLocationGeoLocation = run {
+        syncMapOf(_administrativeUnits.associateWith { mutableMapOf<String, LocationGeoLocation>() })
     }
 
-    val locationCoordinates = merge(
+    val locationGeoLocations = merge(
         imageDataSource.retrieveWithAddress().onEach { it.forEach(::onEachImageAddress) },
-        addressDataSource.retrieve().onEach { it.forEach(::onEachAddressLocationsCoordinates) },
+        addressDataSource.retrieve().onEach { it.forEach(::onEachAddressLocationsGeoLocations) },
         locationDataSource.retrieve().onEach { it.forEach(::onEachLocation) },
         _currentAdministrativeUnitStateFlow.onEach { _currentAdministrativeUnit = it }
     ).map {
-        _currentLocationCoordinates = administrativeUnitAddressNameLocationCoordinate[
+        _currentLocationGeoLocations = administrativeUnitAddressNameLocationGeoLocation[
             _currentAdministrativeUnit
         ]?.values?.toList() ?: emptyList()
-        _currentLocationCoordinates
+        _currentLocationGeoLocations
     }
 
     private fun onEachImageAddress(imageAddress: ImageAddress) {
         val (image, addressRetrieved) = imageAddress
-        val coordinate = image.coordinate
+        val geoLocation = image.geoLocation
         if (addressRetrieved != null) {
-            assignNewLocationCoordinate(
+            assignNewLocationGeoLocation(
                 administrativeUnit = CITY,
                 addressName = addressRetrieved.name(),
-                initialCoordinate = coordinate
+                initialGeoLocation = geoLocation
             )
         }
-        retrieveAddressForCoordinate(
-            coordinate = coordinate,
-            addressFromCoordinate = addressRetrieved
+        retrieveAddressForGeoLocation(
+            geoLocation = geoLocation,
+            addressFromGeoLocation = addressRetrieved
         )
     }
 
-    private fun onEachAddressLocationsCoordinates(
-        addressLocationsCoordinates: AddressLocationsCoordinates
+    private fun onEachAddressLocationsGeoLocations(
+        addressLocationsGeoLocations: AddressLocationsGeoLocations
     ) {
-        val (address, coordinates, administrativeUnitLocation) = addressLocationsCoordinates
+        val (address, geoLocations, administrativeUnitLocation) = addressLocationsGeoLocations
         val locationsRetrieved = administrativeUnitLocation.values
-        assignNewLocationCoordinate(
+        assignNewLocationGeoLocation(
             administrativeUnit = CITY,
             addressName = address.name(),
             location = administrativeUnitLocation[CITY],
-            initialCoordinate = coordinates[0]
+            initialGeoLocation = geoLocations[0]
         )
         retrieveLocationsForAddress(address = address, locationsFromAddress = locationsRetrieved)
     }
 
     private fun onEachLocation(location: Location) {
-        assignNewLocationCoordinate(
+        assignNewLocationGeoLocation(
             administrativeUnit = location.administrativeUnit,
             addressName = location.addressName(),
             location = location,
-            initialCoordinate = location.boundingBox.center()
+            initialGeoLocation = location.boundingBox.center()
         )
     }
 
-    fun selectLocationCoordinateAt(index: Int) {
-        val locationCoordinate = _currentLocationCoordinates[index]
+    fun selectLocationGeoLocationAt(index: Int) {
+        val locationGeoLocation = _currentLocationGeoLocations[index]
         log(
-            method = "selectLocationCoordinateAt",
-            msg = "LocationCoordinate at $index is $locationCoordinate"
+            method = "selectLocationGeoLocationAt",
+            msg = "LocationGeoLocation at $index is $locationGeoLocation"
         )
-        currentLocationCoordinateDataSource.update(locationCoordinate = locationCoordinate)
+        currentLocationGeoLocationDataSource.update(locationGeoLocation = locationGeoLocation)
     }
 
     fun changeCurrentAdministrativeUnit(index: Int) {
@@ -112,15 +112,15 @@ class HomeRepository(
 
     suspend fun removeAllImages() { imageDataSource.delete() }
 
-    private fun retrieveAddressForCoordinate(
-        coordinate: Coordinate, addressFromCoordinate: Address?
+    private fun retrieveAddressForGeoLocation(
+        geoLocation: GeoLocation, addressFromGeoLocation: Address?
     ) {
-        if (addressFromCoordinate != null) coordinateRetrievingAddressSet.add(coordinate)
-        val addressNotBeingRetrieved = !coordinateRetrievingAddressSet.contains(coordinate)
+        if (addressFromGeoLocation != null) geoLocationRetrievingAddressSet.add(geoLocation)
+        val addressNotBeingRetrieved = !geoLocationRetrievingAddressSet.contains(geoLocation)
         if (addressNotBeingRetrieved) {
-            coordinateRetrievingAddressSet.add(element = coordinate)
-            log(method = "retrieveAddressForCoordinate", msg = "Retrieve Address for $coordinate")
-            externalScope.launch { addressDataSource.retrieveAddressFor(coordinate = coordinate) }
+            geoLocationRetrievingAddressSet.add(element = geoLocation)
+            log(method = "retrieveAddressForGeoLocation", msg = "Retrieve Address for $geoLocation")
+            externalScope.launch { addressDataSource.retrieveAddressFor(geoLocation = geoLocation) }
         }
     }
 
@@ -152,33 +152,33 @@ class HomeRepository(
         }
     }
 
-    private fun assignNewLocationCoordinate(
+    private fun assignNewLocationGeoLocation(
         administrativeUnit: AdministrativeUnit,
         addressName: String,
         location: Location? = null,
-        initialCoordinate: Coordinate
+        initialGeoLocation: GeoLocation
     ) {
-        val locationCoordinate = (administrativeUnitAddressNameLocationCoordinate[
+        val locationGeoLocation = (administrativeUnitAddressNameLocationGeoLocation[
             administrativeUnit
         ] ?: return)[addressName]
-        val needToAssignNewLocationCoordinate = locationCoordinate == null ||
-                (locationCoordinate.location == null && location != null)
+        val needToAssignNewLocationGeoLocation = locationGeoLocation == null ||
+                (locationGeoLocation.location == null && location != null)
 
-        if (needToAssignNewLocationCoordinate) {
-            val newLocationCoordinate = LocationCoordinate(
+        if (needToAssignNewLocationGeoLocation) {
+            val newLocationGeoLocation = LocationGeoLocation(
                 location = location,
-                initialCoordinate = initialCoordinate
+                initialGeoLocation = initialGeoLocation
             )
             log(
-                method = "assignLocationCoordinates",
-                msg = "Assign $newLocationCoordinate " +
-                        "to administrativeUnitAddressNameLocationCoordinate[" +
+                method = "assignNewLocationGeoLocation",
+                msg = "Assign $newLocationGeoLocation " +
+                        "to administrativeUnitAddressNameLocationGeoLocation[" +
                         "$administrativeUnit" +
                        "][$addressName]"
             )
-            administrativeUnitAddressNameLocationCoordinate[
+            administrativeUnitAddressNameLocationGeoLocation[
                 administrativeUnit
-            ]?.set(addressName, newLocationCoordinate)
+            ]?.set(addressName, newLocationGeoLocation)
         }
     }
 

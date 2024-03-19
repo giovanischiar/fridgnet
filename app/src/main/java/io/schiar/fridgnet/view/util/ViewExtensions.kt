@@ -9,14 +9,14 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.MapUiSettings
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
-import io.schiar.fridgnet.view.viewdata.CoordinateViewData
+import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
 
-// CoordinateViewData
-fun CoordinateViewData.toLatLng(): LatLng {
+// GeoLocationViewData
+fun GeoLocationViewData.toLatLng(): LatLng {
     return LatLng(latitude, longitude)
 }
 
-fun List<CoordinateViewData>.toLatLngList(): List<LatLng> {
+fun List<GeoLocationViewData>.toLatLngList(): List<LatLng> {
     return map { it.toLatLng() }
 }
 
@@ -25,14 +25,14 @@ fun BoundingBoxViewData.toLatLngBounds(): LatLngBounds {
     return LatLngBounds(southwest.toLatLng(), northeast.toLatLng())
 }
 
-fun LatLng.toCoordinateViewData(): CoordinateViewData {
-    return CoordinateViewData(latitude = latitude, longitude = longitude)
+fun LatLng.toGeoLocationViewData(): GeoLocationViewData {
+    return GeoLocationViewData(latitude = latitude, longitude = longitude)
 }
 
 fun LatLngBounds.toBoundingBoxViewData(): BoundingBoxViewData {
     return BoundingBoxViewData(
-        southwest = southwest.toCoordinateViewData(),
-        northeast = northeast.toCoordinateViewData()
+        southwest = southwest.toGeoLocationViewData(),
+        northeast = northeast.toGeoLocationViewData()
     )
 }
 

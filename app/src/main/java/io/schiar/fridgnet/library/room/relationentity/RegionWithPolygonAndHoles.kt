@@ -9,7 +9,7 @@ data class RegionWithPolygonAndHoles(
     @Embedded
     val regionEntity: RegionEntity,
     @Relation(entity = PolygonEntity::class, parentColumn = "polygonID", entityColumn = "id")
-    val polygon: PolygonWithCoordinates,
+    val polygon: PolygonWithGeoLocations,
     @Relation(entity = PolygonEntity::class, parentColumn = "id", entityColumn = "holesID")
-    val holes: List<PolygonWithCoordinates>
+    val holes: List<PolygonWithGeoLocations>
 )

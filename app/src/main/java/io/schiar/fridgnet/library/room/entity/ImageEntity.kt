@@ -10,7 +10,7 @@ data class ImageEntity(
     val uri: String,
     val byteArray: ByteArray,
     val date: Long,
-    val coordinateID: Long
+    val geoLocationID: Long
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
@@ -22,7 +22,7 @@ data class ImageEntity(
         if (uri != other.uri) return false
         if (!byteArray.contentEquals(other.byteArray)) return false
         if (date != other.date) return false
-        if (coordinateID != other.coordinateID) return false
+        if (geoLocationID != other.geoLocationID) return false
 
         return true
     }
@@ -32,7 +32,7 @@ data class ImageEntity(
         result = 31 * result + uri.hashCode()
         result = 31 * result + byteArray.contentHashCode()
         result = 31 * result + date.hashCode()
-        result = 31 * result + coordinateID.hashCode()
+        result = 31 * result + geoLocationID.hashCode()
         return result
     }
 }

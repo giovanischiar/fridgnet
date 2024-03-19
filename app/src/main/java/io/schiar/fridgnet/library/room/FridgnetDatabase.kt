@@ -5,7 +5,7 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import io.schiar.fridgnet.library.room.entity.AddressEntity
-import io.schiar.fridgnet.library.room.entity.CoordinateEntity
+import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.library.room.entity.ImageEntity
 import io.schiar.fridgnet.library.room.entity.LocationEntity
 import io.schiar.fridgnet.library.room.entity.PolygonEntity
@@ -15,7 +15,7 @@ import io.schiar.fridgnet.library.room.entity.RegionEntity
     entities = [
         ImageEntity::class,
         AddressEntity::class,
-        CoordinateEntity::class,
+        GeoLocationEntity::class,
         LocationEntity::class,
         PolygonEntity::class,
         RegionEntity::class,

@@ -1,49 +1,44 @@
 package io.schiar.fridgnet.library.room
 
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AddressLocationsCoordinates
+import io.schiar.fridgnet.model.AddressLocationsGeoLocations
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.AdministrativeUnit.CITY
 import io.schiar.fridgnet.model.AdministrativeUnit.COUNTRY
 import io.schiar.fridgnet.model.AdministrativeUnit.COUNTY
 import io.schiar.fridgnet.model.AdministrativeUnit.STATE
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.service.AddressService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 class AddressRoomService(private val addressDAO: AddressDAO) : AddressService {
-    override fun retrieveCoordinates(
+    override fun retrieveGeoLocations(
         address: Address, administrativeUnit: AdministrativeUnit
-    ): Flow<List<Coordinate>> {
+    ): Flow<List<GeoLocation>> {
         val (_, locality, subAdminArea, adminArea, countryName) = address
         return when(administrativeUnit) {
-            CITY -> addressDAO.selectCoordinates(
+            CITY -> addressDAO.selectGeoLocations(
                 locality = locality,
                 subAdminArea = subAdminArea,
                 adminArea = adminArea,
                 countryName = countryName
             )
-            COUNTY -> addressDAO.selectCoordinates(
+            COUNTY -> addressDAO.selectGeoLocations(
                 subAdminArea = subAdminArea, adminArea = adminArea, countryName = countryName
             )
-            STATE -> addressDAO.selectCoordinates(adminArea = adminArea, countryName = countryName)
-            COUNTRY -> addressDAO.selectCoordinates(countryName = countryName)
-        }.map { it.toCoordinates() }
+            STATE -> addressDAO.selectGeoLocations(adminArea = adminArea, countryName = countryName)
+            COUNTRY -> addressDAO.selectGeoLocations(countryName = countryName)
+        }.map { it.toGeoLocations() }
     }
 
-    override suspend fun create(coordinate: Coordinate, address: Address) {
-        addressDAO.insert(coordinate = coordinate, address = address)
+    override suspend fun create(geoLocation: GeoLocation, address: Address) {
+        addressDAO.insert(geoLocation = geoLocation, address = address)
     }
 
-    override fun retrieve(): Flow<List<AddressLocationsCoordinates>> {
-        return addressDAO.selectAddressesWithCoordinates().map { it.toAddressesCoordinates() }
-    }
-
-    override suspend fun retrieve(coordinate: Coordinate): AddressLocationsCoordinates? {
-        val (_, latitude, longitude) = coordinate
-        return addressDAO.selectAddressEntityBy(
-            latitude = latitude, longitude = longitude
-        )?.toAddressCoordinates()
+    override fun retrieve(): Flow<List<AddressLocationsGeoLocations>> {
+        return addressDAO.selectAddressesWithGeoLocations().map {
+            it.toAddressLocationsGeoLocations()
+        }
     }
 }

@@ -13,7 +13,7 @@ class BoundsTestCreator {
             Log.d("BoundingBoxTest", "package io.schiar.fridgnet.boundingbox")
             Log.d("BoundingBoxTest", "")
             Log.d("BoundingBoxTest", "import io.schiar.fridgnet.model.BoundingBox")
-            Log.d("BoundingBoxTest", "import io.schiar.fridgnet.model.Coordinate")
+            Log.d("BoundingBoxTest", "import io.schiar.fridgnet.model.GeoLocation")
             Log.d("BoundingBoxTest", "import io.schiar.fridgnet.model.contains")
             Log.d("BoundingBoxTest", "import org.junit.Assert")
             Log.d("BoundingBoxTest", "import org.junit.Test")
@@ -25,9 +25,9 @@ class BoundsTestCreator {
                 val southwest = boundingBox.southwest
                 val northeast = boundingBox.northeast
                 val southwestStr =
-                    "Coordinate(latitude = ${southwest.latitude}, longitude = ${southwest.longitude})"
+                    "GeoLocation(latitude = ${southwest.latitude}, longitude = ${southwest.longitude})"
                 val northeastStr =
-                    "Coordinate(latitude = ${northeast.latitude}, longitude = ${northeast.longitude})"
+                    "GeoLocation(latitude = ${northeast.latitude}, longitude = ${northeast.longitude})"
                 val boundingBoxStr =
                     "BoundingBox(\n\t\tsouthwest = $southwestStr,\n\t\tnortheast = $northeastStr\n\t)"
                 Log.d("BoundingBoxTest", "\tprivate val boundingBox = $southwestStr")
@@ -39,9 +39,9 @@ class BoundsTestCreator {
                 visibleRegions.map { it.boundingBox }.mapIndexed { index, boundingBoxViewData ->
                     val (southwest, northeast) = boundingBoxViewData
                     val southwestStr =
-                        "Coordinate(latitude = ${southwest.latitude}, longitude = ${southwest.longitude})"
+                        "GeoLocation(latitude = ${southwest.latitude}, longitude = ${southwest.longitude})"
                     val northeastStr =
-                        "Coordinate(latitude = ${northeast.latitude}, longitude = ${northeast.longitude})"
+                        "GeoLocation(latitude = ${northeast.latitude}, longitude = ${northeast.longitude})"
 
                     "\t@Test\n\tfun `Polygons app generated are inside bounding box $index`() {\n\t\tval polygon$index = BoundingBox(\n\t\t\tsouthwest = $southwestStr,\n" +
                             "\t\t\tnortheast = $northeastStr\n\t\t)\n\n\t\tAssert.assertFalse(boundingBox.contains(polygon$index))\n\t}"

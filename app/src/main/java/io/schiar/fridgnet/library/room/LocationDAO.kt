@@ -6,13 +6,13 @@ import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
-import io.schiar.fridgnet.library.room.entity.CoordinateEntity
+import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.library.room.entity.LocationEntity
 import io.schiar.fridgnet.library.room.entity.PolygonEntity
 import io.schiar.fridgnet.library.room.entity.RegionEntity
 import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
@@ -30,7 +30,7 @@ abstract class LocationDAO {
     abstract suspend fun insert(polygonEntity: PolygonEntity): Long
 
     @Insert(onConflict = REPLACE)
-    abstract suspend fun insertCoordinates(coordinateEntities: List<CoordinateEntity>): List<Long>
+    abstract suspend fun insertGeoLocations(geoLocationEntities: List<GeoLocationEntity>): List<Long>
 
     @Transaction
     open suspend fun insert(location: Location) {
@@ -54,20 +54,22 @@ abstract class LocationDAO {
 
     private suspend fun insertPolygon(polygon: Polygon): Long {
         val polygonID = insert(polygonEntity = PolygonEntity())
-        insertCoordinates(coordinatesID = polygonID, coordinates = polygon.coordinates)
+        insertGeoLocations(geoLocationsID = polygonID, geoLocations = polygon.geoLocations)
         return polygonID
     }
 
     private suspend fun insertHoles(regionID: Long, holes: List<Polygon>) {
         for (hole in holes) {
             val holeID = insert(polygonEntity = PolygonEntity(holesID = regionID))
-            insertCoordinates(coordinatesID = holeID, coordinates = hole.coordinates)
+            insertGeoLocations(geoLocationsID = holeID, geoLocations = hole.geoLocations)
         }
     }
 
-    private suspend fun insertCoordinates(coordinatesID: Long, coordinates: List<Coordinate>) {
-        val coordinateEntities = coordinates.toCoordinateEntities(coordinatesID = coordinatesID)
-        insertCoordinates(coordinateEntities)
+    private suspend fun insertGeoLocations(geoLocationsID: Long, geoLocations: List<GeoLocation>) {
+        val geoLocationEntities = geoLocations.toGeoLocationEntities(
+            geoLocationsID = geoLocationsID
+        )
+        insertGeoLocations(geoLocationEntities)
     }
 
     @Transaction
@@ -96,22 +98,22 @@ abstract class LocationDAO {
 
     private suspend fun updatePolygon(polygon: Polygon) {
         update(polygonEntity = PolygonEntity(id = polygon.id))
-        updateCoordinates(coordinatesID = polygon.id, coordinates = polygon.coordinates)
+        updateGeoLocations(geoLocationsID = polygon.id, geoLocations = polygon.geoLocations)
     }
 
     private suspend fun updateHoles(regionID: Long, holes: List<Polygon>) {
         for (hole in holes) {
             val polygonEntity = PolygonEntity(id = hole.id, holesID = regionID)
             update(polygonEntity = polygonEntity)
-            updateCoordinates(coordinatesID = polygonEntity.id, coordinates = hole.coordinates)
+            updateGeoLocations(geoLocationsID = polygonEntity.id, geoLocations = hole.geoLocations)
         }
     }
 
-    private suspend fun updateCoordinates(coordinatesID: Long, coordinates: List<Coordinate>) {
-        val coordinateEntities = coordinates.toCoordinateEntitiesWithID(
-            coordinatesID = coordinatesID
+    private suspend fun updateGeoLocations(geoLocationsID: Long, geoLocations: List<GeoLocation>) {
+        val getLocationEntities = geoLocations.toGeoLocationEntitiesWithID(
+            geoLocationsID = geoLocationsID
         )
-        updateCoordinates(coordinateEntities)
+        updateGeoLocations(getLocationEntities)
     }
 
     @Query("SELECT * FROM Location Where addressLocationsID = :addressID")
@@ -137,5 +139,5 @@ abstract class LocationDAO {
     abstract suspend fun update(polygonEntity: PolygonEntity)
 
     @Update
-    abstract suspend fun updateCoordinates(coordinateEntities: List<CoordinateEntity>)
+    abstract suspend fun updateGeoLocations(geoLocationEntities: List<GeoLocationEntity>)
 }

@@ -11,10 +11,10 @@ import io.schiar.fridgnet.view.viewdata.RegionViewData
 @Composable
 fun RegionDrawer(region: RegionViewData, index: Int, onClick: (index: Int) -> Unit = {}) {
     Polygon(
-        points = region.polygon.coordinates.toLatLngList(),
+        points = region.polygon.geoLocations.toLatLngList(),
         onClick = { onClick(index) },
         visible = region.active,
-        holes = region.holes.map { hole -> hole.coordinates.toLatLngList() },
+        holes = region.holes.map { hole -> hole.geoLocations.toLatLngList() },
         fillColor = Color.Transparent,
         clickable = true,
         zIndex = region.zIndex

@@ -11,9 +11,9 @@ data class LocationEntity(
     val addressLocationsID: Long,
     val administrativeUnit: String,
     @Embedded(prefix = "boundingBoxSouthwest_")
-    var boundingBoxSouthwest: CoordinateEntity,
+    var boundingBoxSouthwest: GeoLocationEntity,
     @Embedded(prefix = "boundingBoxNortheast_")
-    var boundingBoxNortheast: CoordinateEntity,
+    var boundingBoxNortheast: GeoLocationEntity,
     val zIndex: Float
 ) {
     fun boundingBoxUpdated(
@@ -26,15 +26,15 @@ data class LocationEntity(
             id = id,
             addressLocationsID = addressLocationsID,
             administrativeUnit = administrativeUnit,
-            boundingBoxSouthwest = CoordinateEntity(
+            boundingBoxSouthwest = GeoLocationEntity(
                 id = boundingBoxSouthwest.id,
-                coordinatesID = boundingBoxSouthwest.coordinatesID,
+                geoLocationsID = boundingBoxSouthwest.geoLocationsID,
                 latitude = southwestLatitude,
                 longitude = southwestLongitude
             ),
-            boundingBoxNortheast = CoordinateEntity(
+            boundingBoxNortheast = GeoLocationEntity(
                 id = boundingBoxNortheast.id,
-                coordinatesID = boundingBoxNortheast.coordinatesID,
+                geoLocationsID = boundingBoxNortheast.geoLocationsID,
                 latitude = northeastLatitude,
                 longitude = northeastLongitude
             ),

@@ -5,46 +5,46 @@ import org.junit.Test
 
 class PolygonTest {
     @Test
-    fun `Create a polygon with a list of negative coordinates`() {
+    fun `Create a polygon with a list of negative geo locations`() {
         val polygon = Polygon(
-            coordinates = listOf(
-                Coordinate(latitude = -25, longitude = -25),
-                Coordinate(latitude = -15, longitude = -30),
-                Coordinate(latitude = -20, longitude = -40),
-                Coordinate(latitude = -30, longitude = -45),
-                Coordinate(latitude = -40, longitude = -35),
-                Coordinate(latitude = -35, longitude = -20),
-                Coordinate(latitude = -30, longitude = -15),
-                Coordinate(latitude = -25, longitude = -25)
+            geoLocations = listOf(
+                GeoLocation(latitude = -25, longitude = -25),
+                GeoLocation(latitude = -15, longitude = -30),
+                GeoLocation(latitude = -20, longitude = -40),
+                GeoLocation(latitude = -30, longitude = -45),
+                GeoLocation(latitude = -40, longitude = -35),
+                GeoLocation(latitude = -35, longitude = -20),
+                GeoLocation(latitude = -30, longitude = -15),
+                GeoLocation(latitude = -25, longitude = -25)
             )
         )
 
         val expected = BoundingBox(
-            southwest = Coordinate(latitude = -40, longitude = -45),
-            northeast = Coordinate(latitude = -15, longitude = -15)
+            southwest = GeoLocation(latitude = -40, longitude = -45),
+            northeast = GeoLocation(latitude = -15, longitude = -15)
         )
 
         Assert.assertEquals(expected, polygon.findBoundingBox())
     }
 
     @Test
-    fun `Create a polygon with a list of positive coordinates`() {
+    fun `Create a polygon with a list of positive geo locations`() {
         val polygon = Polygon(
-            coordinates = listOf(
-                Coordinate(latitude = 20, longitude = 20),
-                Coordinate(latitude = 30, longitude = 40),
-                Coordinate(latitude = 30, longitude = 40),
-                Coordinate(latitude = 50, longitude = 30),
-                Coordinate(latitude = 60, longitude = 20),
-                Coordinate(latitude = 40, longitude = 10),
-                Coordinate(latitude = 30, longitude = 10),
-                Coordinate(latitude = 20, longitude = 20)
+            geoLocations = listOf(
+                GeoLocation(latitude = 20, longitude = 20),
+                GeoLocation(latitude = 30, longitude = 40),
+                GeoLocation(latitude = 30, longitude = 40),
+                GeoLocation(latitude = 50, longitude = 30),
+                GeoLocation(latitude = 60, longitude = 20),
+                GeoLocation(latitude = 40, longitude = 10),
+                GeoLocation(latitude = 30, longitude = 10),
+                GeoLocation(latitude = 20, longitude = 20)
             )
         )
 
         val expected = BoundingBox(
-            southwest = Coordinate(latitude = 20, longitude = 10),
-            northeast = Coordinate(latitude = 60, longitude = 40)
+            southwest = GeoLocation(latitude = 20, longitude = 10),
+            northeast = GeoLocation(latitude = 60, longitude = 40)
         )
 
         Assert.assertEquals(expected, polygon.findBoundingBox())
@@ -53,21 +53,21 @@ class PolygonTest {
     @Test
     fun `Create a polygon with a list of positive latitude and negative longitude`() {
         val polygon = Polygon(
-            coordinates = listOf(
-                Coordinate(latitude = 40, longitude = -40),
-                Coordinate(latitude = 60, longitude = -20),
-                Coordinate(latitude = 80, longitude = -40),
-                Coordinate(latitude = 100, longitude = -50),
-                Coordinate(latitude = 80, longitude = -70),
-                Coordinate(latitude = 50, longitude = -90),
-                Coordinate(latitude = 50, longitude = -60),
-                Coordinate(latitude = 40, longitude = -40)
+            geoLocations = listOf(
+                GeoLocation(latitude = 40, longitude = -40),
+                GeoLocation(latitude = 60, longitude = -20),
+                GeoLocation(latitude = 80, longitude = -40),
+                GeoLocation(latitude = 100, longitude = -50),
+                GeoLocation(latitude = 80, longitude = -70),
+                GeoLocation(latitude = 50, longitude = -90),
+                GeoLocation(latitude = 50, longitude = -60),
+                GeoLocation(latitude = 40, longitude = -40)
             )
         )
 
         val expected = BoundingBox(
-            southwest = Coordinate(latitude = 40, longitude = -90),
-            northeast = Coordinate(latitude = 100, longitude = -20)
+            southwest = GeoLocation(latitude = 40, longitude = -90),
+            northeast = GeoLocation(latitude = 100, longitude = -20)
         )
 
         Assert.assertEquals(expected, polygon.findBoundingBox())
@@ -76,21 +76,21 @@ class PolygonTest {
     @Test
     fun `Create a polygon with a list of negative latitude and positive longitude`() {
         val polygon = Polygon(
-            coordinates = listOf(
-                Coordinate(latitude = -80, longitude = 100),
-                Coordinate(latitude = -40, longitude = 120),
-                Coordinate(latitude = -20, longitude = 80),
-                Coordinate(latitude = -60, longitude = 80),
-                Coordinate(latitude = -60, longitude = 40),
-                Coordinate(latitude = -80, longitude = 20),
-                Coordinate(latitude = -100, longitude = 60),
-                Coordinate(latitude = -80, longitude = 100),
+            geoLocations = listOf(
+                GeoLocation(latitude = -80, longitude = 100),
+                GeoLocation(latitude = -40, longitude = 120),
+                GeoLocation(latitude = -20, longitude = 80),
+                GeoLocation(latitude = -60, longitude = 80),
+                GeoLocation(latitude = -60, longitude = 40),
+                GeoLocation(latitude = -80, longitude = 20),
+                GeoLocation(latitude = -100, longitude = 60),
+                GeoLocation(latitude = -80, longitude = 100),
             )
         )
 
         val expected = BoundingBox(
-            southwest = Coordinate(latitude = -100, longitude = 20),
-            northeast = Coordinate(latitude = -20, longitude = 120)
+            southwest = GeoLocation(latitude = -100, longitude = 20),
+            northeast = GeoLocation(latitude = -20, longitude = 120)
         )
 
         Assert.assertEquals(expected, polygon.findBoundingBox())
@@ -99,21 +99,21 @@ class PolygonTest {
     @Test
     fun `Create a polygon crossing the antimeridian`() {
         val polygon = Polygon(
-            coordinates = listOf(
-                Coordinate(latitude = -20, longitude = 160),
-                Coordinate(latitude = -60, longitude = 160),
-                Coordinate(latitude = -40, longitude = -160),
-                Coordinate(latitude = 0, longitude = -120),
-                Coordinate(latitude = 20, longitude = -160),
-                Coordinate(latitude = 60, longitude = 160),
-                Coordinate(latitude = 20, longitude = 120),
-                Coordinate(latitude = -20, longitude = 160),
+            geoLocations = listOf(
+                GeoLocation(latitude = -20, longitude = 160),
+                GeoLocation(latitude = -60, longitude = 160),
+                GeoLocation(latitude = -40, longitude = -160),
+                GeoLocation(latitude = 0, longitude = -120),
+                GeoLocation(latitude = 20, longitude = -160),
+                GeoLocation(latitude = 60, longitude = 160),
+                GeoLocation(latitude = 20, longitude = 120),
+                GeoLocation(latitude = -20, longitude = 160),
             )
         )
 
         val expected = BoundingBox(
-            southwest = Coordinate(latitude = -60, longitude = 120),
-            northeast = Coordinate(latitude = 60, longitude = -120)
+            southwest = GeoLocation(latitude = -60, longitude = 120),
+            northeast = GeoLocation(latitude = 60, longitude = -120)
         )
 
         Assert.assertEquals(expected, polygon.findBoundingBox())

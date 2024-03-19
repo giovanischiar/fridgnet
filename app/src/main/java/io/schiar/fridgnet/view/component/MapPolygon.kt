@@ -40,8 +40,8 @@ fun MapPolygon(
             }
         ) {
             Polygon(
-                points = region.polygon.coordinates.toLatLngList(),
-                holes = region.holes.map { hole -> hole.coordinates.toLatLngList() },
+                points = region.polygon.geoLocations.toLatLngList(),
+                holes = region.holes.map { hole -> hole.geoLocations.toLatLngList() },
                 fillColor = Color.Transparent
             )
         }

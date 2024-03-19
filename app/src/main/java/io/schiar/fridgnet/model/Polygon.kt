@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.model
 
-data class Polygon(val id: Long = 0, val coordinates: List<Coordinate>) {
+data class Polygon(val id: Long = 0, val geoLocations: List<GeoLocation>) {
     fun findBoundingBox(): BoundingBox {
         var maxLatitude = Double.NEGATIVE_INFINITY
         var maxLongitude = Double.NEGATIVE_INFINITY
@@ -12,9 +12,9 @@ data class Polygon(val id: Long = 0, val coordinates: List<Coordinate>) {
 
         var wasAntimeridianEverCrossed = false
 
-        for (i in this.coordinates.indices) {
-            val coordinate = this.coordinates[i]
-            val (_, latitude, longitude) = coordinate
+        for (i in this.geoLocations.indices) {
+            val getLocation = this.geoLocations[i]
+            val (_, latitude, longitude) = getLocation
 
             if (latitude > maxLatitude) {
                 maxLatitude = latitude
@@ -39,10 +39,10 @@ data class Polygon(val id: Long = 0, val coordinates: List<Coordinate>) {
                 }
             }
 
-            if (i + 1 < this.coordinates.size) {
-                val next = this.coordinates[i + 1]
+            if (i + 1 < this.geoLocations.size) {
+                val next = this.geoLocations[i + 1]
                 wasAntimeridianEverCrossed = wasAntimeridianEverCrossed ||
-                        coordinate.wasAntimeridianCrossed(next.longitude)
+                        getLocation.wasAntimeridianCrossed(next.longitude)
             }
         }
 
@@ -60,8 +60,8 @@ data class Polygon(val id: Long = 0, val coordinates: List<Coordinate>) {
         }
 
         return BoundingBox(
-            southwest = Coordinate(latitude = southwestLatitude, longitude = southwestLongitude),
-            northeast = Coordinate(latitude = northeastLatitude, longitude = northeastLongitude)
+            southwest = GeoLocation(latitude = southwestLatitude, longitude = southwestLongitude),
+            northeast = GeoLocation(latitude = northeastLatitude, longitude = northeastLongitude)
         )
     }
 }

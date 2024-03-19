@@ -5,6 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.schiar.fridgnet.library.room.FridgnetDatabase
 import io.schiar.fridgnet.model.*
 import io.schiar.fridgnet.model.datasource.room.FridgnetDatabase
 import io.schiar.fridgnet.library.room.LocationRoomService
@@ -40,21 +41,21 @@ class FridgnetDatabaseTest {
     fun insertLocationAndEnsureTheLocationRetrievedIsTheSame() {
         val region = Region(
             polygon = Polygon(
-                coordinates = listOf(
-                    Coordinate(latitude = -10, longitude = -10),
-                    Coordinate(latitude = -10, longitude = 10),
-                    Coordinate(latitude = 10, longitude = 10),
-                    Coordinate(latitude = 10, longitude = -10)
+                geoLocations = listOf(
+                    GeoLocation(latitude = -10, longitude = -10),
+                    GeoLocation(latitude = -10, longitude = 10),
+                    GeoLocation(latitude = 10, longitude = 10),
+                    GeoLocation(latitude = 10, longitude = -10)
                 )
             ),
 
             holes = listOf(
                 Polygon(
-                    coordinates = listOf(
-                        Coordinate(latitude = -5, longitude = -5),
-                        Coordinate(latitude = -5, longitude = 5),
-                        Coordinate(latitude = 5, longitude = 5),
-                        Coordinate(latitude = 5, longitude = -5)
+                    geoLocations = listOf(
+                        GeoLocation(latitude = -5, longitude = -5),
+                        GeoLocation(latitude = -5, longitude = 5),
+                        GeoLocation(latitude = 5, longitude = 5),
+                        GeoLocation(latitude = 5, longitude = -5)
                     )
                 )
             ),
@@ -62,8 +63,8 @@ class FridgnetDatabaseTest {
             active = true,
 
             boundingBox = BoundingBox(
-                southwest = Coordinate(latitude = -10, longitude = -10),
-                northeast = Coordinate(latitude = 10, longitude = 10)
+                southwest = GeoLocation(latitude = -10, longitude = -10),
+                northeast = GeoLocation(latitude = 10, longitude = 10)
             ),
             zIndex = 1.0f
         )
@@ -80,8 +81,8 @@ class FridgnetDatabaseTest {
             address = address,
             regions = listOf(region),
             boundingBox = BoundingBox(
-                southwest = Coordinate(latitude = -10, longitude = -10),
-                northeast = Coordinate(latitude = 10, longitude = 10)
+                southwest = GeoLocation(latitude = -10, longitude = -10),
+                northeast = GeoLocation(latitude = 10, longitude = 10)
             ),
             zIndex = 1.0f
         )

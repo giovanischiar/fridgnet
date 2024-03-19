@@ -4,7 +4,7 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
-data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
+data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
     fun containsAntimeridian(): Boolean {
         return abs(northeast.longitude - southwest.longitude) > 180.0
     }
@@ -13,9 +13,9 @@ data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
         return latitude >= southwest.latitude && latitude <= northeast.latitude
     }
 
-    fun contains(coordinate: Coordinate): Boolean {
-        return containsLatitude(latitude = coordinate.latitude) &&
-                containsLongitude(longitude = coordinate.longitude)
+    fun contains(geoLocation: GeoLocation): Boolean {
+        return containsLatitude(latitude = geoLocation.latitude) &&
+                containsLongitude(longitude = geoLocation.longitude)
     }
 
     fun southOfLatitude(latitude: Double): Boolean {
@@ -52,8 +52,8 @@ data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
         }
     }
 
-    fun center(): Coordinate {
-        return Coordinate(
+    fun center(): GeoLocation {
+        return GeoLocation(
             latitude = (northeast.latitude + southwest.latitude) / 2.0,
             longitude = centerLongitude()
         )
@@ -94,19 +94,19 @@ data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
 
     operator fun plus(other: BoundingBox): BoundingBox {
         return BoundingBox(
-            southwest = Coordinate(
+            southwest = GeoLocation(
                 latitude = min(southwest.latitude, other.southwest.latitude),
                 longitude = min(southwest.longitude, other.southwest.longitude)
             ),
 
-            northeast = Coordinate(
+            northeast = GeoLocation(
                 latitude = max(northeast.latitude, other.northeast.latitude),
                 longitude = max(northeast.longitude, other.northeast.longitude)
             )
         )
     }
 
-    operator fun plus(other: Coordinate): BoundingBox {
+    operator fun plus(other: GeoLocation): BoundingBox {
         return plus(other = BoundingBox(southwest = other, northeast = other))
     }
 
@@ -153,8 +153,8 @@ data class BoundingBox(val southwest: Coordinate, val northeast: Coordinate) {
                 containsLatitude(latitude = other.northeast.latitude) &&
                 eastOfLongitude(longitude = other.northeast.longitude)
 
-        val otherWrapBounds = other.contains(coordinate = southwest) &&
-                other.contains(coordinate = northeast)
+        val otherWrapBounds = other.contains(geoLocation = southwest) &&
+                other.contains(geoLocation = northeast)
 
         return southwestOrNortheastInside ||
                 northwestCorner ||

@@ -3,7 +3,7 @@ package io.schiar.fridgnet.library.geocoder
 import android.location.Geocoder
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.datasource.retriever.AddressRetriever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -11,8 +11,8 @@ import android.location.Address as AndroidAddress
 
 class AddressGeocoderRetriever(private val geocoder: Geocoder) : AddressRetriever {
 
-    override suspend fun retrieve(coordinate: Coordinate): Address? {
-        val (_, latitude, longitude) = coordinate
+    override suspend fun retrieve(geoLocation: GeoLocation): Address? {
+        val (_, latitude, longitude) = geoLocation
         Log.d("Add Image Feature", "Getting address for ($latitude, $longitude)")
         val androidAddress = withContext(Dispatchers.IO) {
             getAndroidAddress(latitude = latitude, longitude = longitude)

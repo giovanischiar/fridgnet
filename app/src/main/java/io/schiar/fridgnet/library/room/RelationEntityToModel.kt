@@ -1,11 +1,11 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.library.room.relationentity.AddressWithLocationsAndCoordinates
-import io.schiar.fridgnet.library.room.relationentity.ImageWithAddressAndCoordinate
+import io.schiar.fridgnet.library.room.relationentity.AddressWithLocationsAndGeoLocations
+import io.schiar.fridgnet.library.room.relationentity.ImageWithAddressAndGeoLocation
 import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
-import io.schiar.fridgnet.library.room.relationentity.PolygonWithCoordinates
+import io.schiar.fridgnet.library.room.relationentity.PolygonWithGeoLocations
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
-import io.schiar.fridgnet.model.AddressLocationsCoordinates
+import io.schiar.fridgnet.model.AddressLocationsGeoLocations
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Image
@@ -15,44 +15,44 @@ import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 
 
-fun List<AddressWithLocationsAndCoordinates>.toAddressesCoordinates(): List<AddressLocationsCoordinates> {
-    return map { it.toAddressCoordinates() }
+fun List<AddressWithLocationsAndGeoLocations>.toAddressLocationsGeoLocations(): List<AddressLocationsGeoLocations> {
+    return map { it.toAddressLocationsGeoLocations() }
 }
 
-fun List<ImageWithAddressAndCoordinate>.toImageAddresses(): List<ImageAddress>{
+fun List<ImageWithAddressAndGeoLocation>.toImageAddresses(): List<ImageAddress>{
     return map { it.toImageAddress() }
 }
 
-fun List<ImageWithAddressAndCoordinate>.toImages(): List<Image>{
+fun List<ImageWithAddressAndGeoLocation>.toImages(): List<Image>{
     return map { it.toImage() }
 }
 
-fun AddressWithLocationsAndCoordinates.toAddressCoordinates(): AddressLocationsCoordinates {
-    return AddressLocationsCoordinates(
+fun AddressWithLocationsAndGeoLocations.toAddressLocationsGeoLocations(): AddressLocationsGeoLocations {
+    return AddressLocationsGeoLocations(
         address = addressEntity.toAddress(),
         administrativeUnitLocation = locationEntities.toAdministrativeUnitLocation(),
-        coordinates = coordinateEntities.toCoordinates()
+        geoLocations = geoLocationEntities.toGeoLocations()
     )
 }
 
-fun ImageWithAddressAndCoordinate.toImage(): Image {
+fun ImageWithAddressAndGeoLocation.toImage(): Image {
     return Image(
         uri = imageEntity.uri,
         byteArray = imageEntity.byteArray,
         date = imageEntity.date,
-        coordinate = coordinateWithAddress.coordinateEntity.toCoordinate()
+        geoLocation = geoLocationWithAddress.geoLocationEntity.toGeoLocation()
     )
 }
 
-fun ImageWithAddressAndCoordinate.toImageAddress(): ImageAddress {
+fun ImageWithAddressAndGeoLocation.toImageAddress(): ImageAddress {
     return ImageAddress(
         image = Image(
             uri = imageEntity.uri,
             byteArray = imageEntity.byteArray,
             date = imageEntity.date,
-            coordinate = coordinateWithAddress.coordinateEntity.toCoordinate()
+            geoLocation = geoLocationWithAddress.geoLocationEntity.toGeoLocation()
         ),
-        address = coordinateWithAddress.addressEntity?.toAddress()
+        address = geoLocationWithAddress.addressEntity?.toAddress()
     )
 }
 
@@ -73,16 +73,16 @@ fun LocationWithRegions.toLocation(): Location {
         address = addressEntity.toAddress(),
         regions = regionEntities.map { it.toRegion() },
         boundingBox = BoundingBox(
-            southwest = locationEntity.boundingBoxSouthwest.toCoordinate(),
-            northeast = locationEntity.boundingBoxNortheast.toCoordinate(),
+            southwest = locationEntity.boundingBoxSouthwest.toGeoLocation(),
+            northeast = locationEntity.boundingBoxNortheast.toGeoLocation(),
         ),
         zIndex = locationEntity.zIndex,
         administrativeUnit = AdministrativeUnit.valueOf(value = locationEntity.administrativeUnit)
     )
 }
 
-fun PolygonWithCoordinates.toPolygon(): Polygon {
-    return Polygon(id = polygon.id, coordinates = coordinates.map { it.toCoordinate() })
+fun PolygonWithGeoLocations.toPolygon(): Polygon {
+    return Polygon(id = polygon.id, geoLocations = getLocationEntitites.map { it.toGeoLocation() })
 }
 
 fun List<RegionWithPolygonAndHoles>.toRegions(): List<Region> {
@@ -96,8 +96,8 @@ fun RegionWithPolygonAndHoles.toRegion(): Region {
         holes = holes.map { it.toPolygon() },
         active = regionEntity.active,
         boundingBox = BoundingBox(
-            southwest = regionEntity.boundingBoxSouthwest.toCoordinate(),
-            northeast = regionEntity.boundingBoxNortheast.toCoordinate(),
+            southwest = regionEntity.boundingBoxSouthwest.toGeoLocation(),
+            northeast = regionEntity.boundingBoxNortheast.toGeoLocation(),
         ),
         zIndex = regionEntity.zIndex
     )

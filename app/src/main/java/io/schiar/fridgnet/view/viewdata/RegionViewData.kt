@@ -5,6 +5,6 @@ data class RegionViewData(
     val holes: List<PolygonViewData>,
     val active: Boolean = true,
     val boundingBox: BoundingBoxViewData,
-    val center: CoordinateViewData,
+    val center: GeoLocationViewData,
     val zIndex: Float
 )

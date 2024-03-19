@@ -2,12 +2,12 @@ package io.schiar.fridgnet.library.room.relationentity
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import io.schiar.fridgnet.library.room.entity.CoordinateEntity
+import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.library.room.entity.PolygonEntity
 
-data class PolygonWithCoordinates(
+data class PolygonWithGeoLocations(
     @Embedded
     val polygon: PolygonEntity,
-    @Relation(parentColumn = "id", entityColumn = "coordinatesID")
-    val coordinates: List<CoordinateEntity>
+    @Relation(parentColumn = "id", entityColumn = "geoLocationsID")
+    val getLocationEntitites: List<GeoLocationEntity>
 )

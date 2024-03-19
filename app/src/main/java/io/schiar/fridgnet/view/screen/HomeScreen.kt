@@ -78,7 +78,7 @@ fun HomeScreen(
         )
     )
 
-    val locationCoordinates by viewModel.locationCoordinates.collectAsState(
+    val locationGeoLocations by viewModel.locationGeoLocations.collectAsState(
         initial = emptyList()
     )
 
@@ -100,14 +100,14 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyVerticalGrid(columns = GridCells.Fixed(columnCount)) {
-            items(count = locationCoordinates.size) { index ->
-                val (location, initialCoordinate) = locationCoordinates[index]
+            items(count = locationGeoLocations.size) { index ->
+                val (location, initialGeoLocation) = locationGeoLocations[index]
                 MapPhotoItem(
-                    initialCoordinate = initialCoordinate,
+                    initialGeoLocation = initialGeoLocation,
                     location = location,
                     columnCount = columnCount
                 ) {
-                    viewModel.selectLocationCoordinateAt(index = index)
+                    viewModel.selectLocationGeoLocationAt(index = index)
                     onNavigateImage()
                 }
             }

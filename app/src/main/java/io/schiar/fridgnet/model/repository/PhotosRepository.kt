@@ -1,12 +1,12 @@
 package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.LocationImages
-import io.schiar.fridgnet.model.Coordinate
+import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
-import io.schiar.fridgnet.model.LocationCoordinate
+import io.schiar.fridgnet.model.LocationGeoLocation
+import io.schiar.fridgnet.model.LocationImages
 import io.schiar.fridgnet.model.datasource.AddressDataSource
-import io.schiar.fridgnet.model.datasource.CurrentLocationCoordinateDataSource
+import io.schiar.fridgnet.model.datasource.CurrentLocationGeoLocationDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
@@ -16,36 +16,36 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 
 class PhotosRepository(
-    currentAddressLocationCoordinateDataSource: CurrentLocationCoordinateDataSource,
+    currentAddressLocationsGeoLocationsDataSource: CurrentLocationGeoLocationDataSource,
     imageDataSource: ImageDataSource,
-    addressCoordinatesDataSource: AddressDataSource
+    addressLocationsGeoLocationsDataSource: AddressDataSource
 )  {
-    private var addressLocationCoordinate: LocationCoordinate? = null
+    private var locationGeoLocation: LocationGeoLocation? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val locationImages = currentAddressLocationCoordinateDataSource
+    val locationImages = currentAddressLocationsGeoLocationsDataSource
         .retrieve()
-        .onEach { addressLocationCoordinate = it }
+        .onEach { locationGeoLocation = it }
         .flatMapLatest {
             if (it?.location == null) {
                 return@flatMapLatest flowOf(value = emptyList())
             } else {
-                addressCoordinatesDataSource.retrieveCoordinates(
+                addressLocationsGeoLocationsDataSource.retrieveGeoLocations(
                     address = it.location.address, administrativeUnit = it.location.administrativeUnit
                 )
             }
         }.combine(
             flow = imageDataSource.retrieve(),
-            transform = ::combineCoordinatesImages
+            transform = ::combineGeoLocationImages
         ).filterNotNull()
 
-    private fun combineCoordinatesImages(
-        coordinates: List<Coordinate>, images: List<Image>
+    private fun combineGeoLocationImages(
+        geoLocations: List<GeoLocation>, images: List<Image>
     ): LocationImages? {
-        Log.d("", "combineCoordinatesImages(coordinates = $coordinates, image coordinates = ${images.map { it.coordinate }} )")
+        Log.d("", "combineGeoLocationImages(geoLocations = $geoLocations, image geoLocations = ${images.map { it.geoLocation }} )")
         return LocationImages(
-            location = addressLocationCoordinate?.location ?: return null,
-            images = images.filter { image -> coordinates.contains(element = image.coordinate) }
+            location = locationGeoLocation?.location ?: return null,
+            images = images.filter { image -> geoLocations.contains(element = image.geoLocation) }
         )
     }
 }

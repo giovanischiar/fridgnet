@@ -10,9 +10,9 @@ import io.schiar.fridgnet.view.viewdata.LocationViewData
 fun LocationDrawer(location: LocationViewData) {
     location.regions.map {
         Polygon(
-            points = it.polygon.coordinates.toLatLngList(),
+            points = it.polygon.geoLocations.toLatLngList(),
             visible = it.active,
-            holes = it.holes.map { hole -> hole.coordinates.toLatLngList() },
+            holes = it.holes.map { hole -> hole.geoLocations.toLatLngList() },
             fillColor = Color.Transparent
         )
     }

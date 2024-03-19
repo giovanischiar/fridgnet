@@ -17,23 +17,23 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import io.schiar.fridgnet.view.util.static
 import io.schiar.fridgnet.view.util.toLatLng
 import io.schiar.fridgnet.view.util.toLatLngBounds
-import io.schiar.fridgnet.view.viewdata.CoordinateViewData
+import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
 import io.schiar.fridgnet.view.viewdata.LocationViewData
 
 @Composable
 fun MapPhotoItem(
-    initialCoordinate: CoordinateViewData?,
+    initialGeoLocation: GeoLocationViewData?,
     location: LocationViewData?,
     columnCount: Int,
     onMapClick: (LatLng) -> Unit
 ) {
     val cameraPositionState = rememberCameraPositionState {
-        var coordinate = location?.center
-        if (coordinate == null) {
-            coordinate = initialCoordinate
+        var geoLocation = location?.center
+        if (geoLocation == null) {
+            geoLocation = initialGeoLocation
         }
-        if (coordinate != null) {
-            position = CameraPosition.fromLatLngZoom(coordinate.toLatLng(), 10f)
+        if (geoLocation != null) {
+            position = CameraPosition.fromLatLngZoom(geoLocation.toLatLng(), 10f)
         }
     }
     var mapLoaded by remember { mutableStateOf(value = false) }

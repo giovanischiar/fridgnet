@@ -115,7 +115,7 @@ fun Map(
                     }
                 }
                 Marker(
-                    state = MarkerState(position = it.coordinate.toLatLng()),
+                    state = MarkerState(position = it.geoLocation.toLatLng()),
                     icon = bitmaps[it.uri],
                     visible = bitmaps.containsKey(it.uri)
                 )

@@ -28,7 +28,7 @@ data class Location(
             id = id,
             address = address,
             regions = regions
-                .sortedBy { region -> region.polygon.coordinates.size }
+                .sortedBy { region -> region.polygon.geoLocations.size }
                 .asReversed()
                 .mapIndexed { index, region ->
                     if (index == 0) region else region.switch()

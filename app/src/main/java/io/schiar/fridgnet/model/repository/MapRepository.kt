@@ -44,7 +44,7 @@ class MapRepository(
             emptyList()
         } else {
             boundingBoxPhotosFlow.update { images.mergeToBoundingBox() }
-            images.filter { currentBoundingBox.contains(coordinate = it.coordinate) }
+            images.filter { currentBoundingBox.contains(geoLocation = it.geoLocation) }
         }
     }
 
