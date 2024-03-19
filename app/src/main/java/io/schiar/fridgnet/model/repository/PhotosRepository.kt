@@ -16,7 +16,8 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 
 class PhotosRepository(
-    currentCartographicBoundaryGeoLocationsDataSource: CurrentCartographicBoundaryGeoLocationDataSource,
+    currentCartographicBoundaryGeoLocationsDataSource
+        : CurrentCartographicBoundaryGeoLocationDataSource,
     imageDataSource: ImageDataSource,
     administrativeUnitDataSource: AdministrativeUnitDataSource
 )  {
@@ -31,7 +32,8 @@ class PhotosRepository(
                 return@flatMapLatest flowOf(value = emptyList())
             } else {
                 administrativeUnitDataSource.retrieveGeoLocations(
-                    administrativeUnit = it.cartographicBoundary.administrativeUnit, administrativeLevel = it.cartographicBoundary.administrativeLevel
+                    administrativeUnit = it.cartographicBoundary.administrativeUnit,
+                    administrativeLevel = it.cartographicBoundary.administrativeLevel
                 )
             }
         }.combine(
@@ -42,9 +44,15 @@ class PhotosRepository(
     private fun combineGeoLocationImages(
         geoLocations: List<GeoLocation>, images: List<Image>
     ): CartographicBoundaryImages? {
-        Log.d("", "combineGeoLocationImages(geoLocations = $geoLocations, image geoLocations = ${images.map { it.geoLocation }} )")
+        Log.d(
+            tag = "",
+            msg = "combineGeoLocationImages(" +
+                    "geoLocations = $geoLocations, " +
+                    "image geoLocations = ${images.map { it.geoLocation }} )"
+        )
         return CartographicBoundaryImages(
-            cartographicBoundary = cartographicBoundaryGeoLocation?.cartographicBoundary ?: return null,
+            cartographicBoundary = cartographicBoundaryGeoLocation
+                ?.cartographicBoundary ?: return null,
             images = images.filter { image -> geoLocations.contains(element = image.geoLocation) }
         )
     }

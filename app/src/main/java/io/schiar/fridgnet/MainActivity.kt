@@ -87,7 +87,8 @@ class MainActivity : ComponentActivity() {
         val administrativeUnitDataSource = createAdministrativeUnitDataSource()
         val cartographicBoundaryDataSource = createCartographicBoundaryDataSource()
         val currentRegionDataSource = CurrentRegionLocalDataSource()
-        val currentCartographicBoundaryGeoLocationsDataSource = CurrentCartographicBoundaryGeoLocationDataSource()
+        val currentCartographicBoundaryGeoLocationsDataSource
+            = CurrentCartographicBoundaryGeoLocationDataSource()
 
         val polygonsRepository = PolygonsRepository(
             currentRegionDataSource = currentRegionDataSource,
@@ -110,7 +111,8 @@ class MainActivity : ComponentActivity() {
             administrativeUnitDataSource = administrativeUnitDataSource,
             cartographicBoundaryDataSource = cartographicBoundaryDataSource,
             imageDataSource = imageDataSource,
-            currentCartographicBoundaryGeoLocationsDataSource = currentCartographicBoundaryGeoLocationsDataSource,
+            currentCartographicBoundaryGeoLocationsDataSource =
+                currentCartographicBoundaryGeoLocationsDataSource,
             externalScope = GlobalScope
         )
 
@@ -137,7 +139,9 @@ class MainActivity : ComponentActivity() {
         val administrativeUnitDAO = fridgnetDatabase.administrativeUnitDAO()
         return AdministrativeUnitGeoLocationsDataSource(
             administrativeUnitRetriever = AdministrativeUnitGeocoderRetriever(geocoder = geocoder),
-            administrativeUnitService = AdministrativeUnitRoomService(administrativeUnitDAO = administrativeUnitDAO)
+            administrativeUnitService = AdministrativeUnitRoomService(
+                administrativeUnitDAO = administrativeUnitDAO
+            )
         )
     }
 
@@ -147,8 +151,12 @@ class MainActivity : ComponentActivity() {
         val retrofitHelper = RetrofitHelper.getInstance()
         val nominatimAPI = retrofitHelper.create(NominatimAPI::class.java)
         return CartographicBoundaryAPIDBDataSource(
-            cartographicBoundaryRetriever = CartographicBoundaryRetrofitRetriever(nominatimAPI = nominatimAPI),
-            cartographicBoundaryService = CartographicBoundaryRoomService(cartographicBoundaryDAO = cartographicBoundaryDAO)
+            cartographicBoundaryRetriever = CartographicBoundaryRetrofitRetriever
+                (nominatimAPI = nominatimAPI
+            ),
+            cartographicBoundaryService = CartographicBoundaryRoomService(
+                cartographicBoundaryDAO = cartographicBoundaryDAO
+            )
         )
     }
 }

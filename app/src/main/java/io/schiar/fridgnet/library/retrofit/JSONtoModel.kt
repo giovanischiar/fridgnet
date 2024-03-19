@@ -64,9 +64,9 @@ fun JSONResult<GeoJSONAttributes>.toCartographicBoundary(
             val polygon = Polygon(geoLocations = polygonGeoLocations[0])
             val region = Region(
                 polygon = polygon,
-                holes = polygonGeoLocations.subList(1, polygonGeoLocations.size).map {
-                    Polygon(geoLocations = it)
-                },
+                holes = polygonGeoLocations.subList(
+                    1, polygonGeoLocations.size
+                ).map { geoLocations -> Polygon(geoLocations = geoLocations) },
                 boundingBox = polygon.findBoundingBox(),
                 zIndex = administrativeLevel.zIndex()
             )

@@ -20,22 +20,30 @@ class AdministrativeUnitGeoLocationsDataSource(
 
     override suspend fun create(geoLocation: GeoLocation, administrativeUnit: AdministrativeUnit) {
         log(geoLocation, "creating administrativeUnit ${administrativeUnit.name()}")
-        administrativeUnitService.create(geoLocation = geoLocation, administrativeUnit = administrativeUnit)
+        administrativeUnitService.create(
+            geoLocation = geoLocation, administrativeUnit = administrativeUnit
+        )
     }
 
     private fun updateCacheFromService(
-        administrativeUnitesLocationsGeoLocations: List<AdministrativeUnitCartographicBoundariesGeoLocations>
+        administrativeUnitesLocationsGeoLocations
+            : List<AdministrativeUnitCartographicBoundariesGeoLocations>
     ) {
-        administrativeUnitesLocationsGeoLocations.forEach { administrativeUnitesLocationsGeoLocation ->
-            geoLocationSet.addAll(elements = administrativeUnitesLocationsGeoLocation.geoLocations)
-        }
+        administrativeUnitesLocationsGeoLocations
+            .forEach { administrativeUnitesLocationsGeoLocation ->
+                geoLocationSet.addAll(
+                    elements = administrativeUnitesLocationsGeoLocation.geoLocations
+                )
+            }
     }
 
     override suspend fun retrieveAdministrativeUnitFor(geoLocation: GeoLocation) {
         if (geoLocationSet.contains(element = geoLocation)) return
         geoLocationSet.add(element = geoLocation)
         log(geoLocation = geoLocation, "It's not on memory, retrieving using the Geocoder")
-        val administrativeUnitFromRetriever = administrativeUnitRetriever.retrieve(geoLocation = geoLocation)
+        val administrativeUnitFromRetriever = administrativeUnitRetriever.retrieve(
+            geoLocation = geoLocation
+        )
         if (administrativeUnitFromRetriever != null) {
             create(geoLocation = geoLocation, administrativeUnit = administrativeUnitFromRetriever)
             return

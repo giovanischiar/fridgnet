@@ -29,7 +29,9 @@ class FridgnetDatabaseTest {
             context = context,
             klass = FridgnetDatabase::class.java
         ).build()
-        cartographicBoundaryRoomService = CartographicBoundaryRoomService(cartographicBoundaryDAO = database.cartographicBoundaryDAO())
+        cartographicBoundaryRoomService = CartographicBoundaryRoomService(
+            cartographicBoundaryDAO = database.cartographicBoundaryDAO()
+        )
     }
 
     @After
@@ -89,7 +91,9 @@ class FridgnetDatabaseTest {
         )
 
         cartographicBoundaryRoomService.create(cartographicBoundary = cartographicBoundary)
-        val actual = cartographicBoundaryRoomService.selectCartographicBoundaryByAdministrativeUnit(administrativeUnit = administrativeUnit).first()
+        val actual = cartographicBoundaryRoomService
+            .selectCartographicBoundaryByAdministrativeUnit(administrativeUnit = administrativeUnit)
+            .first()
         assertThat(actual, equalTo(cartographicBoundary))
     }
 }

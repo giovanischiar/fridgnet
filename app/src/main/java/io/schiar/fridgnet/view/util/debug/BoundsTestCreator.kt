@@ -25,11 +25,17 @@ class BoundsTestCreator {
                 val southwest = boundingBox.southwest
                 val northeast = boundingBox.northeast
                 val southwestStr =
-                    "GeoLocation(latitude = ${southwest.latitude}, longitude = ${southwest.longitude})"
+                    "GeoLocation(" +
+                            "latitude = ${southwest.latitude}, longitude = ${southwest.longitude}" +
+                    ")"
                 val northeastStr =
-                    "GeoLocation(latitude = ${northeast.latitude}, longitude = ${northeast.longitude})"
+                    "GeoLocation(" +
+                            "latitude = ${northeast.latitude}, longitude = ${northeast.longitude}" +
+                    ")"
                 val boundingBoxStr =
-                    "BoundingBox(\n\t\tsouthwest = $southwestStr,\n\t\tnortheast = $northeastStr\n\t)"
+                    "BoundingBox(\n\t\t" +
+                            "southwest = $southwestStr,\n\t\tnortheast = $northeastStr\n\t" +
+                    ")"
                 Log.d("BoundingBoxTest", "\tprivate val boundingBox = $southwestStr")
                 Log.d("BoundingBoxTest", "")
             }
@@ -39,12 +45,23 @@ class BoundsTestCreator {
                 visibleRegions.map { it.boundingBox }.mapIndexed { index, boundingBoxViewData ->
                     val (southwest, northeast) = boundingBoxViewData
                     val southwestStr =
-                        "GeoLocation(latitude = ${southwest.latitude}, longitude = ${southwest.longitude})"
+                        "GeoLocation(" +
+                                "latitude = ${southwest.latitude}, " +
+                                "longitude = ${southwest.longitude}" +
+                        ")"
                     val northeastStr =
-                        "GeoLocation(latitude = ${northeast.latitude}, longitude = ${northeast.longitude})"
+                        "GeoLocation(" +
+                                "latitude = ${northeast.latitude}, " +
+                                "longitude = ${northeast.longitude}" +
+                        ")"
 
-                    "\t@Test\n\tfun `Polygons app generated are inside bounding box $index`() {\n\t\tval polygon$index = BoundingBox(\n\t\t\tsouthwest = $southwestStr,\n" +
-                            "\t\t\tnortheast = $northeastStr\n\t\t)\n\n\t\tAssert.assertFalse(boundingBox.contains(polygon$index))\n\t}"
+                    "\t@Test\n\tfun `Polygons app generated are inside bounding box $index`() {" +
+                            "\n\t\tval polygon$index = BoundingBox(\n" +
+                                  "\t\t\tsouthwest = $southwestStr,\n" +
+                                  "\t\t\tnortheast = $northeastStr\n\t\t" +
+                            ")\n\n\t\t" +
+                            "Assert.assertFalse(boundingBox.contains(polygon$index))\n\t" +
+                      "}"
                 }.joinToString("\n\n")
             )
 

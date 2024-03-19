@@ -18,7 +18,10 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
     val currentAdministrativeLevel = homeRepository.currentAdministrativeLevel.map { it.toString() }
 
     fun selectCartographicBoundaryGeoLocationAt(index: Int) = viewModelScope.launch {
-        Log.d("Select Image Feature", "Select cartographic boundary geo location at $index")
+        Log.d(
+            tag = "Select Image Feature",
+            msg ="Select cartographic boundary geo location at $index"
+        )
         homeRepository.selectCartographicBoundaryGeoLocationAt(index = index)
     }
 

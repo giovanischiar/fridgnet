@@ -28,8 +28,10 @@ abstract class ImageDAO {
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query(
-        "SELECT * FROM Image JOIN GeoLocation ON Image.geoLocationID is GeoLocation.id " +
-                "WHERE GeoLocation.latitude is :latitude AND GeoLocation.longitude is :longitude"
+        "SELECT * " +
+        "FROM Image JOIN GeoLocation ON Image.geoLocationID is GeoLocation.id " +
+        "WHERE GeoLocation.latitude is :latitude AND " +
+              "GeoLocation.longitude is :longitude"
     )
     abstract suspend fun selectImageBy(
         latitude: Double, longitude: Double
@@ -38,12 +40,14 @@ abstract class ImageDAO {
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Image")
-    abstract fun selectImagesWithGeoLocationAndAdministrativeUnit(): Flow<List<ImageWithAdministrativeUnitAndGeoLocation>>
+    abstract fun selectImagesWithGeoLocationAndAdministrativeUnit()
+        : Flow<List<ImageWithAdministrativeUnitAndGeoLocation>>
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Image")
-    abstract fun selectImagesWithAdministrativeUnitAndGeoLocation(): Flow<List<ImageWithAdministrativeUnitAndGeoLocation>>
+    abstract fun selectImagesWithAdministrativeUnitAndGeoLocation()
+        : Flow<List<ImageWithAdministrativeUnitAndGeoLocation>>
 
     @Query("DELETE FROM Image")
     abstract suspend fun deleteAll()

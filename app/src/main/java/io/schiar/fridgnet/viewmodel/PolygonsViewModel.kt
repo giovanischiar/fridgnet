@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class PolygonsViewModel(private val polygonsRepository: PolygonsRepository) : ViewModel() {
-    val currentCartographicBoundary = polygonsRepository.currentCartographicBoundary.map { it?.toCartographicBoundaryViewData() }
+    val currentCartographicBoundary = polygonsRepository
+        .currentCartographicBoundary
+        .map { it?.toCartographicBoundaryViewData() }
 
     fun switchRegionAt(index: Int) = viewModelScope.launch {
         polygonsRepository.switchRegionAt(index = index)

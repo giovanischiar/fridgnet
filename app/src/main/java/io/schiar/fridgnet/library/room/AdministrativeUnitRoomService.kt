@@ -6,13 +6,15 @@ import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
 import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
 import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 import io.schiar.fridgnet.model.AdministrativeUnit
-import io.schiar.fridgnet.model.AdministrativeUnitLocationsGeoLocations
+import io.schiar.fridgnet.model.AdministrativeUnitCartographicBoundariesGeoLocations
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.service.AdministrativeUnitService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class AdministrativeUnitRoomService(private val administrativeUnitDAO: AdministrativeUnitDAO) : AdministrativeUnitService {
+class AdministrativeUnitRoomService(
+    private val administrativeUnitDAO: AdministrativeUnitDAO
+) : AdministrativeUnitService {
     override fun retrieveGeoLocations(
         administrativeUnit: AdministrativeUnit, administrativeLevel: AdministrativeLevel
     ): Flow<List<GeoLocation>> {
@@ -27,18 +29,28 @@ class AdministrativeUnitRoomService(private val administrativeUnitDAO: Administr
             COUNTY -> administrativeUnitDAO.selectGeoLocations(
                 subAdminArea = subAdminArea, adminArea = adminArea, countryName = countryName
             )
-            STATE -> administrativeUnitDAO.selectGeoLocations(adminArea = adminArea, countryName = countryName)
+            STATE -> {
+                administrativeUnitDAO.selectGeoLocations(
+                    adminArea = adminArea,
+                    countryName = countryName
+                )
+            }
             COUNTRY -> administrativeUnitDAO.selectGeoLocations(countryName = countryName)
         }.map { it.toGeoLocations() }
     }
 
     override suspend fun create(geoLocation: GeoLocation, administrativeUnit: AdministrativeUnit) {
-        administrativeUnitDAO.insert(geoLocation = geoLocation, administrativeUnit = administrativeUnit)
+        administrativeUnitDAO.insert(
+            geoLocation = geoLocation,
+            administrativeUnit = administrativeUnit
+        )
     }
 
-    override fun retrieve(): Flow<List<AdministrativeUnitLocationsGeoLocations>> {
-        return administrativeUnitDAO.selectAdministrativeUnitWithGeoLocations().map {
-            it.toAdministrativeUnitLocationsGeoLocations()
-        }
+    override fun retrieve(): Flow<List<AdministrativeUnitCartographicBoundariesGeoLocations>> {
+        return administrativeUnitDAO.selectAdministrativeUnitWithGeoLocations()
+            .map { administrativeUnitWithGeoLocations ->
+                administrativeUnitWithGeoLocations
+                    .toAdministrativeUnitCartographicBoundariesGeoLocations()
+            }
     }
 }

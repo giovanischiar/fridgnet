@@ -87,7 +87,8 @@ fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
 }
 
 // CartographicBoundaryGeoLocation
-fun CartographicBoundaryGeoLocation.toGeographicBoundaryImagesViewData(): CartographicBoundaryGeoLocationViewData {
+fun CartographicBoundaryGeoLocation
+    .toGeographicBoundaryImagesViewData(): CartographicBoundaryGeoLocationViewData {
     return CartographicBoundaryGeoLocationViewData(
         cartographicBoundary = cartographicBoundary?.toCartographicBoundaryViewData(),
         initialGeoLocation = initialGeoLocation?.toGeoLocationViewData() ?: GeoLocationViewData()
@@ -100,7 +101,8 @@ fun List<CartographicBoundaryGeoLocation>.toCartographicBoundaryGeoLocationViewD
 }
 
 // CartographicBoundaryImages
-fun CartographicBoundaryImages.toGeographicBoundaryImagesViewData(): CartographicBoundaryImagesViewData {
+fun CartographicBoundaryImages
+    .toGeographicBoundaryImagesViewData(): CartographicBoundaryImagesViewData {
     return CartographicBoundaryImagesViewData(
         cartographicBoundary = cartographicBoundary.toCartographicBoundaryViewData(),
         images = images.toImageViewDataList(),

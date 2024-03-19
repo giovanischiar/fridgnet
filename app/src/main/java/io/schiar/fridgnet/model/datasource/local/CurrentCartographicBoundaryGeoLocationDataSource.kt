@@ -8,9 +8,8 @@ import kotlinx.coroutines.flow.update
 
 class CurrentCartographicBoundaryGeoLocationDataSource:
     CurrentCartographicBoundaryGeoLocationDataSource {
-    private val cartographicBoundaryGeoLocation = MutableStateFlow<CartographicBoundaryGeoLocation?>(
-        value = null
-    )
+    private val cartographicBoundaryGeoLocation
+        = MutableStateFlow<CartographicBoundaryGeoLocation?>(value = null)
 
     override fun retrieve(): Flow<CartographicBoundaryGeoLocation?> {
         return cartographicBoundaryGeoLocation

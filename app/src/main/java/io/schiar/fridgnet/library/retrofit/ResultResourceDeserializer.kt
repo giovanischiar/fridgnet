@@ -9,7 +9,9 @@ import java.lang.reflect.Type
 class ResultResourceDeserializer : JsonDeserializer<JSONResult<GeoJSONAttributes>> {
     private val pointResource = object : TypeToken<JSONResult<List<Double>>?>() {}.type
     private val lineStringResource = object : TypeToken<JSONResult<List<List<Double>>>?>() {}.type
-    private val polygonResource = object : TypeToken<JSONResult<List<List<List<Double>>>>?>() {}.type
+    private val polygonResource = object : TypeToken<
+            JSONResult<List<List<List<Double>>>>?
+    >() {}.type
     private val multiPolygonResource =
         object : TypeToken<JSONResult<List<List<List<List<Double>>>>>?>() {}.type
 

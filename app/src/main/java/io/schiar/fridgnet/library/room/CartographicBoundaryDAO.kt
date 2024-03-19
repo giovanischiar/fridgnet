@@ -131,17 +131,23 @@ abstract class CartographicBoundaryDAO {
         updateGeoLocations(getLocationEntities)
     }
 
-    @Query("SELECT * " +
-           "FROM CartographicBoundary " +
-           "WHERE administrativeUnitCartographicBoundariesID = :administrativeUnitID"
+    @Query(
+        "SELECT * " +
+        "FROM CartographicBoundary " +
+        "WHERE administrativeUnitCartographicBoundariesID = :administrativeUnitID"
     )
     abstract fun selectCartographicBoundaryWithRegionsByAdministrativeUnit(
         administrativeUnitID: Long
     ): Flow<CartographicBoundaryWithRegions?>
 
-    @Query("SELECT * " +
-           "FROM CartographicBoundary " +
-           "WHERE id IN (SELECT regionsID FROM Region WHERE id = :regionID)"
+    @Query(
+        "SELECT * " +
+        "FROM CartographicBoundary " +
+        "WHERE id IN (" +
+                "SELECT regionsID " +
+                "FROM Region " +
+                "WHERE id = :regionID" +
+              ")"
     )
     abstract fun select(regionID: Long): Flow<CartographicBoundaryWithRegions?>
 

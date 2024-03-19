@@ -7,7 +7,9 @@ import io.schiar.fridgnet.model.Region
 import kotlinx.coroutines.flow.Flow
 
 interface CartographicBoundaryDataSource {
-    suspend fun retrieveLocationFor(administrativeUnit: AdministrativeUnit, administrativeLevel: AdministrativeLevel)
+    suspend fun retrieveLocationFor(
+        administrativeUnit: AdministrativeUnit, administrativeLevel: AdministrativeLevel
+    )
     fun retrieve(): Flow<List<CartographicBoundary>>
     fun retrieveRegions(): Flow<List<Region>>
     fun retrieve(region: Region): Flow<CartographicBoundary?>

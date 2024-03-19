@@ -4,9 +4,9 @@ import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Region
+import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.datasource.CurrentRegionDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
-import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.mergeToBoundingBox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -26,10 +26,12 @@ class MapRepository(
     private val _regionsMutableSet = mutableSetOf<Region>()
     private var _visibleRegions = emptyList<Region>()
 
-    val visibleRegions = cartographicBoundaryDataSource.retrieveRegions().flowOn(Dispatchers.IO).combine(
-        flow = currentBoundingBoxFlow,
-        transform = ::combineRegionsCurrentBoundingBox
-    )
+    val visibleRegions = cartographicBoundaryDataSource.retrieveRegions()
+        .flowOn(Dispatchers.IO)
+        .combine(
+            flow = currentBoundingBoxFlow,
+            transform = ::combineRegionsCurrentBoundingBox
+        )
     val visibleImages = imageDataSource.retrieve().combine(
         flow = currentBoundingBoxFlow,
         transform = ::combineImagesCurrentBoundingBox

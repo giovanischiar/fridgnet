@@ -87,7 +87,9 @@ fun Map(
             uiSettings = MapUiSettings(zoomControlsEnabled = false)
         ) {
             if (moveCamera && boundingBox != null && mapLoaded) {
-                val cu = CameraUpdateFactory.newLatLngBounds(boundingBox.toLatLngBounds(), 2)
+                val cu = CameraUpdateFactory.newLatLngBounds(
+                    boundingBox.toLatLngBounds(), 2
+                )
                 coroutineScope.launch(Dispatchers.Main) {
                     withContext(coroutineContext) {
                         cameraPositionState.animate(cu, 1000)

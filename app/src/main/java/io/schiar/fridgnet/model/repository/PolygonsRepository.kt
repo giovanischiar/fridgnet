@@ -18,19 +18,24 @@ class PolygonsRepository(
     private val cartographicBoundaryDataSource: CartographicBoundaryDataSource
 ) {
     private var _currentCartographicBoundary: CartographicBoundary? = null
-    private val currentCartographicBoundaryFlow = MutableStateFlow(value = _currentCartographicBoundary)
+    private val currentCartographicBoundaryFlow = MutableStateFlow(
+        value = _currentCartographicBoundary
+    )
     @OptIn(ExperimentalCoroutinesApi::class)
-    val currentCartographicBoundary = merge(currentRegionDataSource.retrieve().flatMapLatest { region ->
-        if (region == null) flowOf(value = null) else cartographicBoundaryDataSource.retrieve(
-            region = region
-        ).onEach {
-            Log.d("", "new cartographic boundary $it")
-            _currentCartographicBoundary = it
-        }
+    val currentCartographicBoundary = merge(currentRegionDataSource.retrieve()
+        .flatMapLatest { region ->
+            if (region == null) {
+                flowOf(value = null)
+            } else cartographicBoundaryDataSource.retrieve(region = region)
+                .onEach { cartographicBoundary ->
+                    Log.d("", "new cartographic boundary $cartographicBoundary")
+                    _currentCartographicBoundary = cartographicBoundary
+                }
     }, currentCartographicBoundaryFlow).distinctUntilChanged()
 
     suspend fun switchRegionAt(index: Int) {
-        val currentCartographicBoundary = (_currentCartographicBoundary ?: return).switchRegionAt(index = index)
+        val currentCartographicBoundary = (_currentCartographicBoundary ?: return)
+            .switchRegionAt(index = index)
         Log.d("", "switchRegionAt($index)")
         _currentCartographicBoundary = currentCartographicBoundary
         currentCartographicBoundaryFlow.update { currentCartographicBoundary }

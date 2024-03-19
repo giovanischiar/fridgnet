@@ -78,9 +78,9 @@ fun HomeScreen(
         )
     )
 
-    val cartographicBoundaryGeoLocations by viewModel.cartographicBoundaryGeoLocations.collectAsState(
-        initial = emptyList()
-    )
+    val cartographicBoundaryGeoLocations by viewModel
+        .cartographicBoundaryGeoLocations
+        .collectAsState(initial = emptyList())
 
     fun getColumnSize(): Int {
         return when (currentAdministrativeLevel) {
@@ -101,7 +101,9 @@ fun HomeScreen(
     ) {
         LazyVerticalGrid(columns = GridCells.Fixed(columnCount)) {
             items(count = cartographicBoundaryGeoLocations.size) { index ->
-                val (cartographicBoundary, initialGeoLocation) = cartographicBoundaryGeoLocations[index]
+                val (
+                    cartographicBoundary, initialGeoLocation
+                ) = cartographicBoundaryGeoLocations[index]
                 MapPhotoItem(
                     initialGeoLocation = initialGeoLocation,
                     cartographicBoundary = cartographicBoundary,

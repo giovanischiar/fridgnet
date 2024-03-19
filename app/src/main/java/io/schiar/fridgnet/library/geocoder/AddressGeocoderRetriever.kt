@@ -9,11 +9,16 @@ import io.schiar.fridgnet.model.datasource.retriever.AdministrativeUnitRetriever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AdministrativeUnitGeocoderRetriever(private val geocoder: Geocoder) : AdministrativeUnitRetriever {
+class AdministrativeUnitGeocoderRetriever(
+    private val geocoder: Geocoder
+) : AdministrativeUnitRetriever {
 
     override suspend fun retrieve(geoLocation: GeoLocation): AdministrativeUnit? {
         val (_, latitude, longitude) = geoLocation
-        Log.d("Add Image Feature", "Getting administrative unit for ($latitude, $longitude)")
+        Log.d(
+            tag = "Add Image Feature",
+            msg = "Getting administrative unit for ($latitude, $longitude)"
+        )
         val address = withContext(Dispatchers.IO) {
             getAddress(latitude = latitude, longitude = longitude)
         }
@@ -42,11 +47,17 @@ class AdministrativeUnitGeocoderRetriever(private val geocoder: Geocoder) : Admi
                     longitude,
                     1
                 )
-                val androidAdministrativeUnit = androidAdministrativeUnits?.firstOrNull() ?: return null
+                val androidAdministrativeUnit = androidAdministrativeUnits
+                    ?.firstOrNull() ?: return null
                 if (androidAdministrativeUnit.countryName == "United States") {
-                    val administrativeUnitName = "${androidAdministrativeUnit.locality}, ${androidAdministrativeUnit.adminArea}"
+                    val administrativeUnitName =
+                        androidAdministrativeUnit.locality + ", "
+                        androidAdministrativeUnit.adminArea
                     @Suppress("DEPRECATION")
-                    androidAdministrativeUnits = geocoder.getFromLocationName(administrativeUnitName, 1)
+                    androidAdministrativeUnits = geocoder.getFromLocationName(
+                        administrativeUnitName,
+                        1
+                    )
                 }
                 return androidAdministrativeUnits?.firstOrNull()
             } catch (e: Exception) {

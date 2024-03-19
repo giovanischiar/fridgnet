@@ -22,9 +22,10 @@ class CartographicBoundaryRoomService(
     }
 
     override fun retrieve(region: Region): Flow<CartographicBoundary?> {
-        return cartographicBoundaryDAO.select(regionID = region.id).map {
-            it?.toCartographicBoundary()
-        }
+        return cartographicBoundaryDAO.select(regionID = region.id)
+            .map { cartographicBoundaryWithRegions ->
+                cartographicBoundaryWithRegions?.toCartographicBoundary()
+            }
     }
 
     override fun retrieve(administrativeUnit: AdministrativeUnit): Flow<CartographicBoundary?> {

@@ -8,9 +8,5 @@ fun List<GeoLocationEntity>.toGeoLocations(): List<GeoLocation> {
 }
 
 fun GeoLocationEntity.toGeoLocation(): GeoLocation {
-    return GeoLocation(
-        id = id,
-        latitude = latitude,
-        longitude = longitude
-    )
+    return GeoLocation(id = id, latitude = latitude, longitude = longitude)
 }

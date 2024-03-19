@@ -25,7 +25,9 @@ class ViewModelFactory(
             AppViewModel::class.java -> AppViewModel(appRepository = appRepository)
             HomeViewModel::class.java -> HomeViewModel(homeRepository = homeRepository)
             MapViewModel::class.java -> MapViewModel(mapRepository = mapRepository)
-            PolygonsViewModel::class.java -> PolygonsViewModel(polygonsRepository = polygonsRepository)
+            PolygonsViewModel::class.java -> {
+                PolygonsViewModel(polygonsRepository = polygonsRepository)
+            }
             PhotosViewModel::class.java -> PhotosViewModel(photosRepository = photosRepository)
             else -> throw IllegalArgumentException("Unknown view model class: ${modelClass.name}")
         } as T

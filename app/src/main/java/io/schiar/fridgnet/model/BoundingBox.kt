@@ -71,7 +71,8 @@ data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
             if (centerAntipode <= 0.0) {
                 longitude in centerAntipode..southwest.longitude
             } else {
-                longitude in -180.0..southwest.longitude || longitude in centerAntipode..180.0
+                longitude in -180.0..southwest.longitude ||
+                        longitude in centerAntipode..180.0
             }
         } else {
             longitude in centerAntipode..southwest.longitude
@@ -85,7 +86,8 @@ data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
             if (centerAntipode >= 0.0) {
                 longitude in northeast.longitude..centerAntipode
             } else {
-                longitude in northeast.longitude..180.0 || longitude in -180.0..centerAntipode
+                longitude in northeast.longitude..180.0 ||
+                        longitude in -180.0..centerAntipode
             }
         } else {
             longitude in northeast.longitude..centerAntipode
