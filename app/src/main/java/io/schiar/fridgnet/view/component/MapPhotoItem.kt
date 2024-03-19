@@ -17,18 +17,18 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import io.schiar.fridgnet.view.util.static
 import io.schiar.fridgnet.view.util.toLatLng
 import io.schiar.fridgnet.view.util.toLatLngBounds
+import io.schiar.fridgnet.view.viewdata.CartographicBoundaryViewData
 import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
-import io.schiar.fridgnet.view.viewdata.LocationViewData
 
 @Composable
 fun MapPhotoItem(
     initialGeoLocation: GeoLocationViewData?,
-    location: LocationViewData?,
+    cartographicBoundary: CartographicBoundaryViewData?,
     columnCount: Int,
     onMapClick: (LatLng) -> Unit
 ) {
     val cameraPositionState = rememberCameraPositionState {
-        var geoLocation = location?.center
+        var geoLocation = cartographicBoundary?.center
         if (geoLocation == null) {
             geoLocation = initialGeoLocation
         }
@@ -45,9 +45,9 @@ fun MapPhotoItem(
         onMapClick = onMapClick,
         onMapLoaded = { mapLoaded = true }
     ) {
-        if (location != null && mapLoaded) {
-            LocationDrawer(location = location)
-            val boundingBox = location.boundingBox.toLatLngBounds()
+        if (cartographicBoundary != null && mapLoaded) {
+            CartographicBoundaryDrawer(cartographicBoundary = cartographicBoundary)
+            val boundingBox = cartographicBoundary.boundingBox.toLatLngBounds()
             val cu = CameraUpdateFactory.newLatLngBounds(boundingBox, 2)
             cameraPositionState.move(cu)
         }

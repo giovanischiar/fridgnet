@@ -3,12 +3,12 @@ package io.schiar.fridgnet.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.schiar.fridgnet.model.repository.PolygonsRepository
-import io.schiar.fridgnet.viewmodel.util.toLocationViewData
+import io.schiar.fridgnet.viewmodel.util.toCartographicBoundaryViewData
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class PolygonsViewModel(private val polygonsRepository: PolygonsRepository) : ViewModel() {
-    val currentLocation = polygonsRepository.currentLocation.map { it?.toLocationViewData() }
+    val currentCartographicBoundary = polygonsRepository.currentCartographicBoundary.map { it?.toCartographicBoundaryViewData() }
 
     fun switchRegionAt(index: Int) = viewModelScope.launch {
         polygonsRepository.switchRegionAt(index = index)

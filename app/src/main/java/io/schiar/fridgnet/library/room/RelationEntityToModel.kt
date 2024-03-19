@@ -1,22 +1,22 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.library.room.relationentity.AdministrativeUnitWithLocationsAndGeoLocations
+import io.schiar.fridgnet.library.room.relationentity.AdministrativeUnitWithCartographicBoundariesAndGeoLocations
+import io.schiar.fridgnet.library.room.relationentity.CartographicBoundaryWithRegions
 import io.schiar.fridgnet.library.room.relationentity.ImageWithAdministrativeUnitAndGeoLocation
-import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
 import io.schiar.fridgnet.library.room.relationentity.PolygonWithGeoLocations
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
-import io.schiar.fridgnet.model.AdministrativeUnitLocationsGeoLocations
 import io.schiar.fridgnet.model.AdministrativeLevel
+import io.schiar.fridgnet.model.AdministrativeUnitCartographicBoundariesGeoLocations
 import io.schiar.fridgnet.model.BoundingBox
+import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.ImageAdministrativeUnit
-import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 
 
-fun List<AdministrativeUnitWithLocationsAndGeoLocations>.toAdministrativeUnitLocationsGeoLocations(): List<AdministrativeUnitLocationsGeoLocations> {
-    return map { it.toAdministrativeUnitLocationsGeoLocations() }
+fun List<AdministrativeUnitWithCartographicBoundariesAndGeoLocations>.toAdministrativeUnitCartographicBoundariesGeoLocations(): List<AdministrativeUnitCartographicBoundariesGeoLocations> {
+    return map { it.toAdministrativeUnitCartographicBoundariesGeoLocations() }
 }
 
 fun List<ImageWithAdministrativeUnitAndGeoLocation>.toImageAdministrativeUnits(): List<ImageAdministrativeUnit>{
@@ -27,10 +27,10 @@ fun List<ImageWithAdministrativeUnitAndGeoLocation>.toImages(): List<Image>{
     return map { it.toImage() }
 }
 
-fun AdministrativeUnitWithLocationsAndGeoLocations.toAdministrativeUnitLocationsGeoLocations(): AdministrativeUnitLocationsGeoLocations {
-    return AdministrativeUnitLocationsGeoLocations(
+fun AdministrativeUnitWithCartographicBoundariesAndGeoLocations.toAdministrativeUnitCartographicBoundariesGeoLocations(): AdministrativeUnitCartographicBoundariesGeoLocations {
+    return AdministrativeUnitCartographicBoundariesGeoLocations(
         administrativeUnit = administrativeUnitEntity.toAdministrativeUnit(),
-        administrativeLevelLocation = locationEntities.toAdministrativeLevelLocation(),
+        administrativeLevelCartographicBoundary = cartographicBoundaryEntities.toAdministrativeLevelCartographicBoundary(),
         geoLocations = geoLocationEntities.toGeoLocations()
     )
 }
@@ -56,33 +56,33 @@ fun ImageWithAdministrativeUnitAndGeoLocation.toImageAdministrativeUnit(): Image
     )
 }
 
-fun List<LocationWithRegions>.toAdministrativeLevelLocation(): Map<AdministrativeLevel, Location> {
+fun List<CartographicBoundaryWithRegions>.toAdministrativeLevelCartographicBoundary(): Map<AdministrativeLevel, CartographicBoundary> {
     return associate {
-        AdministrativeLevel.valueOf(value = it.locationEntity.administrativeLevel) to it.toLocation()
+        AdministrativeLevel.valueOf(value = it.cartographicBoundaryEntity.administrativeLevel) to it.toCartographicBoundary()
     }
 }
 
 
-fun List<LocationWithRegions>.toLocations(): List<Location> {
-    return map { it.toLocation() }
+fun List<CartographicBoundaryWithRegions>.toLocations(): List<CartographicBoundary> {
+    return map { it.toCartographicBoundary() }
 }
 
-fun LocationWithRegions.toLocation(): Location {
-    return Location(
-        id = locationEntity.id,
+fun CartographicBoundaryWithRegions.toCartographicBoundary(): CartographicBoundary {
+    return CartographicBoundary(
+        id = cartographicBoundaryEntity.id,
         administrativeUnit = administrativeUnitEntity.toAdministrativeUnit(),
         regions = regionEntities.map { it.toRegion() },
         boundingBox = BoundingBox(
-            southwest = locationEntity.boundingBoxSouthwest.toGeoLocation(),
-            northeast = locationEntity.boundingBoxNortheast.toGeoLocation(),
+            southwest = cartographicBoundaryEntity.boundingBoxSouthwest.toGeoLocation(),
+            northeast = cartographicBoundaryEntity.boundingBoxNortheast.toGeoLocation(),
         ),
-        zIndex = locationEntity.zIndex,
-        administrativeLevel = AdministrativeLevel.valueOf(value = locationEntity.administrativeLevel)
+        zIndex = cartographicBoundaryEntity.zIndex,
+        administrativeLevel = AdministrativeLevel.valueOf(value = cartographicBoundaryEntity.administrativeLevel)
     )
 }
 
 fun PolygonWithGeoLocations.toPolygon(): Polygon {
-    return Polygon(id = polygon.id, geoLocations = getLocationEntitites.map { it.toGeoLocation() })
+    return Polygon(id = polygon.id, geoLocations = getLocationEntities.map { it.toGeoLocation() })
 }
 
 fun List<RegionWithPolygonAndHoles>.toRegions(): List<Region> {

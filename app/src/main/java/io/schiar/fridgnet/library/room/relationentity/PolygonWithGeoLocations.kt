@@ -9,5 +9,5 @@ data class PolygonWithGeoLocations(
     @Embedded
     val polygon: PolygonEntity,
     @Relation(parentColumn = "id", entityColumn = "geoLocationsID")
-    val getLocationEntitites: List<GeoLocationEntity>
+    val getLocationEntities: List<GeoLocationEntity>
 )

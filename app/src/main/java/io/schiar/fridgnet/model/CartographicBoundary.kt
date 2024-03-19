@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.model
 
-data class Location(
+data class CartographicBoundary(
     val id: Long = 0,
     val administrativeUnit: AdministrativeUnit,
     val regions: List<Region>,
@@ -12,8 +12,8 @@ data class Location(
         return administrativeUnit.name(administrativeLevel = administrativeLevel)
     }
 
-    fun updateAdministrativeUnit(administrativeUnit: AdministrativeUnit): Location {
-        return Location(
+    fun updateAdministrativeUnit(administrativeUnit: AdministrativeUnit): CartographicBoundary {
+        return CartographicBoundary(
             id = id,
             administrativeUnit = administrativeUnit,
             regions = regions,
@@ -23,8 +23,8 @@ data class Location(
         )
     }
 
-    fun switchAll(): Location {
-        return Location(
+    fun switchAll(): CartographicBoundary {
+        return CartographicBoundary(
             id = id,
             administrativeUnit = administrativeUnit,
             regions = regions
@@ -39,15 +39,15 @@ data class Location(
         ).updateBoundingBox()
     }
 
-    fun switchRegionAt(index: Int): Location {
+    fun switchRegionAt(index: Int): CartographicBoundary {
         return switch(region = regions[index])
     }
 
-    private fun switch(region: Region): Location {
+    private fun switch(region: Region): CartographicBoundary {
         val mutableRegions = regions.toMutableList()
         val index = regions.indexOf(region)
         mutableRegions[index] = regions[index].switch()
-        return Location(
+        return CartographicBoundary(
             id = id,
             administrativeUnit = administrativeUnit,
             regions = mutableRegions.toList(),
@@ -57,8 +57,8 @@ data class Location(
         ).updateBoundingBox()
     }
 
-    private fun updateBoundingBox(): Location {
-        return Location(
+    private fun updateBoundingBox(): CartographicBoundary {
+        return CartographicBoundary(
             id = id,
             administrativeUnit = administrativeUnit,
             regions = regions,

@@ -30,7 +30,7 @@ import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 import io.schiar.fridgnet.R
-import io.schiar.fridgnet.view.component.LocationDrawer
+import io.schiar.fridgnet.view.component.CartographicBoundaryDrawer
 import io.schiar.fridgnet.view.component.PhotoGrid
 import io.schiar.fridgnet.view.component.ZoomControls
 import io.schiar.fridgnet.view.util.ScreenInfo
@@ -50,12 +50,12 @@ fun PhotosScreen(
     var mapLoaded by remember { mutableStateOf(false) }
     var zoomedOut by remember { mutableStateOf(true) }
 
-    val locationImages by viewModel.locationImages.collectAsState(
+    val cartographicBoundaryImages by viewModel.cartographicBoundaryImages.collectAsState(
         initial = null
     )
     val coroutineScope = rememberCoroutineScope()
 
-    val (location, images, imagesBondingBox) = locationImages ?: return
+    val (cartographicBoundary, images, imagesBondingBox) = cartographicBoundaryImages ?: return
 
     val missionDoloresPark = LatLng(37.759773, -122.427063)
     val cameraPositionState = rememberCameraPositionState {
@@ -79,7 +79,7 @@ fun PhotosScreen(
     }
 
     info(
-        ScreenInfo(title = location.administrativeUnit)
+        ScreenInfo(title = cartographicBoundary.administrativeUnit)
     )
     Column {
         Box(
@@ -90,15 +90,15 @@ fun PhotosScreen(
             GoogleMap(
                 cameraPositionState = cameraPositionState,
                 properties = MapProperties(
-                    latLngBoundsForCameraTarget = location.boundingBox.toLatLngBounds()
+                    latLngBoundsForCameraTarget = cartographicBoundary.boundingBox.toLatLngBounds()
                 ),
                 uiSettings = MapUiSettings(zoomControlsEnabled = false),
                 onMapLoaded = {
                     mapLoaded = true
-                    moveCamera(boundingBox = location.boundingBox)
+                    moveCamera(boundingBox = cartographicBoundary.boundingBox)
                 }
             ) {
-                LocationDrawer(location = location)
+                CartographicBoundaryDrawer(cartographicBoundary = cartographicBoundary)
                 images.map {
                     Marker(
                         state = MarkerState(position = it.geoLocation.toLatLng()),
@@ -121,7 +121,7 @@ fun PhotosScreen(
                         val boundingBox = (if (zoomedOut) {
                             imagesBoundingBox
                         } else {
-                            location.boundingBox
+                            cartographicBoundary.boundingBox
                         })
                         moveCamera(boundingBox = boundingBox, animate = true, padding = 27)
                         zoomedOut = !zoomedOut
@@ -138,7 +138,7 @@ fun PhotosScreen(
                         contentDescription = if (zoomedOut) {
                             "Zoom to fit all photos"
                         } else {
-                            "Zoom to fit the whole location"
+                            "Zoom to fit the whole cartographicBoundary"
                         },
                         tint = colorResource(id = R.color.white).copy(alpha = 0.40f)
                     )

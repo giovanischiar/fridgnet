@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.view.viewdata
 
-data class LocationViewData(
+data class CartographicBoundaryViewData(
     val administrativeUnit: String,
     val regions: List<RegionViewData>,
     val boundingBox: BoundingBoxViewData,

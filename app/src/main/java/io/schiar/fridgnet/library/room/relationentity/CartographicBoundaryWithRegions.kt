@@ -3,15 +3,15 @@ package io.schiar.fridgnet.library.room.relationentity
 import androidx.room.Embedded
 import androidx.room.Relation
 import io.schiar.fridgnet.library.room.entity.AdministrativeUnitEntity
-import io.schiar.fridgnet.library.room.entity.LocationEntity
+import io.schiar.fridgnet.library.room.entity.CartographicBoundaryEntity
 import io.schiar.fridgnet.library.room.entity.RegionEntity
 
-data class LocationWithRegions(
+data class CartographicBoundaryWithRegions(
     @Embedded
-    val locationEntity: LocationEntity,
+    val cartographicBoundaryEntity: CartographicBoundaryEntity,
     @Relation(
         entity = AdministrativeUnitEntity::class,
-        parentColumn = "administrativeUnitLocationsID",
+        parentColumn = "administrativeUnitCartographicBoundariesID",
         entityColumn = "id"
     )
     val administrativeUnitEntity: AdministrativeUnitEntity,

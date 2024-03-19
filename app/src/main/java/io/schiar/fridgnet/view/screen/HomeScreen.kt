@@ -78,7 +78,7 @@ fun HomeScreen(
         )
     )
 
-    val locationGeoLocations by viewModel.locationGeoLocations.collectAsState(
+    val cartographicBoundaryGeoLocations by viewModel.cartographicBoundaryGeoLocations.collectAsState(
         initial = emptyList()
     )
 
@@ -100,14 +100,14 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyVerticalGrid(columns = GridCells.Fixed(columnCount)) {
-            items(count = locationGeoLocations.size) { index ->
-                val (location, initialGeoLocation) = locationGeoLocations[index]
+            items(count = cartographicBoundaryGeoLocations.size) { index ->
+                val (cartographicBoundary, initialGeoLocation) = cartographicBoundaryGeoLocations[index]
                 MapPhotoItem(
                     initialGeoLocation = initialGeoLocation,
-                    location = location,
+                    cartographicBoundary = cartographicBoundary,
                     columnCount = columnCount
                 ) {
-                    viewModel.selectLocationGeoLocationAt(index = index)
+                    viewModel.selectCartographicBoundaryGeoLocationAt(index = index)
                     onNavigateImage()
                 }
             }

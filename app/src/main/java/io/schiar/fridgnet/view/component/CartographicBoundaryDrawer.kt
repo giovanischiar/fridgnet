@@ -4,11 +4,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import com.google.maps.android.compose.Polygon
 import io.schiar.fridgnet.view.util.toLatLngList
-import io.schiar.fridgnet.view.viewdata.LocationViewData
+import io.schiar.fridgnet.view.viewdata.CartographicBoundaryViewData
 
 @Composable
-fun LocationDrawer(location: LocationViewData) {
-    location.regions.map {
+fun CartographicBoundaryDrawer(cartographicBoundary: CartographicBoundaryViewData) {
+    cartographicBoundary.regions.map {
         Polygon(
             points = it.polygon.geoLocations.toLatLngList(),
             visible = it.active,

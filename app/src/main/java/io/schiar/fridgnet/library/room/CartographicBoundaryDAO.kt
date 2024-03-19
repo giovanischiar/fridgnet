@@ -6,22 +6,22 @@ import androidx.room.OnConflictStrategy.Companion.REPLACE
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Update
+import io.schiar.fridgnet.library.room.entity.CartographicBoundaryEntity
 import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
-import io.schiar.fridgnet.library.room.entity.LocationEntity
 import io.schiar.fridgnet.library.room.entity.PolygonEntity
 import io.schiar.fridgnet.library.room.entity.RegionEntity
-import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
+import io.schiar.fridgnet.library.room.relationentity.CartographicBoundaryWithRegions
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
+import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
-import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-abstract class LocationDAO {
+abstract class CartographicBoundaryDAO {
     @Insert(onConflict = REPLACE)
-    abstract suspend fun insert(locationEntity: LocationEntity): Long
+    abstract suspend fun insert(cartographicBoundaryEntity: CartographicBoundaryEntity): Long
 
     @Insert(onConflict = REPLACE)
     abstract suspend fun insert(regionEntity: RegionEntity): Long
@@ -30,24 +30,33 @@ abstract class LocationDAO {
     abstract suspend fun insert(polygonEntity: PolygonEntity): Long
 
     @Insert(onConflict = REPLACE)
-    abstract suspend fun insertGeoLocations(geoLocationEntities: List<GeoLocationEntity>): List<Long>
+    abstract suspend fun insertGeoLocations(
+        geoLocationEntities: List<GeoLocationEntity>
+    ): List<Long>
 
     @Transaction
-    open suspend fun insert(location: Location) {
-        val locationID = insert(locationEntity = location.toLocationEntity())
-        insertRegions(locationID = locationID, regions = location.regions)
+    open suspend fun insert(cartographicBoundary: CartographicBoundary) {
+        val cartographicBoundaryID = insert(
+            cartographicBoundaryEntity = cartographicBoundary.toCartographicBoundaryEntity()
+        )
+        insertRegions(
+            cartographicBoundaryID = cartographicBoundaryID,
+            regions = cartographicBoundary.regions
+        )
     }
 
-    private suspend fun insertRegions(locationID: Long, regions: List<Region>) {
+    private suspend fun insertRegions(cartographicBoundaryID: Long, regions: List<Region>) {
         regions.forEach { region ->
-            insertRegion(locationID = locationID, region = region)
+            insertRegion(cartographicBoundaryID = cartographicBoundaryID, region = region)
         }
     }
 
-    private suspend fun insertRegion(locationID: Long, region: Region) {
+    private suspend fun insertRegion(cartographicBoundaryID: Long, region: Region) {
         val (_, polygon, holes, _) = region
         val polygonID = insertPolygon(polygon)
-        val regionEntity = region.toRegionEntity(regionsID = locationID, polygonID = polygonID)
+        val regionEntity = region.toRegionEntity(
+            regionsID = cartographicBoundaryID, polygonID = polygonID
+        )
         val regionID = insert(regionEntity = regionEntity)
         insertHoles(regionID = regionID, holes)
     }
@@ -73,23 +82,29 @@ abstract class LocationDAO {
     }
 
     @Transaction
-    open suspend fun update(location: Location) {
-        update(locationEntity = location.toLocationEntity(id = location.id))
-        updateRegions(locationID = location.id, regions = location.regions)
+    open suspend fun update(cartographicBoundary: CartographicBoundary) {
+        update(
+            cartographicBoundaryEntity = cartographicBoundary.toCartographicBoundaryEntity(
+                id = cartographicBoundary.id
+            )
+        )
+        updateRegions(
+            cartographicBoundaryID = cartographicBoundary.id, regions = cartographicBoundary.regions
+        )
     }
 
-    private suspend fun updateRegions(locationID: Long, regions: List<Region>) {
+    private suspend fun updateRegions(cartographicBoundaryID: Long, regions: List<Region>) {
         regions.forEach { region ->
-            updateRegion(locationID = locationID, region = region)
+            updateRegion(cartographicBoundaryID = cartographicBoundaryID, region = region)
         }
     }
 
-    private suspend fun updateRegion(locationID: Long, region: Region) {
+    private suspend fun updateRegion(cartographicBoundaryID: Long, region: Region) {
         val (id, polygon, holes) = region
         updatePolygon(polygon)
         val regionEntity = region.toRegionEntity(
             id = id,
-            regionsID = locationID,
+            regionsID = cartographicBoundaryID,
             polygonID = polygon.id
         )
         update(regionEntity = regionEntity)
@@ -116,21 +131,30 @@ abstract class LocationDAO {
         updateGeoLocations(getLocationEntities)
     }
 
-    @Query("SELECT * FROM Location Where administrativeUnitLocationsID = :administrativeUnitID")
-    abstract fun selectLocationWithRegionsByAdministrativeUnit(administrativeUnitID: Long): Flow<LocationWithRegions?>
+    @Query("SELECT * " +
+           "FROM CartographicBoundary " +
+           "WHERE administrativeUnitCartographicBoundariesID = :administrativeUnitID"
+    )
+    abstract fun selectCartographicBoundaryWithRegionsByAdministrativeUnit(
+        administrativeUnitID: Long
+    ): Flow<CartographicBoundaryWithRegions?>
 
-    @Query("SELECT * FROM Location WHERE id IN (SELECT regionsID FROM Region WHERE id = :regionID)")
-    abstract fun select(regionID: Long): Flow<LocationWithRegions?>
+    @Query("SELECT * " +
+           "FROM CartographicBoundary " +
+           "WHERE id IN (SELECT regionsID FROM Region WHERE id = :regionID)"
+    )
+    abstract fun select(regionID: Long): Flow<CartographicBoundaryWithRegions?>
 
     @Transaction
-    @Query("SELECT * FROM Location")
-    abstract fun selectLocationsWithRegions(): Flow<List<LocationWithRegions>>
+    @Query("SELECT * FROM CartographicBoundary")
+    abstract fun selectCartographicBoundariesWithRegions()
+        : Flow<List<CartographicBoundaryWithRegions>>
 
     @Query("SELECT * FROM Region")
     abstract fun selectRegions(): Flow<List<RegionWithPolygonAndHoles>>
 
     @Update
-    abstract suspend fun update(locationEntity: LocationEntity)
+    abstract suspend fun update(cartographicBoundaryEntity: CartographicBoundaryEntity)
 
     @Update
     abstract suspend fun update(regionEntity: RegionEntity)

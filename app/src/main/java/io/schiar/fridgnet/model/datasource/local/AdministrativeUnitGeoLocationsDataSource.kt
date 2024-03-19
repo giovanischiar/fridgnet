@@ -1,9 +1,9 @@
 package io.schiar.fridgnet.model.datasource.local
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.AdministrativeUnit
-import io.schiar.fridgnet.model.AdministrativeUnitLocationsGeoLocations
 import io.schiar.fridgnet.model.AdministrativeLevel
+import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeUnitCartographicBoundariesGeoLocations
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.retriever.AdministrativeUnitRetriever
@@ -24,7 +24,7 @@ class AdministrativeUnitGeoLocationsDataSource(
     }
 
     private fun updateCacheFromService(
-        administrativeUnitesLocationsGeoLocations: List<AdministrativeUnitLocationsGeoLocations>
+        administrativeUnitesLocationsGeoLocations: List<AdministrativeUnitCartographicBoundariesGeoLocations>
     ) {
         administrativeUnitesLocationsGeoLocations.forEach { administrativeUnitesLocationsGeoLocation ->
             geoLocationSet.addAll(elements = administrativeUnitesLocationsGeoLocation.geoLocations)
@@ -43,7 +43,7 @@ class AdministrativeUnitGeoLocationsDataSource(
         log(geoLocation = geoLocation, "It's not on the Geocoder!")
     }
 
-    override fun retrieve(): Flow<List<AdministrativeUnitLocationsGeoLocations>> {
+    override fun retrieve(): Flow<List<AdministrativeUnitCartographicBoundariesGeoLocations>> {
         return administrativeUnitService.retrieve().onEach(::updateCacheFromService)
     }
 

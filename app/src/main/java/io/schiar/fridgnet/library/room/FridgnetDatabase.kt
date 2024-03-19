@@ -5,9 +5,9 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import io.schiar.fridgnet.library.room.entity.AdministrativeUnitEntity
+import io.schiar.fridgnet.library.room.entity.CartographicBoundaryEntity
 import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.library.room.entity.ImageEntity
-import io.schiar.fridgnet.library.room.entity.LocationEntity
 import io.schiar.fridgnet.library.room.entity.PolygonEntity
 import io.schiar.fridgnet.library.room.entity.RegionEntity
 
@@ -16,7 +16,7 @@ import io.schiar.fridgnet.library.room.entity.RegionEntity
         ImageEntity::class,
         AdministrativeUnitEntity::class,
         GeoLocationEntity::class,
-        LocationEntity::class,
+        CartographicBoundaryEntity::class,
         PolygonEntity::class,
         RegionEntity::class,
     ],
@@ -26,7 +26,7 @@ import io.schiar.fridgnet.library.room.entity.RegionEntity
 abstract class FridgnetDatabase : RoomDatabase() {
     abstract fun imageDAO(): ImageDAO
     abstract fun administrativeUnitDAO(): AdministrativeUnitDAO
-    abstract fun locationDAO(): LocationDAO
+    abstract fun cartographicBoundaryDAO(): CartographicBoundaryDAO
 
     companion object {
         @Volatile
@@ -37,7 +37,7 @@ abstract class FridgnetDatabase : RoomDatabase() {
                 Room.databaseBuilder(
                     context = context,
                     klass = FridgnetDatabase::class.java,
-                    name = "location_database"
+                    name = "fridgnet_database"
                 ).fallbackToDestructiveMigration().build().also { Instance = it }
             }
         }

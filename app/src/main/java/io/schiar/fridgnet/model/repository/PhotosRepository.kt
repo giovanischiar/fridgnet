@@ -1,12 +1,12 @@
 package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
+import io.schiar.fridgnet.model.CartographicBoundaryGeoLocation
+import io.schiar.fridgnet.model.CartographicBoundaryImages
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
-import io.schiar.fridgnet.model.LocationGeoLocation
-import io.schiar.fridgnet.model.LocationImages
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
-import io.schiar.fridgnet.model.datasource.CurrentLocationGeoLocationDataSource
+import io.schiar.fridgnet.model.datasource.CurrentCartographicBoundaryGeoLocationDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
@@ -16,22 +16,22 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 
 class PhotosRepository(
-    currentAdministrativeUnitLocationsGeoLocationsDataSource: CurrentLocationGeoLocationDataSource,
+    currentCartographicBoundaryGeoLocationsDataSource: CurrentCartographicBoundaryGeoLocationDataSource,
     imageDataSource: ImageDataSource,
-    administrativeUnitLocationsGeoLocationsDataSource: AdministrativeUnitDataSource
+    administrativeUnitDataSource: AdministrativeUnitDataSource
 )  {
-    private var locationGeoLocation: LocationGeoLocation? = null
+    private var cartographicBoundaryGeoLocation: CartographicBoundaryGeoLocation? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val locationImages = currentAdministrativeUnitLocationsGeoLocationsDataSource
+    val cartographicBoundaryImages = currentCartographicBoundaryGeoLocationsDataSource
         .retrieve()
-        .onEach { locationGeoLocation = it }
+        .onEach { cartographicBoundaryGeoLocation = it }
         .flatMapLatest {
-            if (it?.location == null) {
+            if (it?.cartographicBoundary == null) {
                 return@flatMapLatest flowOf(value = emptyList())
             } else {
-                administrativeUnitLocationsGeoLocationsDataSource.retrieveGeoLocations(
-                    administrativeUnit = it.location.administrativeUnit, administrativeLevel = it.location.administrativeLevel
+                administrativeUnitDataSource.retrieveGeoLocations(
+                    administrativeUnit = it.cartographicBoundary.administrativeUnit, administrativeLevel = it.cartographicBoundary.administrativeLevel
                 )
             }
         }.combine(
@@ -41,10 +41,10 @@ class PhotosRepository(
 
     private fun combineGeoLocationImages(
         geoLocations: List<GeoLocation>, images: List<Image>
-    ): LocationImages? {
+    ): CartographicBoundaryImages? {
         Log.d("", "combineGeoLocationImages(geoLocations = $geoLocations, image geoLocations = ${images.map { it.geoLocation }} )")
-        return LocationImages(
-            location = locationGeoLocation?.location ?: return null,
+        return CartographicBoundaryImages(
+            cartographicBoundary = cartographicBoundaryGeoLocation?.cartographicBoundary ?: return null,
             images = images.filter { image -> geoLocations.contains(element = image.geoLocation) }
         )
     }

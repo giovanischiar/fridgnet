@@ -6,7 +6,7 @@ import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.CurrentRegionDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
-import io.schiar.fridgnet.model.datasource.LocationDataSource
+import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.mergeToBoundingBox
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -18,7 +18,7 @@ import kotlinx.coroutines.withContext
 import kotlin.time.measureTime
 
 class MapRepository(
-    locationDataSource: LocationDataSource,
+    cartographicBoundaryDataSource: CartographicBoundaryDataSource,
     imageDataSource: ImageDataSource,
     private val currentRegionDataSource: CurrentRegionDataSource
 ) {
@@ -26,7 +26,7 @@ class MapRepository(
     private val _regionsMutableSet = mutableSetOf<Region>()
     private var _visibleRegions = emptyList<Region>()
 
-    val visibleRegions = locationDataSource.retrieveRegions().flowOn(Dispatchers.IO).combine(
+    val visibleRegions = cartographicBoundaryDataSource.retrieveRegions().flowOn(Dispatchers.IO).combine(
         flow = currentBoundingBoxFlow,
         transform = ::combineRegionsCurrentBoundingBox
     )

@@ -32,15 +32,15 @@ import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 
 @Composable
 fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) -> Unit) {
-    val location by viewModel.currentLocation.collectAsState(initial = null)
-    val regions = (location ?: return).regions
+    val cartographicBoundary by viewModel.currentCartographicBoundary.collectAsState(initial = null)
+    val regions = (cartographicBoundary ?: return).regions
     val sortedRegions = regions.sortedBy {
         it.polygon.geoLocations.size
     }.asReversed()
 
     info(
         ScreenInfo(
-            title = location?.administrativeUnit ?: stringResource(id = R.string.polygons_screen),
+            title = cartographicBoundary?.administrativeUnit ?: stringResource(id = R.string.polygons_screen),
             actions = {
                 if (sortedRegions.size > 1) {
                     Button(

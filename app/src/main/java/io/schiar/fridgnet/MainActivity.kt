@@ -7,21 +7,21 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import io.schiar.fridgnet.library.android.ImageAndroidRetriever
 import io.schiar.fridgnet.library.geocoder.AdministrativeUnitGeocoderRetriever
-import io.schiar.fridgnet.library.retrofit.LocationRetrofitRetriever
+import io.schiar.fridgnet.library.retrofit.CartographicBoundaryRetrofitRetriever
 import io.schiar.fridgnet.library.retrofit.NominatimAPI
 import io.schiar.fridgnet.library.retrofit.RetrofitHelper
 import io.schiar.fridgnet.library.room.AdministrativeUnitRoomService
+import io.schiar.fridgnet.library.room.CartographicBoundaryRoomService
 import io.schiar.fridgnet.library.room.FridgnetDatabase
 import io.schiar.fridgnet.library.room.ImageRoomService
-import io.schiar.fridgnet.library.room.LocationRoomService
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
+import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
-import io.schiar.fridgnet.model.datasource.LocationDataSource
 import io.schiar.fridgnet.model.datasource.local.AdministrativeUnitGeoLocationsDataSource
-import io.schiar.fridgnet.model.datasource.local.CurrentLocationGeoLocationDataSource
+import io.schiar.fridgnet.model.datasource.local.CartographicBoundaryAPIDBDataSource
+import io.schiar.fridgnet.model.datasource.local.CurrentCartographicBoundaryGeoLocationDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
 import io.schiar.fridgnet.model.datasource.local.ImageAndroidDBDataSource
-import io.schiar.fridgnet.model.datasource.local.LocationAPIDBDataSource
 import io.schiar.fridgnet.model.repository.AppRepository
 import io.schiar.fridgnet.model.repository.HomeRepository
 import io.schiar.fridgnet.model.repository.MapRepository
@@ -84,33 +84,33 @@ class MainActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     private fun createRepositories(): Repositories {
         val imageDataSource = createImageDataSource()
-        val administrativeUnitLocationsGeoLocationsDataSource = createAdministrativeUnitGeoLocationsDataSource()
-        val locationDataSource = createLocationDataSource()
+        val administrativeUnitDataSource = createAdministrativeUnitDataSource()
+        val cartographicBoundaryDataSource = createCartographicBoundaryDataSource()
         val currentRegionDataSource = CurrentRegionLocalDataSource()
-        val currentAdministrativeUnitLocationsGeoLocationsDataSource = CurrentLocationGeoLocationDataSource()
+        val currentCartographicBoundaryGeoLocationsDataSource = CurrentCartographicBoundaryGeoLocationDataSource()
 
         val polygonsRepository = PolygonsRepository(
             currentRegionDataSource = currentRegionDataSource,
-            locationDataSource = locationDataSource
+            cartographicBoundaryDataSource = cartographicBoundaryDataSource
         )
         val mapRepository = MapRepository(
-            locationDataSource = locationDataSource,
+            cartographicBoundaryDataSource = cartographicBoundaryDataSource,
             imageDataSource = imageDataSource,
             currentRegionDataSource = currentRegionDataSource
         )
 
         val photosRepository = PhotosRepository(
-            currentAdministrativeUnitLocationsGeoLocationsDataSource
-                = currentAdministrativeUnitLocationsGeoLocationsDataSource,
+            currentCartographicBoundaryGeoLocationsDataSource
+                = currentCartographicBoundaryGeoLocationsDataSource,
             imageDataSource = imageDataSource,
-            administrativeUnitLocationsGeoLocationsDataSource = administrativeUnitLocationsGeoLocationsDataSource
+            administrativeUnitDataSource = administrativeUnitDataSource
         )
 
         val homeRepository = HomeRepository(
-            administrativeUnitDataSource = administrativeUnitLocationsGeoLocationsDataSource,
-            locationDataSource = locationDataSource,
+            administrativeUnitDataSource = administrativeUnitDataSource,
+            cartographicBoundaryDataSource = cartographicBoundaryDataSource,
             imageDataSource = imageDataSource,
-            currentLocationGeoLocationDataSource = currentAdministrativeUnitLocationsGeoLocationsDataSource,
+            currentCartographicBoundaryGeoLocationsDataSource = currentCartographicBoundaryGeoLocationsDataSource,
             externalScope = GlobalScope
         )
 
@@ -131,7 +131,7 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun createAdministrativeUnitGeoLocationsDataSource(): AdministrativeUnitDataSource {
+    private fun createAdministrativeUnitDataSource(): AdministrativeUnitDataSource {
         val geocoder = Geocoder(applicationContext, Locale.US)
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
         val administrativeUnitDAO = fridgnetDatabase.administrativeUnitDAO()
@@ -141,14 +141,14 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun createLocationDataSource(): LocationDataSource {
+    private fun createCartographicBoundaryDataSource(): CartographicBoundaryDataSource {
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
-        val locationDAO = fridgnetDatabase.locationDAO()
+        val cartographicBoundaryDAO = fridgnetDatabase.cartographicBoundaryDAO()
         val retrofitHelper = RetrofitHelper.getInstance()
         val nominatimAPI = retrofitHelper.create(NominatimAPI::class.java)
-        return LocationAPIDBDataSource(
-            locationRetriever = LocationRetrofitRetriever(nominatimAPI = nominatimAPI),
-            locationService = LocationRoomService(locationDAO = locationDAO)
+        return CartographicBoundaryAPIDBDataSource(
+            cartographicBoundaryRetriever = CartographicBoundaryRetrofitRetriever(nominatimAPI = nominatimAPI),
+            cartographicBoundaryService = CartographicBoundaryRoomService(cartographicBoundaryDAO = cartographicBoundaryDAO)
         )
     }
 }

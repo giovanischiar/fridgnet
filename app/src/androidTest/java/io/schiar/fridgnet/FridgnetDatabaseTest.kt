@@ -5,8 +5,8 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import io.schiar.fridgnet.library.room.CartographicBoundaryRoomService
 import io.schiar.fridgnet.library.room.FridgnetDatabase
-import io.schiar.fridgnet.library.room.LocationRoomService
 import io.schiar.fridgnet.model.*
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -20,7 +20,7 @@ import java.io.IOException
 @RunWith(AndroidJUnit4::class)
 class FridgnetDatabaseTest {
     private lateinit var database: FridgnetDatabase
-    private lateinit var locationDBDataSource: LocationRoomService
+    private lateinit var cartographicBoundaryRoomService: CartographicBoundaryRoomService
 
     @Before
     fun createDatabase() {
@@ -29,7 +29,7 @@ class FridgnetDatabaseTest {
             context = context,
             klass = FridgnetDatabase::class.java
         ).build()
-        locationDBDataSource = LocationRoomService(locationDAO = database.locationDAO())
+        cartographicBoundaryRoomService = CartographicBoundaryRoomService(cartographicBoundaryDAO = database.cartographicBoundaryDAO())
     }
 
     @After
@@ -39,7 +39,7 @@ class FridgnetDatabaseTest {
     }
 
     @Test
-    fun insertLocationAndEnsureTheLocationRetrievedIsTheSame() = runTest {
+    fun insertCartographicBoundaryAndEnsureTheCartographicBoundaryRetrievedIsTheSame() = runTest {
         val region = Region(
             polygon = Polygon(
                 geoLocations = listOf(
@@ -77,7 +77,7 @@ class FridgnetDatabaseTest {
             countryName = "Square Country",
         )
 
-        val location = Location(
+        val cartographicBoundary = CartographicBoundary(
             administrativeUnit = administrativeUnit,
             regions = listOf(region),
             boundingBox = BoundingBox(
@@ -88,8 +88,8 @@ class FridgnetDatabaseTest {
             administrativeLevel = AdministrativeLevel.CITY
         )
 
-        locationDBDataSource.create(location = location)
-        val actual = locationDBDataSource.selectLocationByAdministrativeUnit(administrativeUnit = administrativeUnit).first()
-        assertThat(actual, equalTo(location))
+        cartographicBoundaryRoomService.create(cartographicBoundary = cartographicBoundary)
+        val actual = cartographicBoundaryRoomService.selectCartographicBoundaryByAdministrativeUnit(administrativeUnit = administrativeUnit).first()
+        assertThat(actual, equalTo(cartographicBoundary))
     }
 }

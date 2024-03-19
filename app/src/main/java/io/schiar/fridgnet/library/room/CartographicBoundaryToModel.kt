@@ -1,9 +1,9 @@
 package io.schiar.fridgnet.library.room
 
+import io.schiar.fridgnet.library.room.entity.CartographicBoundaryEntity
 import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
-import io.schiar.fridgnet.library.room.entity.LocationEntity
+import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
-import io.schiar.fridgnet.model.Location
 
 fun List<GeoLocation>.toGeoLocationEntities(geoLocationsID: Long): List<GeoLocationEntity> {
     return map { it.toGeoLocationEntity(geoLocationsID = geoLocationsID) }
@@ -13,9 +13,9 @@ fun List<GeoLocation>.toGeoLocationEntitiesWithID(geoLocationsID: Long): List<Ge
     return map { it.toGeoLocationEntity(id = it.id, geoLocationsID = geoLocationsID) }
 }
 
-fun Location.toLocationEntity(): LocationEntity {
-    return LocationEntity(
-        administrativeUnitLocationsID = administrativeUnit.id,
+fun CartographicBoundary.toCartographicBoundaryEntity(): CartographicBoundaryEntity {
+    return CartographicBoundaryEntity(
+        administrativeUnitCartographicBoundariesID = administrativeUnit.id,
         administrativeLevel = administrativeLevel.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toGeoLocationEntity(),
         boundingBoxNortheast = boundingBox.northeast.toGeoLocationEntity(),
@@ -23,10 +23,10 @@ fun Location.toLocationEntity(): LocationEntity {
     )
 }
 
-fun Location.toLocationEntity(id: Long): LocationEntity {
-    return LocationEntity(
+fun CartographicBoundary.toCartographicBoundaryEntity(id: Long): CartographicBoundaryEntity {
+    return CartographicBoundaryEntity(
         id = id,
-        administrativeUnitLocationsID = administrativeUnit.id,
+        administrativeUnitCartographicBoundariesID = administrativeUnit.id,
         administrativeLevel = administrativeLevel.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toGeoLocationEntity(),
         boundingBoxNortheast = boundingBox.northeast.toGeoLocationEntity(),

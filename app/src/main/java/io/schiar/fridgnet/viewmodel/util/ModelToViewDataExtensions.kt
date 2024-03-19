@@ -2,20 +2,20 @@ package io.schiar.fridgnet.viewmodel.util
 
 import android.net.Uri
 import io.schiar.fridgnet.model.BoundingBox
+import io.schiar.fridgnet.model.CartographicBoundary
+import io.schiar.fridgnet.model.CartographicBoundaryGeoLocation
+import io.schiar.fridgnet.model.CartographicBoundaryImages
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
-import io.schiar.fridgnet.model.Location
-import io.schiar.fridgnet.model.LocationGeoLocation
-import io.schiar.fridgnet.model.LocationImages
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.mergeToBoundingBox
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
+import io.schiar.fridgnet.view.viewdata.CartographicBoundaryGeoLocationViewData
+import io.schiar.fridgnet.view.viewdata.CartographicBoundaryImagesViewData
+import io.schiar.fridgnet.view.viewdata.CartographicBoundaryViewData
 import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
-import io.schiar.fridgnet.view.viewdata.LocationGeoLocationViewData
-import io.schiar.fridgnet.view.viewdata.LocationImagesViewData
-import io.schiar.fridgnet.view.viewdata.LocationViewData
 import io.schiar.fridgnet.view.viewdata.PolygonViewData
 import io.schiar.fridgnet.view.viewdata.RegionViewData
 
@@ -54,9 +54,9 @@ fun List<Image>.toImageViewDataList(): List<ImageViewData> {
     return map { it.toViewData() }
 }
 
-// Location
-fun Location.toLocationViewData(): LocationViewData {
-    return LocationViewData(
+// CartographicBoundary
+fun CartographicBoundary.toCartographicBoundaryViewData(): CartographicBoundaryViewData {
+    return CartographicBoundaryViewData(
         administrativeUnit = administrativeUnitName(),
         regions = regions.map { it.toRegionViewData() },
         boundingBox = boundingBox.toBoundingBoxViewData(),
@@ -86,23 +86,23 @@ fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
     return map { it.toRegionViewData() }
 }
 
-// LocationGeoLocation
-fun LocationGeoLocation.toLocationImagesViewData(): LocationGeoLocationViewData {
-    return LocationGeoLocationViewData(
-        location = location?.toLocationViewData(),
+// CartographicBoundaryGeoLocation
+fun CartographicBoundaryGeoLocation.toGeographicBoundaryImagesViewData(): CartographicBoundaryGeoLocationViewData {
+    return CartographicBoundaryGeoLocationViewData(
+        cartographicBoundary = cartographicBoundary?.toCartographicBoundaryViewData(),
         initialGeoLocation = initialGeoLocation?.toGeoLocationViewData() ?: GeoLocationViewData()
     )
 }
 
-fun List<LocationGeoLocation>.toLocationGeoLocationViewDataList()
-        : List<LocationGeoLocationViewData> {
-    return map { it.toLocationImagesViewData() }
+fun List<CartographicBoundaryGeoLocation>.toCartographicBoundaryGeoLocationViewDataList()
+        : List<CartographicBoundaryGeoLocationViewData> {
+    return map { it.toGeographicBoundaryImagesViewData() }
 }
 
-// LocationImages
-fun LocationImages.toLocationImagesViewData(): LocationImagesViewData {
-    return LocationImagesViewData(
-        location = location.toLocationViewData(),
+// CartographicBoundaryImages
+fun CartographicBoundaryImages.toGeographicBoundaryImagesViewData(): CartographicBoundaryImagesViewData {
+    return CartographicBoundaryImagesViewData(
+        cartographicBoundary = cartographicBoundary.toCartographicBoundaryViewData(),
         images = images.toImageViewDataList(),
         imagesBoundingBox = images.mergeToBoundingBox()?.toBoundingBoxViewData()
     )
