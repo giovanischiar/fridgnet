@@ -2,7 +2,7 @@ package io.schiar.fridgnet.model.datasource.local
 
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.LocationDataSource
@@ -40,23 +40,23 @@ class LocationAPIDBDataSource(
         locations.forEach { updateCache(address = it.address, location = it) }
     }
 
-    override suspend fun retrieveLocationFor(address: Address, administrativeUnit: AdministrativeUnit) {
-        val addressAdministrativeUnit = Pair(address, administrativeUnit)
-        val addressName = address.name(administrativeUnit = administrativeUnit)
+    override suspend fun retrieveLocationFor(address: Address, administrativeLevel: AdministrativeLevel) {
+        val addressAdministrativeLevel = Pair(address, administrativeLevel)
+        val addressName = address.name(administrativeLevel = administrativeLevel)
         if (addressSet.contains(element = addressName)) return
         addressSet.add(element = addressName)
-        log(addressAdministrativeUnit = addressAdministrativeUnit, "It's not on memory, retrieving using the API")
-        val locationFromRetriever = when(administrativeUnit) {
-            AdministrativeUnit.CITY -> locationRetriever.retrieveLocality(address = address)
-            AdministrativeUnit.COUNTY -> locationRetriever.retrieveSubAdmin(address = address)
-            AdministrativeUnit.STATE -> locationRetriever.retrieveAdmin(address = address)
-            AdministrativeUnit.COUNTRY -> locationRetriever.retrieveCountry(address = address)
+        log(addressAdministrativeLevel = addressAdministrativeLevel, "It's not on memory, retrieving using the API")
+        val locationFromRetriever = when(administrativeLevel) {
+            AdministrativeLevel.CITY -> locationRetriever.retrieveLocality(address = address)
+            AdministrativeLevel.COUNTY -> locationRetriever.retrieveSubAdmin(address = address)
+            AdministrativeLevel.STATE -> locationRetriever.retrieveAdmin(address = address)
+            AdministrativeLevel.COUNTRY -> locationRetriever.retrieveCountry(address = address)
         }
         if (locationFromRetriever != null) {
             create(location = locationFromRetriever)
             return
         }
-        log(addressAdministrativeUnit = addressAdministrativeUnit, "It's not on the API!")
+        log(addressAdministrativeLevel = addressAdministrativeLevel, "It's not on the API!")
     }
 
     override fun retrieve(): Flow<List<Location>> {
@@ -77,11 +77,11 @@ class LocationAPIDBDataSource(
         locationService.update(location = location)
     }
 
-    private fun log(addressAdministrativeUnit: Pair<Address, AdministrativeUnit>, msg: String) {
-        val (address, administrativeUnit) = addressAdministrativeUnit
+    private fun log(addressAdministrativeLevel: Pair<Address, AdministrativeLevel>, msg: String) {
+        val (address, administrativeLevel) = addressAdministrativeLevel
         Log.d(
             "Address to Location Feature",
-            "Retrieving Location for ${address.name(administrativeUnit = administrativeUnit)}: $msg"
+            "Retrieving Location for ${address.name(administrativeLevel = administrativeLevel)}: $msg"
         )
     }
 }

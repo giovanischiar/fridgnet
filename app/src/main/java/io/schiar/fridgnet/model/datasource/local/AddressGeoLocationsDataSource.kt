@@ -3,7 +3,7 @@ package io.schiar.fridgnet.model.datasource.local
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.AddressLocationsGeoLocations
-import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.datasource.AddressDataSource
 import io.schiar.fridgnet.model.datasource.retriever.AddressRetriever
@@ -48,10 +48,10 @@ class AddressGeoLocationsDataSource(
     }
 
     override fun retrieveGeoLocations(
-        address: Address, administrativeUnit: AdministrativeUnit
+        address: Address, administrativeLevel: AdministrativeLevel
     ): Flow<List<GeoLocation>> {
         return addressService.retrieveGeoLocations(
-            address = address, administrativeUnit = administrativeUnit
+            address = address, administrativeLevel = administrativeLevel
         )
     }
 

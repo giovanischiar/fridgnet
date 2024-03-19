@@ -31,7 +31,7 @@ class PhotosRepository(
                 return@flatMapLatest flowOf(value = emptyList())
             } else {
                 addressLocationsGeoLocationsDataSource.retrieveGeoLocations(
-                    address = it.location.address, administrativeUnit = it.location.administrativeUnit
+                    address = it.location.address, administrativeLevel = it.location.administrativeLevel
                 )
             }
         }.combine(

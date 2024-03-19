@@ -1,9 +1,9 @@
 package io.schiar.fridgnet.model
 
-import io.schiar.fridgnet.model.AdministrativeUnit.CITY
-import io.schiar.fridgnet.model.AdministrativeUnit.COUNTRY
-import io.schiar.fridgnet.model.AdministrativeUnit.COUNTY
-import io.schiar.fridgnet.model.AdministrativeUnit.STATE
+import io.schiar.fridgnet.model.AdministrativeLevel.CITY
+import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
+import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
+import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 
 data class Address(
     val id: Long = 0,
@@ -18,8 +18,8 @@ data class Address(
         ).joinToString(separator = ", ")
     }
 
-    fun name(administrativeUnit: AdministrativeUnit): String {
-        return when(administrativeUnit) {
+    fun name(administrativeLevel: AdministrativeLevel): String {
+        return when(administrativeLevel) {
             CITY -> name()
             COUNTY -> {
                 listOfNotNull(subAdminArea, adminArea, countryName).joinToString(separator = ", ")

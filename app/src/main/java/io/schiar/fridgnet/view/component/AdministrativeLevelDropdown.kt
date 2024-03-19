@@ -16,13 +16,13 @@ import androidx.compose.ui.Modifier
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AdministrativeUnitDropdown(
-    administrativeUnits: List<String>,
-    currentAdministrativeUnit: String,
+fun AdministrativeLevelDropdown(
+    administrativeLevels: List<String>,
+    currentAdministrativeLevel: String,
     onDropdown: (index: Int) -> Unit
 ) {
-    fun textOf(administrativeUnit: String): String {
-        return when (administrativeUnit) {
+    fun textOf(administrativeLevel: String): String {
+        return when (administrativeLevel) {
             "CITY" -> "Cities"
             "COUNTY" -> "Counties"
             "STATE" -> "States"
@@ -39,16 +39,16 @@ fun AdministrativeUnitDropdown(
     ) {
         TextField(
             modifier = Modifier.menuAnchor(),
-            value = textOf(currentAdministrativeUnit),
+            value = textOf(currentAdministrativeLevel),
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            administrativeUnits.mapIndexed { index, administrativeUnit ->
+            administrativeLevels.mapIndexed { index, administrativeLevel ->
                 DropdownMenuItem(
                     modifier = Modifier.fillMaxWidth(),
-                    text = { Text(textOf(administrativeUnit)) },
+                    text = { Text(textOf(administrativeLevel)) },
                     onClick = {
                         expanded = false
                         onDropdown(index)

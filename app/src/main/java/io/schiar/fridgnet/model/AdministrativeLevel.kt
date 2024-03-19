@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.model
 
-enum class AdministrativeUnit {
+enum class AdministrativeLevel {
     CITY,
     COUNTY,
     STATE,

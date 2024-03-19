@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import io.schiar.fridgnet.R
-import io.schiar.fridgnet.view.component.AdministrativeUnitDropdown
+import io.schiar.fridgnet.view.component.AdministrativeLevelDropdown
 import io.schiar.fridgnet.view.component.MapPhotoItem
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.viewmodel.HomeViewModel
@@ -35,8 +35,8 @@ fun HomeScreen(
     onNavigateImage: () -> Unit,
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
-    val administrativeUnits by viewModel.administrativeUnits.collectAsState(initial = emptyList())
-    val currentAdministrativeUnit by viewModel.currentAdministrativeUnit.collectAsState(
+    val administrativeLevels by viewModel.administrativeLevels.collectAsState(initial = emptyList())
+    val currentAdministrativeLevel by viewModel.currentAdministrativeLevel.collectAsState(
         initial = ""
     )
 
@@ -46,10 +46,10 @@ fun HomeScreen(
         ScreenInfo(
             title = stringResource(id = R.string.home_screen),
             actions = {
-                AdministrativeUnitDropdown(
-                    administrativeUnits = administrativeUnits,
-                    currentAdministrativeUnit = currentAdministrativeUnit,
-                    onDropdown = viewModel::changeCurrentAdministrativeUnit
+                AdministrativeLevelDropdown(
+                    administrativeLevels = administrativeLevels,
+                    currentAdministrativeLevel = currentAdministrativeLevel,
+                    onDropdown = viewModel::changeCurrentAdministrativeLevel
                 )
 
                 Box {
@@ -83,7 +83,7 @@ fun HomeScreen(
     )
 
     fun getColumnSize(): Int {
-        return when (currentAdministrativeUnit) {
+        return when (currentAdministrativeLevel) {
             "CITY" -> 4
             "COUNTY" -> 3
             "STATE" -> 3

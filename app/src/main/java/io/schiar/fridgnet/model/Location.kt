@@ -6,10 +6,10 @@ data class Location(
     val regions: List<Region>,
     val boundingBox: BoundingBox,
     val zIndex: Float,
-    val administrativeUnit: AdministrativeUnit,
+    val administrativeLevel: AdministrativeLevel,
 ) {
     fun addressName(): String {
-        return address.name(administrativeUnit = administrativeUnit)
+        return address.name(administrativeLevel = administrativeLevel)
     }
 
     fun updateAddress(address: Address): Location {
@@ -19,7 +19,7 @@ data class Location(
             regions = regions,
             boundingBox = boundingBox,
             zIndex = zIndex,
-            administrativeUnit = administrativeUnit
+            administrativeLevel = administrativeLevel
         )
     }
 
@@ -35,7 +35,7 @@ data class Location(
                 },
             boundingBox = boundingBox,
             zIndex = zIndex,
-            administrativeUnit = administrativeUnit
+            administrativeLevel = administrativeLevel
         ).updateBoundingBox()
     }
 
@@ -53,7 +53,7 @@ data class Location(
             regions = mutableRegions.toList(),
             boundingBox = boundingBox,
             zIndex = zIndex,
-            administrativeUnit = administrativeUnit
+            administrativeLevel = administrativeLevel
         ).updateBoundingBox()
     }
 
@@ -69,7 +69,7 @@ data class Location(
                     boundingBox + otherBoundingBox
                 },
             zIndex = zIndex,
-            administrativeUnit = administrativeUnit
+            administrativeLevel = administrativeLevel
         )
     }
 

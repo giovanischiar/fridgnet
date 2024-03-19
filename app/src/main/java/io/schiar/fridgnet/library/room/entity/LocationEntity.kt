@@ -9,7 +9,7 @@ data class LocationEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val addressLocationsID: Long,
-    val administrativeUnit: String,
+    val administrativeLevel: String,
     @Embedded(prefix = "boundingBoxSouthwest_")
     var boundingBoxSouthwest: GeoLocationEntity,
     @Embedded(prefix = "boundingBoxNortheast_")
@@ -25,7 +25,7 @@ data class LocationEntity(
         return LocationEntity(
             id = id,
             addressLocationsID = addressLocationsID,
-            administrativeUnit = administrativeUnit,
+            administrativeLevel = administrativeLevel,
             boundingBoxSouthwest = GeoLocationEntity(
                 id = boundingBoxSouthwest.id,
                 geoLocationsID = boundingBoxSouthwest.geoLocationsID,

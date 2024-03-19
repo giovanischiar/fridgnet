@@ -6,7 +6,7 @@ import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
 import io.schiar.fridgnet.library.room.relationentity.PolygonWithGeoLocations
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
 import io.schiar.fridgnet.model.AddressLocationsGeoLocations
-import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.ImageAddress
@@ -30,7 +30,7 @@ fun List<ImageWithAddressAndGeoLocation>.toImages(): List<Image>{
 fun AddressWithLocationsAndGeoLocations.toAddressLocationsGeoLocations(): AddressLocationsGeoLocations {
     return AddressLocationsGeoLocations(
         address = addressEntity.toAddress(),
-        administrativeUnitLocation = locationEntities.toAdministrativeUnitLocation(),
+        administrativeLevelLocation = locationEntities.toAdministrativeLevelLocation(),
         geoLocations = geoLocationEntities.toGeoLocations()
     )
 }
@@ -56,9 +56,9 @@ fun ImageWithAddressAndGeoLocation.toImageAddress(): ImageAddress {
     )
 }
 
-fun List<LocationWithRegions>.toAdministrativeUnitLocation(): Map<AdministrativeUnit, Location> {
+fun List<LocationWithRegions>.toAdministrativeLevelLocation(): Map<AdministrativeLevel, Location> {
     return associate {
-        AdministrativeUnit.valueOf(value = it.locationEntity.administrativeUnit) to it.toLocation()
+        AdministrativeLevel.valueOf(value = it.locationEntity.administrativeLevel) to it.toLocation()
     }
 }
 
@@ -77,7 +77,7 @@ fun LocationWithRegions.toLocation(): Location {
             northeast = locationEntity.boundingBoxNortheast.toGeoLocation(),
         ),
         zIndex = locationEntity.zIndex,
-        administrativeUnit = AdministrativeUnit.valueOf(value = locationEntity.administrativeUnit)
+        administrativeLevel = AdministrativeLevel.valueOf(value = locationEntity.administrativeLevel)
     )
 }
 

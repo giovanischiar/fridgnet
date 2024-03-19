@@ -2,11 +2,11 @@ package io.schiar.fridgnet.library.room
 
 import io.schiar.fridgnet.model.Address
 import io.schiar.fridgnet.model.AddressLocationsGeoLocations
-import io.schiar.fridgnet.model.AdministrativeUnit
-import io.schiar.fridgnet.model.AdministrativeUnit.CITY
-import io.schiar.fridgnet.model.AdministrativeUnit.COUNTRY
-import io.schiar.fridgnet.model.AdministrativeUnit.COUNTY
-import io.schiar.fridgnet.model.AdministrativeUnit.STATE
+import io.schiar.fridgnet.model.AdministrativeLevel
+import io.schiar.fridgnet.model.AdministrativeLevel.CITY
+import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
+import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
+import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.service.AddressService
 import kotlinx.coroutines.flow.Flow
@@ -14,10 +14,10 @@ import kotlinx.coroutines.flow.map
 
 class AddressRoomService(private val addressDAO: AddressDAO) : AddressService {
     override fun retrieveGeoLocations(
-        address: Address, administrativeUnit: AdministrativeUnit
+        address: Address, administrativeLevel: AdministrativeLevel
     ): Flow<List<GeoLocation>> {
         val (_, locality, subAdminArea, adminArea, countryName) = address
-        return when(administrativeUnit) {
+        return when(administrativeLevel) {
             CITY -> addressDAO.selectGeoLocations(
                 locality = locality,
                 subAdminArea = subAdminArea,

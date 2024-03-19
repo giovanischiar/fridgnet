@@ -85,7 +85,7 @@ class FridgnetDatabaseTest {
                 northeast = GeoLocation(latitude = 10, longitude = 10)
             ),
             zIndex = 1.0f,
-            administrativeUnit = AdministrativeUnit.CITY
+            administrativeLevel = AdministrativeLevel.CITY
         )
 
         locationDBDataSource.create(location = location)

@@ -1,7 +1,7 @@
 package io.schiar.fridgnet.library.retrofit
 
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Location
@@ -31,7 +31,7 @@ fun List<String>.toBoundingBox(): BoundingBox {
 }
 
 fun JSONResult<GeoJSONAttributes>.toLocation(
-    address: Address, administrativeUnit: AdministrativeUnit
+    address: Address, administrativeLevel: AdministrativeLevel
 ): Location? {
     val regions = when (geoJSON.type) {
         "Point" -> {
@@ -41,7 +41,7 @@ fun JSONResult<GeoJSONAttributes>.toLocation(
                 polygon = polygon,
                 holes = emptyList(),
                 boundingBox = polygon.findBoundingBox(),
-                zIndex = administrativeUnit.zIndex()
+                zIndex = administrativeLevel.zIndex()
             )
             listOf(region)
         }
@@ -53,7 +53,7 @@ fun JSONResult<GeoJSONAttributes>.toLocation(
                 polygon = polygon,
                 holes = emptyList(),
                 boundingBox = polygon.findBoundingBox(),
-                zIndex = administrativeUnit.zIndex()
+                zIndex = administrativeLevel.zIndex()
             )
             listOf(region)
         }
@@ -68,7 +68,7 @@ fun JSONResult<GeoJSONAttributes>.toLocation(
                     Polygon(geoLocations = it)
                 },
                 boundingBox = polygon.findBoundingBox(),
-                zIndex = administrativeUnit.zIndex()
+                zIndex = administrativeLevel.zIndex()
             )
             listOf(region)
         }
@@ -83,7 +83,7 @@ fun JSONResult<GeoJSONAttributes>.toLocation(
                         Polygon(geoLocations = geoLocations)
                     },
                     boundingBox = polygon.findBoundingBox(),
-                    zIndex = administrativeUnit.zIndex()
+                    zIndex = administrativeLevel.zIndex()
                 )
             }
             regions
@@ -96,7 +96,7 @@ fun JSONResult<GeoJSONAttributes>.toLocation(
         address = address,
         regions = regions,
         boundingBox = boundingBox.toBoundingBox(),
-        zIndex = administrativeUnit.zIndex(),
-        administrativeUnit = administrativeUnit
+        zIndex = administrativeLevel.zIndex(),
+        administrativeLevel = administrativeLevel
     )
 }

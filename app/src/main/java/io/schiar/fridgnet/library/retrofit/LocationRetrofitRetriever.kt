@@ -2,11 +2,11 @@ package io.schiar.fridgnet.library.retrofit
 
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AdministrativeUnit
-import io.schiar.fridgnet.model.AdministrativeUnit.CITY
-import io.schiar.fridgnet.model.AdministrativeUnit.COUNTRY
-import io.schiar.fridgnet.model.AdministrativeUnit.COUNTY
-import io.schiar.fridgnet.model.AdministrativeUnit.STATE
+import io.schiar.fridgnet.model.AdministrativeLevel
+import io.schiar.fridgnet.model.AdministrativeLevel.CITY
+import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
+import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
+import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.datasource.retriever.LocationRetriever
 import kotlinx.coroutines.delay
@@ -25,34 +25,34 @@ class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : Locati
         val addressStr = newAddress.name()
         if (fetchingPlaces.contains(addressStr)) return null
         fetchingPlaces = fetchingPlaces + addressStr
-        return fetchLocation(address = newAddress, administrativeUnit = CITY)
+        return fetchLocation(address = newAddress, administrativeLevel = CITY)
     }
 
     override suspend fun retrieveSubAdmin(address: Address): Location? {
         address.subAdminArea ?: return null
         address.adminArea ?: return null
         address.countryName ?: return null
-        val countyAddressName = address.name(administrativeUnit = COUNTY)
+        val countyAddressName = address.name(administrativeLevel = COUNTY)
         if (fetchingPlaces.contains(countyAddressName)) return null
         fetchingPlaces = fetchingPlaces + countyAddressName
-        return fetchLocation(address = address, administrativeUnit = COUNTY)
+        return fetchLocation(address = address, administrativeLevel = COUNTY)
     }
 
     override suspend fun retrieveAdmin(address: Address): Location? {
         address.adminArea ?: return null
         address.countryName ?: return null
-        val stateAddressName = address.name(administrativeUnit = STATE)
+        val stateAddressName = address.name(administrativeLevel = STATE)
         if (fetchingPlaces.contains(stateAddressName)) return null
         fetchingPlaces = fetchingPlaces + stateAddressName
-        return fetchLocation(address = address, administrativeUnit = STATE)
+        return fetchLocation(address = address, administrativeLevel = STATE)
     }
 
     override suspend fun retrieveCountry(address: Address): Location? {
         address.countryName ?: return null
-        val countryAddressName = address.name(administrativeUnit = COUNTRY)
+        val countryAddressName = address.name(administrativeLevel = COUNTRY)
         if (fetchingPlaces.contains(countryAddressName)) return null
         fetchingPlaces = fetchingPlaces + countryAddressName
-        return fetchLocation(address = address, administrativeUnit = COUNTRY)
+        return fetchLocation(address = address, administrativeLevel = COUNTRY)
     }
 
     private fun extractAddress(address: Address): Address {
@@ -71,7 +71,7 @@ class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : Locati
 
     private suspend fun fetchLocation(
         address: Address,
-        administrativeUnit: AdministrativeUnit
+        administrativeLevel: AdministrativeLevel
     ): Location? {
         val city = address.locality ?: ""
         val county = address.subAdminArea ?: ""
@@ -79,7 +79,7 @@ class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : Locati
         val country = address.countryName ?: ""
         mutex.lock()
         val jsonResult = try {
-            when (administrativeUnit) {
+            when (administrativeLevel) {
                 CITY -> {
                     searchCity(city = city, state = state, country = country)
                 }
@@ -112,9 +112,9 @@ class LocationRetrofitRetriever(private val nominatimAPI: NominatimAPI) : Locati
         jsonResult ?: return null
         Log.d(
             "API Result",
-            "type: $administrativeUnit, address: ${address.name()} body.geojson: ${jsonResult.geoJSON}"
+            "type: $administrativeLevel, address: ${address.name()} body.geojson: ${jsonResult.geoJSON}"
         )
-        return jsonResult.toLocation(address = address, administrativeUnit = administrativeUnit)
+        return jsonResult.toLocation(address = address, administrativeLevel = administrativeLevel)
     }
 
     private suspend fun searchCity(
