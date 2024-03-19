@@ -6,9 +6,10 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.schiar.fridgnet.library.room.FridgnetDatabase
-import io.schiar.fridgnet.model.*
-import io.schiar.fridgnet.model.datasource.room.FridgnetDatabase
 import io.schiar.fridgnet.library.room.LocationRoomService
+import io.schiar.fridgnet.model.*
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.runTest
 import org.hamcrest.CoreMatchers.equalTo
 import org.junit.After
 import org.junit.Before
@@ -38,7 +39,7 @@ class FridgnetDatabaseTest {
     }
 
     @Test
-    fun insertLocationAndEnsureTheLocationRetrievedIsTheSame() {
+    fun insertLocationAndEnsureTheLocationRetrievedIsTheSame() = runTest {
         val region = Region(
             polygon = Polygon(
                 geoLocations = listOf(
@@ -74,7 +75,6 @@ class FridgnetDatabaseTest {
             subAdminArea = "Square County",
             adminArea = "Square State",
             countryName = "Square Country",
-            administrativeUnit = AdministrativeUnit.CITY
         )
 
         val location = Location(
@@ -84,11 +84,12 @@ class FridgnetDatabaseTest {
                 southwest = GeoLocation(latitude = -10, longitude = -10),
                 northeast = GeoLocation(latitude = 10, longitude = 10)
             ),
-            zIndex = 1.0f
+            zIndex = 1.0f,
+            administrativeUnit = AdministrativeUnit.CITY
         )
 
         locationDBDataSource.create(location = location)
-        val actual = locationDBDataSource.selectLocationByAddress(address = address)
+        val actual = locationDBDataSource.selectLocationByAddress(address = address).first()
         assertThat(actual, equalTo(location))
     }
 }
