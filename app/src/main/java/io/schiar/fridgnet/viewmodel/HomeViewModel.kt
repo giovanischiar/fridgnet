@@ -19,7 +19,7 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
 
     fun selectLocationCoordinateAt(index: Int) = viewModelScope.launch {
         Log.d("Select Image Feature", "Select location coordinate at $index")
-        homeRepository.selectAddressLocationCoordinateAt(index = index)
+        homeRepository.selectLocationCoordinateAt(index = index)
     }
 
     fun changeCurrentAdministrativeUnit(index: Int) = viewModelScope.launch(Dispatchers.IO) {

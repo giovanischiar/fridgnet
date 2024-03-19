@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AddressDataSource {
     suspend fun create(coordinate: Coordinate, address: Address)
-    suspend fun createFrom(coordinate: Coordinate)
+    suspend fun retrieveAddressFor(coordinate: Coordinate)
     fun retrieve(): Flow<List<AddressLocationsCoordinates>>
     fun retrieveCoordinates(
         address: Address, administrativeUnit: AdministrativeUnit

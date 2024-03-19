@@ -16,5 +16,5 @@ data class LocationWithRegions(
     )
     val addressEntity: AddressEntity,
     @Relation(entity = RegionEntity::class, parentColumn = "id", entityColumn = "regionsID")
-    val regions: List<RegionWithPolygonAndHoles>
+    val regionEntities: List<RegionWithPolygonAndHoles>
 )

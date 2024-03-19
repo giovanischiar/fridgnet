@@ -17,4 +17,8 @@ data class LocationCoordinate(
             initialCoordinate = initialCoordinate
         )
     }
+
+    override fun toString(): String {
+        return "LocationCoordinate($location, $initialCoordinate)"
+    }
 }

@@ -26,4 +26,8 @@ data class Coordinate(val id: Long = 0, val latitude: Double, val longitude: Dou
         result = 31 * result + longitude.hashCode()
         return result
     }
+
+    override fun toString(): String {
+        return "($latitude, $longitude)"
+    }
 }

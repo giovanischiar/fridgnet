@@ -5,9 +5,9 @@ import androidx.room.Relation
 import io.schiar.fridgnet.library.room.entity.CoordinateEntity
 import io.schiar.fridgnet.library.room.entity.ImageEntity
 
-data class ImageWithCoordinate(
+data class ImageWithAddressAndCoordinate(
     @Embedded
     val imageEntity: ImageEntity,
-    @Relation(parentColumn = "coordinateID", entityColumn = "id")
-    val coordinate: CoordinateEntity
+    @Relation(entity = CoordinateEntity::class, parentColumn = "coordinateID", entityColumn = "id")
+    val coordinateWithAddress: CoordinateWithAddress,
 )

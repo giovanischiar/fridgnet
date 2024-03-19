@@ -40,7 +40,7 @@ class LocationAPIDBDataSource(
         locations.forEach { updateCache(address = it.address, location = it) }
     }
 
-    override suspend fun createFrom(address: Address, administrativeUnit: AdministrativeUnit) {
+    override suspend fun retrieveLocationFor(address: Address, administrativeUnit: AdministrativeUnit) {
         val addressAdministrativeUnit = Pair(address, administrativeUnit)
         val addressName = address.name(administrativeUnit = administrativeUnit)
         if (addressSet.contains(element = addressName)) return

@@ -7,7 +7,7 @@ import io.schiar.fridgnet.model.Region
 import kotlinx.coroutines.flow.Flow
 
 interface LocationDataSource {
-    suspend fun createFrom(address: Address, administrativeUnit: AdministrativeUnit)
+    suspend fun retrieveLocationFor(address: Address, administrativeUnit: AdministrativeUnit)
     fun retrieve(): Flow<List<Location>>
     fun retrieveRegions(): Flow<List<Region>>
     fun retrieve(region: Region): Flow<Location?>

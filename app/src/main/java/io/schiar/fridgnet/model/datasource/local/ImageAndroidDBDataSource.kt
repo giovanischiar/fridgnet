@@ -2,16 +2,12 @@ package io.schiar.fridgnet.model.datasource.local
 
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.Image
+import io.schiar.fridgnet.model.ImageAddress
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
 import io.schiar.fridgnet.model.service.ImageService
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.update
-import java.util.Collections.synchronizedMap as syncMapOf
 import java.util.Collections.synchronizedSet as syncSetOf
 
 class ImageAndroidDBDataSource(
@@ -19,19 +15,11 @@ class ImageAndroidDBDataSource(
     private val imageService: ImageService
 ): ImageDataSource {
     private val uriSet: MutableSet<String> = syncSetOf(mutableSetOf())
-    private val uriImage: MutableMap<String, Image> = syncMapOf(mutableMapOf())
-    private val imagesCacheFlow = MutableStateFlow(uriImage.values.toList())
 
-    override suspend fun create(image: Image) {
-        updateCache(uri = image.uri, image = image)
-        imagesCacheFlow.update { uriImage.values.toList() }
-        imageService.create(image = image)
-    }
+    override suspend fun create(image: Image) { imageService.create(image = image) }
 
-    private fun updateCache(uri: String, image: Image) { uriImage[uri] = image }
-
-    private fun updateCache(images: List<Image>) { images.forEach { image ->
-        updateCache(uri = image.uri, image = image) }
+    private fun updateSet(imageAddresses: List<ImageAddress>) {
+        uriSet.addAll(imageAddresses.map { it.image.uri })
     }
 
     override suspend fun createFrom(uri: String) {
@@ -46,17 +34,13 @@ class ImageAndroidDBDataSource(
         log(uri = uri, "It's not on the Android!")
     }
 
-    override fun retrieve(): Flow<List<Image>> {
-        return merge(
-            imagesCacheFlow,
-            imageService.retrieve().onEach(::updateCache)
-        ).distinctUntilChanged()
+    override fun retrieveWithAddress(): Flow<List<ImageAddress>> {
+        return imageService.retrieveWithAddress().onEach(::updateSet)
     }
 
-    override suspend fun delete() {
-        uriImage.clear()
-        imageService.delete()
-    }
+    override fun retrieve(): Flow<List<Image>> { return imageService.retrieve() }
+
+    override suspend fun delete() { imageService.delete() }
 
     private fun log(uri: String, msg: String) {
         Log.d(tag = "Uri to Image Feature", msg = "Fetching Image of uri $uri: $msg")

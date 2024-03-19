@@ -72,4 +72,10 @@ data class Location(
             administrativeUnit = administrativeUnit
         )
     }
+
+    override fun toString(): String {
+        val regionSize = regions.size
+        val regionSizeName = "$regionSize ${if (regions.size == 1) "region" else "regions"}"
+        return "(${addressName()}, $regionSizeName)"
+    }
 }

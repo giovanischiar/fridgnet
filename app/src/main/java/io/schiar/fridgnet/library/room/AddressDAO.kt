@@ -19,7 +19,7 @@ abstract class AddressDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(addressEntity: AddressEntity): Long
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(coordinateEntity: CoordinateEntity): Long
 
     @Transaction

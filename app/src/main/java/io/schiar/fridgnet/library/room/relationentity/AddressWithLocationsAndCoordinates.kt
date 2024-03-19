@@ -14,7 +14,7 @@ data class AddressWithLocationsAndCoordinates(
         parentColumn = "id",
         entityColumn = "addressLocationsID"
     )
-    val locations: List<LocationWithRegions>,
+    val locationEntities: List<LocationWithRegions>,
     @Relation(parentColumn = "id", entityColumn = "addressCoordinatesID")
-    val coordinates: List<CoordinateEntity>
+    val coordinateEntities: List<CoordinateEntity>
 )

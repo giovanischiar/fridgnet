@@ -14,6 +14,7 @@ fun Coordinate.toCoordinateEntity(id: Long, addressCoordinatesID: Long): Coordin
 
 fun Coordinate.toCoordinateEntity(addressCoordinatesID: Long): CoordinateEntity {
     return CoordinateEntity(
+        id = id,
         addressCoordinatesID = addressCoordinatesID,
         latitude = latitude,
         longitude = longitude

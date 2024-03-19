@@ -29,7 +29,7 @@ class AddressCoordinatesDataSource(
         }
     }
 
-    override suspend fun createFrom(coordinate: Coordinate) {
+    override suspend fun retrieveAddressFor(coordinate: Coordinate) {
         if (coordinateSet.contains(element = coordinate)) return
         coordinateSet.add(element = coordinate)
         log(coordinate = coordinate, "It's not on memory, retrieving using the Geocoder")

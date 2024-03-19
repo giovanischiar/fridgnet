@@ -6,7 +6,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
-class CurrentAddressLocationCoordinateLocalDataSource: CurrentLocationCoordinateDataSource {
+class CurrentLocationCoordinateDataSource:
+    CurrentLocationCoordinateDataSource {
     private val _addressLocationCoordinate = MutableStateFlow<LocationCoordinate?>(
         value = null
     )
@@ -15,7 +16,7 @@ class CurrentAddressLocationCoordinateLocalDataSource: CurrentLocationCoordinate
         return _addressLocationCoordinate
     }
 
-    override fun update(addressLocationCoordinate: LocationCoordinate) {
-        _addressLocationCoordinate.update { addressLocationCoordinate }
+    override fun update(locationCoordinate: LocationCoordinate) {
+        _addressLocationCoordinate.update { locationCoordinate }
     }
 }

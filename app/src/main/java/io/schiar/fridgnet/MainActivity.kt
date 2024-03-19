@@ -18,7 +18,7 @@ import io.schiar.fridgnet.model.datasource.AddressDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.LocationDataSource
 import io.schiar.fridgnet.model.datasource.local.AddressCoordinatesDataSource
-import io.schiar.fridgnet.model.datasource.local.CurrentAddressLocationCoordinateLocalDataSource
+import io.schiar.fridgnet.model.datasource.local.CurrentLocationCoordinateDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
 import io.schiar.fridgnet.model.datasource.local.ImageAndroidDBDataSource
 import io.schiar.fridgnet.model.datasource.local.LocationAPIDBDataSource
@@ -87,7 +87,7 @@ class MainActivity : ComponentActivity() {
         val addressCoordinatesDataSource = createAddressDataSource()
         val locationDataSource = createLocationDataSource()
         val currentRegionDataSource = CurrentRegionLocalDataSource()
-        val currentAddressLocationCoordinateDataSource = CurrentAddressLocationCoordinateLocalDataSource()
+        val currentAddressLocationCoordinateDataSource = CurrentLocationCoordinateDataSource()
 
         val polygonsRepository = PolygonsRepository(
             currentRegionDataSource = currentRegionDataSource,
@@ -109,7 +109,7 @@ class MainActivity : ComponentActivity() {
             addressDataSource = addressCoordinatesDataSource,
             locationDataSource = locationDataSource,
             imageDataSource = imageDataSource,
-            currentAddressLocationCoordinateLocalDataSource = currentAddressLocationCoordinateDataSource,
+            currentLocationCoordinateDataSource = currentAddressLocationCoordinateDataSource,
             externalScope = GlobalScope
         )
 

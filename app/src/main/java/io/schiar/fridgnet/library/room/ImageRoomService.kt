@@ -1,6 +1,7 @@
 package io.schiar.fridgnet.library.room
 
 import io.schiar.fridgnet.model.Image
+import io.schiar.fridgnet.model.ImageAddress
 import io.schiar.fridgnet.model.service.ImageService
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -8,6 +9,10 @@ import kotlinx.coroutines.flow.map
 class ImageRoomService(private val imageDAO: ImageDAO) : ImageService {
     override fun retrieve(): Flow<List<Image>> {
         return imageDAO.selectImagesWithCoordinate().map { it.toImages() }
+    }
+
+    override fun retrieveWithAddress(): Flow<List<ImageAddress>> {
+        return imageDAO.selectImagesWithCoordinateAndAddress().map { it.toImageAddresses() }
     }
 
     override suspend fun create(image: Image) {

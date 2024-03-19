@@ -20,7 +20,7 @@ class AddressGeocoderRetriever(private val geocoder: Geocoder) : AddressRetrieve
         val address = androidAddress?.toModelAddress()
         if (address != null) {
             Log.d(
-                "Add Image Feature",
+                "AddressGeocoderRetriever.Add Image Feature",
                 "($latitude, $longitude) is ${address.name()}"
             )
         } else {
@@ -37,11 +37,17 @@ class AddressGeocoderRetriever(private val geocoder: Geocoder) : AddressRetrieve
         while (tries <= 3) {
             try {
                 @Suppress("DEPRECATION")
-                val androidAddresses = geocoder.getFromLocation(
+                var androidAddresses = geocoder.getFromLocation(
                     latitude,
                     longitude,
                     1
                 )
+                val androidAddress = androidAddresses?.firstOrNull() ?: return null
+                if (androidAddress.countryName == "United States") {
+                    val addressName = "${androidAddress.locality}, ${androidAddress.adminArea}"
+                    @Suppress("DEPRECATION")
+                    androidAddresses = geocoder.getFromLocationName(addressName, 1)
+                }
                 return androidAddresses?.firstOrNull()
             } catch (e: Exception) {
                 Log.d(
