@@ -40,7 +40,7 @@ fun PolygonsScreen(viewModel: PolygonsViewModel, info: (screenInfo: ScreenInfo) 
 
     info(
         ScreenInfo(
-            title = location?.address ?: stringResource(id = R.string.polygons_screen),
+            title = location?.administrativeUnit ?: stringResource(id = R.string.polygons_screen),
             actions = {
                 if (sortedRegions.size > 1) {
                     Button(

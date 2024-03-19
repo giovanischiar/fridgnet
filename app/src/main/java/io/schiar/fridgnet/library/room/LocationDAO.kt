@@ -116,8 +116,8 @@ abstract class LocationDAO {
         updateGeoLocations(getLocationEntities)
     }
 
-    @Query("SELECT * FROM Location Where addressLocationsID = :addressID")
-    abstract fun selectLocationWithRegionsByAddress(addressID: Long): Flow<LocationWithRegions?>
+    @Query("SELECT * FROM Location Where administrativeUnitLocationsID = :administrativeUnitID")
+    abstract fun selectLocationWithRegionsByAdministrativeUnit(administrativeUnitID: Long): Flow<LocationWithRegions?>
 
     @Query("SELECT * FROM Location WHERE id IN (SELECT regionsID FROM Region WHERE id = :regionID)")
     abstract fun select(regionID: Long): Flow<LocationWithRegions?>

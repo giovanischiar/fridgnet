@@ -5,7 +5,7 @@ import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.LocationGeoLocation
 import io.schiar.fridgnet.model.LocationImages
-import io.schiar.fridgnet.model.datasource.AddressDataSource
+import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.CurrentLocationGeoLocationDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -16,22 +16,22 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 
 class PhotosRepository(
-    currentAddressLocationsGeoLocationsDataSource: CurrentLocationGeoLocationDataSource,
+    currentAdministrativeUnitLocationsGeoLocationsDataSource: CurrentLocationGeoLocationDataSource,
     imageDataSource: ImageDataSource,
-    addressLocationsGeoLocationsDataSource: AddressDataSource
+    administrativeUnitLocationsGeoLocationsDataSource: AdministrativeUnitDataSource
 )  {
     private var locationGeoLocation: LocationGeoLocation? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val locationImages = currentAddressLocationsGeoLocationsDataSource
+    val locationImages = currentAdministrativeUnitLocationsGeoLocationsDataSource
         .retrieve()
         .onEach { locationGeoLocation = it }
         .flatMapLatest {
             if (it?.location == null) {
                 return@flatMapLatest flowOf(value = emptyList())
             } else {
-                addressLocationsGeoLocationsDataSource.retrieveGeoLocations(
-                    address = it.location.address, administrativeLevel = it.location.administrativeLevel
+                administrativeUnitLocationsGeoLocationsDataSource.retrieveGeoLocations(
+                    administrativeUnit = it.location.administrativeUnit, administrativeLevel = it.location.administrativeLevel
                 )
             }
         }.combine(

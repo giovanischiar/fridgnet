@@ -3,10 +3,10 @@ package io.schiar.fridgnet.library.room
 import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.model.GeoLocation
 
-fun GeoLocation.toGeoLocationEntity(addressGeoLocationsID: Long): GeoLocationEntity {
+fun GeoLocation.toGeoLocationEntity(administrativeUnitGeoLocationsID: Long): GeoLocationEntity {
     return GeoLocationEntity(
         id = id,
-        addressGeoLocationsID = addressGeoLocationsID,
+        administrativeUnitGeoLocationsID = administrativeUnitGeoLocationsID,
         latitude = latitude,
         longitude = longitude
     )

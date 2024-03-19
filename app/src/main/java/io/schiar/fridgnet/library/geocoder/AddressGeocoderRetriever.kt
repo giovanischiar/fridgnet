@@ -1,58 +1,58 @@
 package io.schiar.fridgnet.library.geocoder
 
+import android.location.Address
 import android.location.Geocoder
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.GeoLocation
-import io.schiar.fridgnet.model.datasource.retriever.AddressRetriever
+import io.schiar.fridgnet.model.datasource.retriever.AdministrativeUnitRetriever
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import android.location.Address as AndroidAddress
 
-class AddressGeocoderRetriever(private val geocoder: Geocoder) : AddressRetriever {
+class AdministrativeUnitGeocoderRetriever(private val geocoder: Geocoder) : AdministrativeUnitRetriever {
 
-    override suspend fun retrieve(geoLocation: GeoLocation): Address? {
+    override suspend fun retrieve(geoLocation: GeoLocation): AdministrativeUnit? {
         val (_, latitude, longitude) = geoLocation
-        Log.d("Add Image Feature", "Getting address for ($latitude, $longitude)")
-        val androidAddress = withContext(Dispatchers.IO) {
-            getAndroidAddress(latitude = latitude, longitude = longitude)
+        Log.d("Add Image Feature", "Getting administrative unit for ($latitude, $longitude)")
+        val address = withContext(Dispatchers.IO) {
+            getAddress(latitude = latitude, longitude = longitude)
         }
-        val address = androidAddress?.toModelAddress()
-        if (address != null) {
+        val administrativeUnit = address?.toAdministrativeUnit()
+        if (administrativeUnit != null) {
             Log.d(
-                "AddressGeocoderRetriever.Add Image Feature",
-                "($latitude, $longitude) is ${address.name()}"
+                "AdministrativeUnitGeocoderRetriever.Add Image Feature",
+                "($latitude, $longitude) is ${administrativeUnit.name()}"
             )
         } else {
             Log.d(
                 "Add Image Feature",
-                "Couldn't find address of ($latitude, $longitude) }"
+                "Couldn't find administrative unit of ($latitude, $longitude) }"
             )
         }
-        return address
+        return administrativeUnit
     }
 
-    private fun getAndroidAddress(latitude: Double, longitude: Double): AndroidAddress? {
+    private fun getAddress(latitude: Double, longitude: Double): Address? {
         var tries = 0
         while (tries <= 3) {
             try {
                 @Suppress("DEPRECATION")
-                var androidAddresses = geocoder.getFromLocation(
+                var androidAdministrativeUnits = geocoder.getFromLocation(
                     latitude,
                     longitude,
                     1
                 )
-                val androidAddress = androidAddresses?.firstOrNull() ?: return null
-                if (androidAddress.countryName == "United States") {
-                    val addressName = "${androidAddress.locality}, ${androidAddress.adminArea}"
+                val androidAdministrativeUnit = androidAdministrativeUnits?.firstOrNull() ?: return null
+                if (androidAdministrativeUnit.countryName == "United States") {
+                    val administrativeUnitName = "${androidAdministrativeUnit.locality}, ${androidAdministrativeUnit.adminArea}"
                     @Suppress("DEPRECATION")
-                    androidAddresses = geocoder.getFromLocationName(addressName, 1)
+                    androidAdministrativeUnits = geocoder.getFromLocationName(administrativeUnitName, 1)
                 }
-                return androidAddresses?.firstOrNull()
+                return androidAdministrativeUnits?.firstOrNull()
             } catch (e: Exception) {
                 Log.d(
                     "Add Image Feature",
-                    "Error fetching address $e tries: $tries"
+                    "Error fetching administrative unit $e tries: $tries"
                 )
                 tries++
             }

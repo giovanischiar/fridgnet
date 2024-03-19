@@ -70,7 +70,7 @@ class FridgnetDatabaseTest {
             zIndex = 1.0f
         )
 
-        val address = Address(
+        val administrativeUnit = AdministrativeUnit(
             locality = "Donut Square",
             subAdminArea = "Square County",
             adminArea = "Square State",
@@ -78,7 +78,7 @@ class FridgnetDatabaseTest {
         )
 
         val location = Location(
-            address = address,
+            administrativeUnit = administrativeUnit,
             regions = listOf(region),
             boundingBox = BoundingBox(
                 southwest = GeoLocation(latitude = -10, longitude = -10),
@@ -89,7 +89,7 @@ class FridgnetDatabaseTest {
         )
 
         locationDBDataSource.create(location = location)
-        val actual = locationDBDataSource.selectLocationByAddress(address = address).first()
+        val actual = locationDBDataSource.selectLocationByAdministrativeUnit(administrativeUnit = administrativeUnit).first()
         assertThat(actual, equalTo(location))
     }
 }

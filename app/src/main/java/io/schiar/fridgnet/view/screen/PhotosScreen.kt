@@ -79,7 +79,7 @@ fun PhotosScreen(
     }
 
     info(
-        ScreenInfo(title = location.address)
+        ScreenInfo(title = location.administrativeUnit)
     )
     Column {
         Box(

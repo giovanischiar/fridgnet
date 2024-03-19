@@ -1,10 +1,10 @@
 package io.schiar.fridgnet.library.geocoder
 
-import io.schiar.fridgnet.model.Address
-import android.location.Address as AndroidAddress
+import android.location.Address
+import io.schiar.fridgnet.model.AdministrativeUnit
 
-fun AndroidAddress.toModelAddress(): Address {
-    return Address(
+fun Address.toAdministrativeUnit(): AdministrativeUnit {
+    return AdministrativeUnit(
         locality = if (countryName != "Brazil") locality else subAdminArea,
         subAdminArea = subAdminArea,
         adminArea = adminArea,

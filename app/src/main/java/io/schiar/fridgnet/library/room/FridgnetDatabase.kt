@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import io.schiar.fridgnet.library.room.entity.AddressEntity
+import io.schiar.fridgnet.library.room.entity.AdministrativeUnitEntity
 import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.library.room.entity.ImageEntity
 import io.schiar.fridgnet.library.room.entity.LocationEntity
@@ -14,7 +14,7 @@ import io.schiar.fridgnet.library.room.entity.RegionEntity
 @Database(
     entities = [
         ImageEntity::class,
-        AddressEntity::class,
+        AdministrativeUnitEntity::class,
         GeoLocationEntity::class,
         LocationEntity::class,
         PolygonEntity::class,
@@ -25,7 +25,7 @@ import io.schiar.fridgnet.library.room.entity.RegionEntity
 )
 abstract class FridgnetDatabase : RoomDatabase() {
     abstract fun imageDAO(): ImageDAO
-    abstract fun addressDAO(): AddressDAO
+    abstract fun administrativeUnitDAO(): AdministrativeUnitDAO
     abstract fun locationDAO(): LocationDAO
 
     companion object {

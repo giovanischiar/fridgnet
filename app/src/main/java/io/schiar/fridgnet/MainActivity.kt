@@ -6,18 +6,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import io.schiar.fridgnet.library.android.ImageAndroidRetriever
-import io.schiar.fridgnet.library.geocoder.AddressGeocoderRetriever
+import io.schiar.fridgnet.library.geocoder.AdministrativeUnitGeocoderRetriever
 import io.schiar.fridgnet.library.retrofit.LocationRetrofitRetriever
 import io.schiar.fridgnet.library.retrofit.NominatimAPI
 import io.schiar.fridgnet.library.retrofit.RetrofitHelper
-import io.schiar.fridgnet.library.room.AddressRoomService
+import io.schiar.fridgnet.library.room.AdministrativeUnitRoomService
 import io.schiar.fridgnet.library.room.FridgnetDatabase
 import io.schiar.fridgnet.library.room.ImageRoomService
 import io.schiar.fridgnet.library.room.LocationRoomService
-import io.schiar.fridgnet.model.datasource.AddressDataSource
+import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.LocationDataSource
-import io.schiar.fridgnet.model.datasource.local.AddressGeoLocationsDataSource
+import io.schiar.fridgnet.model.datasource.local.AdministrativeUnitGeoLocationsDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentLocationGeoLocationDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
 import io.schiar.fridgnet.model.datasource.local.ImageAndroidDBDataSource
@@ -84,10 +84,10 @@ class MainActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     private fun createRepositories(): Repositories {
         val imageDataSource = createImageDataSource()
-        val addressLocationsGeoLocationsDataSource = createAddressGeoLocationsDataSource()
+        val administrativeUnitLocationsGeoLocationsDataSource = createAdministrativeUnitGeoLocationsDataSource()
         val locationDataSource = createLocationDataSource()
         val currentRegionDataSource = CurrentRegionLocalDataSource()
-        val currentAddressLocationsGeoLocationsDataSource = CurrentLocationGeoLocationDataSource()
+        val currentAdministrativeUnitLocationsGeoLocationsDataSource = CurrentLocationGeoLocationDataSource()
 
         val polygonsRepository = PolygonsRepository(
             currentRegionDataSource = currentRegionDataSource,
@@ -100,17 +100,17 @@ class MainActivity : ComponentActivity() {
         )
 
         val photosRepository = PhotosRepository(
-            currentAddressLocationsGeoLocationsDataSource
-                = currentAddressLocationsGeoLocationsDataSource,
+            currentAdministrativeUnitLocationsGeoLocationsDataSource
+                = currentAdministrativeUnitLocationsGeoLocationsDataSource,
             imageDataSource = imageDataSource,
-            addressLocationsGeoLocationsDataSource = addressLocationsGeoLocationsDataSource
+            administrativeUnitLocationsGeoLocationsDataSource = administrativeUnitLocationsGeoLocationsDataSource
         )
 
         val homeRepository = HomeRepository(
-            addressDataSource = addressLocationsGeoLocationsDataSource,
+            administrativeUnitDataSource = administrativeUnitLocationsGeoLocationsDataSource,
             locationDataSource = locationDataSource,
             imageDataSource = imageDataSource,
-            currentLocationGeoLocationDataSource = currentAddressLocationsGeoLocationsDataSource,
+            currentLocationGeoLocationDataSource = currentAdministrativeUnitLocationsGeoLocationsDataSource,
             externalScope = GlobalScope
         )
 
@@ -131,13 +131,13 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun createAddressGeoLocationsDataSource(): AddressDataSource {
+    private fun createAdministrativeUnitGeoLocationsDataSource(): AdministrativeUnitDataSource {
         val geocoder = Geocoder(applicationContext, Locale.US)
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
-        val addressDAO = fridgnetDatabase.addressDAO()
-        return AddressGeoLocationsDataSource(
-            addressRetriever = AddressGeocoderRetriever(geocoder = geocoder),
-            addressService = AddressRoomService(addressDAO = addressDAO)
+        val administrativeUnitDAO = fridgnetDatabase.administrativeUnitDAO()
+        return AdministrativeUnitGeoLocationsDataSource(
+            administrativeUnitRetriever = AdministrativeUnitGeocoderRetriever(geocoder = geocoder),
+            administrativeUnitService = AdministrativeUnitRoomService(administrativeUnitDAO = administrativeUnitDAO)
         )
     }
 

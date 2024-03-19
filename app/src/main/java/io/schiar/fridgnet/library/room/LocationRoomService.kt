@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.service.LocationService
@@ -22,13 +22,13 @@ class LocationRoomService(private val locationDAO: LocationDAO) : LocationServic
         return locationDAO.select(regionID = region.id).map { it?.toLocation() }
     }
 
-    override fun retrieve(address: Address): Flow<Location?> {
-        return selectLocationByAddress(address = address)
+    override fun retrieve(administrativeUnit: AdministrativeUnit): Flow<Location?> {
+        return selectLocationByAdministrativeUnit(administrativeUnit = administrativeUnit)
     }
 
-    fun selectLocationByAddress(address: Address): Flow<Location?> {
-        return locationDAO.selectLocationWithRegionsByAddress(
-            addressID = address.id
+    fun selectLocationByAdministrativeUnit(administrativeUnit: AdministrativeUnit): Flow<Location?> {
+        return locationDAO.selectLocationWithRegionsByAdministrativeUnit(
+            administrativeUnitID = administrativeUnit.id
         ).map { it?.toLocation() }
     }
 

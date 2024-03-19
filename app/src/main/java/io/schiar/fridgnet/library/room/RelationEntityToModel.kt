@@ -1,58 +1,58 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.library.room.relationentity.AddressWithLocationsAndGeoLocations
-import io.schiar.fridgnet.library.room.relationentity.ImageWithAddressAndGeoLocation
+import io.schiar.fridgnet.library.room.relationentity.AdministrativeUnitWithLocationsAndGeoLocations
+import io.schiar.fridgnet.library.room.relationentity.ImageWithAdministrativeUnitAndGeoLocation
 import io.schiar.fridgnet.library.room.relationentity.LocationWithRegions
 import io.schiar.fridgnet.library.room.relationentity.PolygonWithGeoLocations
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
-import io.schiar.fridgnet.model.AddressLocationsGeoLocations
+import io.schiar.fridgnet.model.AdministrativeUnitLocationsGeoLocations
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Image
-import io.schiar.fridgnet.model.ImageAddress
+import io.schiar.fridgnet.model.ImageAdministrativeUnit
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 
 
-fun List<AddressWithLocationsAndGeoLocations>.toAddressLocationsGeoLocations(): List<AddressLocationsGeoLocations> {
-    return map { it.toAddressLocationsGeoLocations() }
+fun List<AdministrativeUnitWithLocationsAndGeoLocations>.toAdministrativeUnitLocationsGeoLocations(): List<AdministrativeUnitLocationsGeoLocations> {
+    return map { it.toAdministrativeUnitLocationsGeoLocations() }
 }
 
-fun List<ImageWithAddressAndGeoLocation>.toImageAddresses(): List<ImageAddress>{
-    return map { it.toImageAddress() }
+fun List<ImageWithAdministrativeUnitAndGeoLocation>.toImageAdministrativeUnits(): List<ImageAdministrativeUnit>{
+    return map { it.toImageAdministrativeUnit() }
 }
 
-fun List<ImageWithAddressAndGeoLocation>.toImages(): List<Image>{
+fun List<ImageWithAdministrativeUnitAndGeoLocation>.toImages(): List<Image>{
     return map { it.toImage() }
 }
 
-fun AddressWithLocationsAndGeoLocations.toAddressLocationsGeoLocations(): AddressLocationsGeoLocations {
-    return AddressLocationsGeoLocations(
-        address = addressEntity.toAddress(),
+fun AdministrativeUnitWithLocationsAndGeoLocations.toAdministrativeUnitLocationsGeoLocations(): AdministrativeUnitLocationsGeoLocations {
+    return AdministrativeUnitLocationsGeoLocations(
+        administrativeUnit = administrativeUnitEntity.toAdministrativeUnit(),
         administrativeLevelLocation = locationEntities.toAdministrativeLevelLocation(),
         geoLocations = geoLocationEntities.toGeoLocations()
     )
 }
 
-fun ImageWithAddressAndGeoLocation.toImage(): Image {
+fun ImageWithAdministrativeUnitAndGeoLocation.toImage(): Image {
     return Image(
         uri = imageEntity.uri,
         byteArray = imageEntity.byteArray,
         date = imageEntity.date,
-        geoLocation = geoLocationWithAddress.geoLocationEntity.toGeoLocation()
+        geoLocation = geoLocationWithAdministrativeUnit.geoLocationEntity.toGeoLocation()
     )
 }
 
-fun ImageWithAddressAndGeoLocation.toImageAddress(): ImageAddress {
-    return ImageAddress(
+fun ImageWithAdministrativeUnitAndGeoLocation.toImageAdministrativeUnit(): ImageAdministrativeUnit {
+    return ImageAdministrativeUnit(
         image = Image(
             uri = imageEntity.uri,
             byteArray = imageEntity.byteArray,
             date = imageEntity.date,
-            geoLocation = geoLocationWithAddress.geoLocationEntity.toGeoLocation()
+            geoLocation = geoLocationWithAdministrativeUnit.geoLocationEntity.toGeoLocation()
         ),
-        address = geoLocationWithAddress.addressEntity?.toAddress()
+        administrativeUnit = geoLocationWithAdministrativeUnit.administrativeUnitEntity?.toAdministrativeUnit()
     )
 }
 
@@ -70,7 +70,7 @@ fun List<LocationWithRegions>.toLocations(): List<Location> {
 fun LocationWithRegions.toLocation(): Location {
     return Location(
         id = locationEntity.id,
-        address = addressEntity.toAddress(),
+        administrativeUnit = administrativeUnitEntity.toAdministrativeUnit(),
         regions = regionEntities.map { it.toRegion() },
         boundingBox = BoundingBox(
             southwest = locationEntity.boundingBoxSouthwest.toGeoLocation(),

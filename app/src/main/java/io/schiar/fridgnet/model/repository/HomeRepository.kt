@@ -1,15 +1,15 @@
 package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.Address
-import io.schiar.fridgnet.model.AddressLocationsGeoLocations
+import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeUnitLocationsGeoLocations
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeLevel.CITY
 import io.schiar.fridgnet.model.GeoLocation
-import io.schiar.fridgnet.model.ImageAddress
+import io.schiar.fridgnet.model.ImageAdministrativeUnit
 import io.schiar.fridgnet.model.Location
 import io.schiar.fridgnet.model.LocationGeoLocation
-import io.schiar.fridgnet.model.datasource.AddressDataSource
+import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.LocationDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentLocationGeoLocationDataSource
@@ -25,7 +25,7 @@ import java.util.Collections.synchronizedMap as syncMapOf
 import java.util.Collections.synchronizedSet as syncSetOf
 
 class HomeRepository(
-    private val addressDataSource: AddressDataSource,
+    private val administrativeUnitDataSource: AdministrativeUnitDataSource,
     private val locationDataSource: LocationDataSource,
     private val imageDataSource: ImageDataSource,
     private val currentLocationGeoLocationDataSource : CurrentLocationGeoLocationDataSource,
@@ -39,59 +39,59 @@ class HomeRepository(
     val administrativeLevels: Flow<List<AdministrativeLevel>> = MutableStateFlow(_administrativeLevels)
     val currentAdministrativeLevel: Flow<AdministrativeLevel> = _currentAdministrativeLevelStateFlow
 
-    private val geoLocationRetrievingAddressSet = syncSetOf(mutableSetOf<GeoLocation>())
-    private val addressRetrievingLocationSet = syncSetOf(mutableSetOf<String>())
+    private val geoLocationRetrievingAdministrativeUnitSet = syncSetOf(mutableSetOf<GeoLocation>())
+    private val administrativeUnitRetrievingLocationSet = syncSetOf(mutableSetOf<String>())
 
-    private val administrativeLevelAddressNameLocationGeoLocation = run {
+    private val administrativeLevelAdministrativeUnitNameLocationGeoLocation = run {
         syncMapOf(_administrativeLevels.associateWith { mutableMapOf<String, LocationGeoLocation>() })
     }
 
     val locationGeoLocations = merge(
-        imageDataSource.retrieveWithAddress().onEach { it.forEach(::onEachImageAddress) },
-        addressDataSource.retrieve().onEach { it.forEach(::onEachAddressLocationsGeoLocations) },
+        imageDataSource.retrieveWithAdministrativeUnit().onEach { it.forEach(::onEachImageAdministrativeUnit) },
+        administrativeUnitDataSource.retrieve().onEach { it.forEach(::onEachAdministrativeUnitLocationsGeoLocations) },
         locationDataSource.retrieve().onEach { it.forEach(::onEachLocation) },
         _currentAdministrativeLevelStateFlow.onEach { _currentAdministrativeLevel = it }
     ).map {
-        _currentLocationGeoLocations = administrativeLevelAddressNameLocationGeoLocation[
+        _currentLocationGeoLocations = administrativeLevelAdministrativeUnitNameLocationGeoLocation[
             _currentAdministrativeLevel
         ]?.values?.toList() ?: emptyList()
         _currentLocationGeoLocations
     }
 
-    private fun onEachImageAddress(imageAddress: ImageAddress) {
-        val (image, addressRetrieved) = imageAddress
+    private fun onEachImageAdministrativeUnit(imageAdministrativeUnit: ImageAdministrativeUnit) {
+        val (image, administrativeUnitRetrieved) = imageAdministrativeUnit
         val geoLocation = image.geoLocation
-        if (addressRetrieved != null) {
+        if (administrativeUnitRetrieved != null) {
             assignNewLocationGeoLocation(
                 administrativeLevel = CITY,
-                addressName = addressRetrieved.name(),
+                administrativeUnitName = administrativeUnitRetrieved.name(),
                 initialGeoLocation = geoLocation
             )
         }
-        retrieveAddressForGeoLocation(
+        retrieveAdministrativeUnitForGeoLocation(
             geoLocation = geoLocation,
-            addressFromGeoLocation = addressRetrieved
+            administrativeUnitFromGeoLocation = administrativeUnitRetrieved
         )
     }
 
-    private fun onEachAddressLocationsGeoLocations(
-        addressLocationsGeoLocations: AddressLocationsGeoLocations
+    private fun onEachAdministrativeUnitLocationsGeoLocations(
+        administrativeUnitLocationsGeoLocations: AdministrativeUnitLocationsGeoLocations
     ) {
-        val (address, geoLocations, administrativeLevelLocation) = addressLocationsGeoLocations
+        val (administrativeUnit, geoLocations, administrativeLevelLocation) = administrativeUnitLocationsGeoLocations
         val locationsRetrieved = administrativeLevelLocation.values
         assignNewLocationGeoLocation(
             administrativeLevel = CITY,
-            addressName = address.name(),
+            administrativeUnitName = administrativeUnit.name(),
             location = administrativeLevelLocation[CITY],
             initialGeoLocation = geoLocations[0]
         )
-        retrieveLocationsForAddress(address = address, locationsFromAddress = locationsRetrieved)
+        retrieveLocationsForAdministrativeUnit(administrativeUnit = administrativeUnit, locationsFromAdministrativeUnit = locationsRetrieved)
     }
 
     private fun onEachLocation(location: Location) {
         assignNewLocationGeoLocation(
             administrativeLevel = location.administrativeLevel,
-            addressName = location.addressName(),
+            administrativeUnitName = location.administrativeUnitName(),
             location = location,
             initialGeoLocation = location.boundingBox.center()
         )
@@ -112,40 +112,40 @@ class HomeRepository(
 
     suspend fun removeAllImages() { imageDataSource.delete() }
 
-    private fun retrieveAddressForGeoLocation(
-        geoLocation: GeoLocation, addressFromGeoLocation: Address?
+    private fun retrieveAdministrativeUnitForGeoLocation(
+        geoLocation: GeoLocation, administrativeUnitFromGeoLocation: AdministrativeUnit?
     ) {
-        if (addressFromGeoLocation != null) geoLocationRetrievingAddressSet.add(geoLocation)
-        val addressNotBeingRetrieved = !geoLocationRetrievingAddressSet.contains(geoLocation)
-        if (addressNotBeingRetrieved) {
-            geoLocationRetrievingAddressSet.add(element = geoLocation)
-            log(method = "retrieveAddressForGeoLocation", msg = "Retrieve Address for $geoLocation")
-            externalScope.launch { addressDataSource.retrieveAddressFor(geoLocation = geoLocation) }
+        if (administrativeUnitFromGeoLocation != null) geoLocationRetrievingAdministrativeUnitSet.add(geoLocation)
+        val administrativeUnitNotBeingRetrieved = !geoLocationRetrievingAdministrativeUnitSet.contains(geoLocation)
+        if (administrativeUnitNotBeingRetrieved) {
+            geoLocationRetrievingAdministrativeUnitSet.add(element = geoLocation)
+            log(method = "retrieveAdministrativeUnitForGeoLocation", msg = "Retrieve AdministrativeUnit for $geoLocation")
+            externalScope.launch { administrativeUnitDataSource.retrieveAdministrativeUnitFor(geoLocation = geoLocation) }
         }
     }
 
-    private fun retrieveLocationsForAddress(
-        address: Address, locationsFromAddress: Collection<Location>
+    private fun retrieveLocationsForAdministrativeUnit(
+        administrativeUnit: AdministrativeUnit, locationsFromAdministrativeUnit: Collection<Location>
     ) {
-        addressRetrievingLocationSet.addAll(locationsFromAddress.map { it.addressName() })
+        administrativeUnitRetrievingLocationSet.addAll(locationsFromAdministrativeUnit.map { it.administrativeUnitName() })
 
         val administrativeLevelsWithNonRetrievedLocation = _administrativeLevels.filter {
                 administrativeLevel -> run {
-                val addressName = address.name(administrativeLevel = administrativeLevel)
-                !addressRetrievingLocationSet.contains(addressName)
+                val administrativeUnitName = administrativeUnit.name(administrativeLevel = administrativeLevel)
+                !administrativeUnitRetrievingLocationSet.contains(administrativeUnitName)
             }
         }
 
         for (administrativeLevel in administrativeLevelsWithNonRetrievedLocation) {
-            val addressName = address.name(administrativeLevel = administrativeLevel)
-            addressRetrievingLocationSet.add(addressName)
+            val administrativeUnitName = administrativeUnit.name(administrativeLevel = administrativeLevel)
+            administrativeUnitRetrievingLocationSet.add(administrativeUnitName)
             externalScope.launch {
                 log(
-                    method = "retrieveLocationForAddress",
-                    msg = "Retrieve Location for $addressName"
+                    method = "retrieveLocationForAdministrativeUnit",
+                    msg = "Retrieve Location for $administrativeUnitName"
                 )
                 locationDataSource.retrieveLocationFor(
-                    address = address,
+                    administrativeUnit = administrativeUnit,
                     administrativeLevel = administrativeLevel
                 )
             }
@@ -154,13 +154,13 @@ class HomeRepository(
 
     private fun assignNewLocationGeoLocation(
         administrativeLevel: AdministrativeLevel,
-        addressName: String,
+        administrativeUnitName: String,
         location: Location? = null,
         initialGeoLocation: GeoLocation
     ) {
-        val locationGeoLocation = (administrativeLevelAddressNameLocationGeoLocation[
+        val locationGeoLocation = (administrativeLevelAdministrativeUnitNameLocationGeoLocation[
             administrativeLevel
-        ] ?: return)[addressName]
+        ] ?: return)[administrativeUnitName]
         val needToAssignNewLocationGeoLocation = locationGeoLocation == null ||
                 (locationGeoLocation.location == null && location != null)
 
@@ -172,13 +172,13 @@ class HomeRepository(
             log(
                 method = "assignNewLocationGeoLocation",
                 msg = "Assign $newLocationGeoLocation " +
-                        "to administrativeLevelAddressNameLocationGeoLocation[" +
+                        "to administrativeLevelAdministrativeUnitNameLocationGeoLocation[" +
                         "$administrativeLevel" +
-                       "][$addressName]"
+                       "][$administrativeUnitName]"
             )
-            administrativeLevelAddressNameLocationGeoLocation[
+            administrativeLevelAdministrativeUnitNameLocationGeoLocation[
                 administrativeLevel
-            ]?.set(addressName, newLocationGeoLocation)
+            ]?.set(administrativeUnitName, newLocationGeoLocation)
         }
     }
 

@@ -57,7 +57,7 @@ fun List<Image>.toImageViewDataList(): List<ImageViewData> {
 // Location
 fun Location.toLocationViewData(): LocationViewData {
     return LocationViewData(
-        address = addressName(),
+        administrativeUnit = administrativeUnitName(),
         regions = regions.map { it.toRegionViewData() },
         boundingBox = boundingBox.toBoundingBoxViewData(),
         center = boundingBox.center().toGeoLocationViewData(),

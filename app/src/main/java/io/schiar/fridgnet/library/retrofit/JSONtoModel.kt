@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.library.retrofit
 
-import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.GeoLocation
@@ -31,7 +31,7 @@ fun List<String>.toBoundingBox(): BoundingBox {
 }
 
 fun JSONResult<GeoJSONAttributes>.toLocation(
-    address: Address, administrativeLevel: AdministrativeLevel
+    administrativeUnit: AdministrativeUnit, administrativeLevel: AdministrativeLevel
 ): Location? {
     val regions = when (geoJSON.type) {
         "Point" -> {
@@ -93,7 +93,7 @@ fun JSONResult<GeoJSONAttributes>.toLocation(
     }
 
     return Location(
-        address = address,
+        administrativeUnit = administrativeUnit,
         regions = regions,
         boundingBox = boundingBox.toBoundingBox(),
         zIndex = administrativeLevel.zIndex(),

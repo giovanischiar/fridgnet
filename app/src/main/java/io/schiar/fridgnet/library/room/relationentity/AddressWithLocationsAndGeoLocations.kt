@@ -2,19 +2,19 @@ package io.schiar.fridgnet.library.room.relationentity
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import io.schiar.fridgnet.library.room.entity.AddressEntity
+import io.schiar.fridgnet.library.room.entity.AdministrativeUnitEntity
 import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.library.room.entity.LocationEntity
 
-data class AddressWithLocationsAndGeoLocations(
+data class AdministrativeUnitWithLocationsAndGeoLocations(
     @Embedded
-    val addressEntity: AddressEntity,
+    val administrativeUnitEntity: AdministrativeUnitEntity,
     @Relation(
         entity = LocationEntity::class,
         parentColumn = "id",
-        entityColumn = "addressLocationsID"
+        entityColumn = "administrativeUnitLocationsID"
     )
     val locationEntities: List<LocationWithRegions>,
-    @Relation(parentColumn = "id", entityColumn = "addressGeoLocationsID")
+    @Relation(parentColumn = "id", entityColumn = "administrativeUnitGeoLocationsID")
     val geoLocationEntities: List<GeoLocationEntity>
 )

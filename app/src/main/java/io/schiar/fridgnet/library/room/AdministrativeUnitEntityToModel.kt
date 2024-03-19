@@ -1,10 +1,10 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.library.room.entity.AddressEntity
-import io.schiar.fridgnet.model.Address
+import io.schiar.fridgnet.library.room.entity.AdministrativeUnitEntity
+import io.schiar.fridgnet.model.AdministrativeUnit
 
-fun AddressEntity.toAddress(): Address {
-    return Address(
+fun AdministrativeUnitEntity.toAdministrativeUnit(): AdministrativeUnit {
+    return AdministrativeUnit(
         id = id,
         locality = locality,
         subAdminArea = subAdminArea,
@@ -13,8 +13,8 @@ fun AddressEntity.toAddress(): Address {
     )
 }
 
-fun AddressEntity.updateSubAdminArea(subAdminArea: String?): AddressEntity {
-    return AddressEntity(
+fun AdministrativeUnitEntity.updateSubAdminArea(subAdminArea: String?): AdministrativeUnitEntity {
+    return AdministrativeUnitEntity(
         id = id,
         locality = locality,
         subAdminArea = this.subAdminArea ?: subAdminArea,

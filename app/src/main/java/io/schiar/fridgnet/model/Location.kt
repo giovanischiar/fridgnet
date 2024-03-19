@@ -2,20 +2,20 @@ package io.schiar.fridgnet.model
 
 data class Location(
     val id: Long = 0,
-    val address: Address,
+    val administrativeUnit: AdministrativeUnit,
     val regions: List<Region>,
     val boundingBox: BoundingBox,
     val zIndex: Float,
     val administrativeLevel: AdministrativeLevel,
 ) {
-    fun addressName(): String {
-        return address.name(administrativeLevel = administrativeLevel)
+    fun administrativeUnitName(): String {
+        return administrativeUnit.name(administrativeLevel = administrativeLevel)
     }
 
-    fun updateAddress(address: Address): Location {
+    fun updateAdministrativeUnit(administrativeUnit: AdministrativeUnit): Location {
         return Location(
             id = id,
-            address = address,
+            administrativeUnit = administrativeUnit,
             regions = regions,
             boundingBox = boundingBox,
             zIndex = zIndex,
@@ -26,7 +26,7 @@ data class Location(
     fun switchAll(): Location {
         return Location(
             id = id,
-            address = address,
+            administrativeUnit = administrativeUnit,
             regions = regions
                 .sortedBy { region -> region.polygon.geoLocations.size }
                 .asReversed()
@@ -49,7 +49,7 @@ data class Location(
         mutableRegions[index] = regions[index].switch()
         return Location(
             id = id,
-            address = address,
+            administrativeUnit = administrativeUnit,
             regions = mutableRegions.toList(),
             boundingBox = boundingBox,
             zIndex = zIndex,
@@ -60,7 +60,7 @@ data class Location(
     private fun updateBoundingBox(): Location {
         return Location(
             id = id,
-            address = address,
+            administrativeUnit = administrativeUnit,
             regions = regions,
             boundingBox = regions
                 .filter { it.active }
@@ -76,6 +76,6 @@ data class Location(
     override fun toString(): String {
         val regionSize = regions.size
         val regionSizeName = "$regionSize ${if (regions.size == 1) "region" else "regions"}"
-        return "(${addressName()}, $regionSizeName)"
+        return "(${administrativeUnitName()}, $regionSizeName)"
     }
 }

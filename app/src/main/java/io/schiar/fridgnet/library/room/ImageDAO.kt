@@ -7,7 +7,7 @@ import androidx.room.RewriteQueriesToDropUnusedColumns
 import androidx.room.Transaction
 import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.library.room.entity.ImageEntity
-import io.schiar.fridgnet.library.room.relationentity.ImageWithAddressAndGeoLocation
+import io.schiar.fridgnet.library.room.relationentity.ImageWithAdministrativeUnitAndGeoLocation
 import io.schiar.fridgnet.model.Image
 import kotlinx.coroutines.flow.Flow
 
@@ -33,17 +33,17 @@ abstract class ImageDAO {
     )
     abstract suspend fun selectImageBy(
         latitude: Double, longitude: Double
-    ): ImageWithAddressAndGeoLocation?
+    ): ImageWithAdministrativeUnitAndGeoLocation?
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Image")
-    abstract fun selectImagesWithGeoLocationAndAddress(): Flow<List<ImageWithAddressAndGeoLocation>>
+    abstract fun selectImagesWithGeoLocationAndAdministrativeUnit(): Flow<List<ImageWithAdministrativeUnitAndGeoLocation>>
 
     @Transaction
     @RewriteQueriesToDropUnusedColumns
     @Query("SELECT * FROM Image")
-    abstract fun selectImagesWithAddressAndGeoLocation(): Flow<List<ImageWithAddressAndGeoLocation>>
+    abstract fun selectImagesWithAdministrativeUnitAndGeoLocation(): Flow<List<ImageWithAdministrativeUnitAndGeoLocation>>
 
     @Query("DELETE FROM Image")
     abstract suspend fun deleteAll()

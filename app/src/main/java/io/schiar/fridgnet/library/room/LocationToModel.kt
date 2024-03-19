@@ -15,7 +15,7 @@ fun List<GeoLocation>.toGeoLocationEntitiesWithID(geoLocationsID: Long): List<Ge
 
 fun Location.toLocationEntity(): LocationEntity {
     return LocationEntity(
-        addressLocationsID = address.id,
+        administrativeUnitLocationsID = administrativeUnit.id,
         administrativeLevel = administrativeLevel.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toGeoLocationEntity(),
         boundingBoxNortheast = boundingBox.northeast.toGeoLocationEntity(),
@@ -26,7 +26,7 @@ fun Location.toLocationEntity(): LocationEntity {
 fun Location.toLocationEntity(id: Long): LocationEntity {
     return LocationEntity(
         id = id,
-        addressLocationsID = address.id,
+        administrativeUnitLocationsID = administrativeUnit.id,
         administrativeLevel = administrativeLevel.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toGeoLocationEntity(),
         boundingBoxNortheast = boundingBox.northeast.toGeoLocationEntity(),
