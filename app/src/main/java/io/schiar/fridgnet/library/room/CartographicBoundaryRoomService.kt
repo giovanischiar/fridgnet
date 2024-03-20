@@ -1,6 +1,6 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.service.CartographicBoundaryService
@@ -28,17 +28,17 @@ class CartographicBoundaryRoomService(
             }
     }
 
-    override fun retrieve(administrativeUnit: AdministrativeUnit): Flow<CartographicBoundary?> {
-        return selectCartographicBoundaryByAdministrativeUnit(
-            administrativeUnit = administrativeUnit
+    override fun retrieve(administrativeUnitName: AdministrativeUnitName): Flow<CartographicBoundary?> {
+        return selectCartographicBoundaryByAdministrativeUnitName(
+            administrativeUnitName = administrativeUnitName
         )
     }
 
-    fun selectCartographicBoundaryByAdministrativeUnit(
-        administrativeUnit: AdministrativeUnit
+    fun selectCartographicBoundaryByAdministrativeUnitName(
+        administrativeUnitName: AdministrativeUnitName
     ): Flow<CartographicBoundary?> {
-        return cartographicBoundaryDAO.selectCartographicBoundaryWithRegionsByAdministrativeUnit(
-            administrativeUnitID = administrativeUnit.id
+        return cartographicBoundaryDAO.selectCartographicBoundaryWithRegionsByAdministrativeUnitName(
+            administrativeUnitNameID = administrativeUnitName.id
         ).map { it?.toCartographicBoundary() }
     }
 

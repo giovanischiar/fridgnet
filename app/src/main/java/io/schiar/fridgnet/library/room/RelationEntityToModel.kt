@@ -1,60 +1,60 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.library.room.relationentity.AdministrativeUnitWithCartographicBoundaries
+import io.schiar.fridgnet.library.room.relationentity.AdministrativeUnitNameWithCartographicBoundaries
 import io.schiar.fridgnet.library.room.relationentity.CartographicBoundaryWithRegions
-import io.schiar.fridgnet.library.room.relationentity.ImageWithAdministrativeUnitAndGeoLocation
+import io.schiar.fridgnet.library.room.relationentity.ImageWithAdministrativeUnitNameAndGeoLocation
 import io.schiar.fridgnet.library.room.relationentity.PolygonWithGeoLocations
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
 import io.schiar.fridgnet.model.AdministrativeLevel
-import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 
-fun List<AdministrativeUnitWithCartographicBoundaries>
-        .toAdministrativeUnitWithCartographicBoundariesList()
-            : List<Pair<AdministrativeUnit, List<CartographicBoundary>>> {
-    return map { it.toAdministrativeUnitWithCartographicBoundaries() }
+fun List<AdministrativeUnitNameWithCartographicBoundaries>
+        .toAdministrativeUnitNameWithCartographicBoundariesList()
+            : List<Pair<AdministrativeUnitName, List<CartographicBoundary>>> {
+    return map { it.toAdministrativeUnitNameWithCartographicBoundaries() }
 }
 
-fun List<ImageWithAdministrativeUnitAndGeoLocation>
-        .toAdministrativeUnitAndImageList(): List<Pair<AdministrativeUnit?, Image>>{
-    return map { it.toAdministrativeUnitAndImage() }
+fun List<ImageWithAdministrativeUnitNameAndGeoLocation>
+        .toAdministrativeUnitNameAndImageList(): List<Pair<AdministrativeUnitName?, Image>>{
+    return map { it.toAdministrativeUnitNameAndImage() }
 }
 
-fun List<ImageWithAdministrativeUnitAndGeoLocation>.toImages(): List<Image>{
+fun List<ImageWithAdministrativeUnitNameAndGeoLocation>.toImages(): List<Image>{
     return map { it.toImage() }
 }
 
-fun AdministrativeUnitWithCartographicBoundaries
-        .toAdministrativeUnitWithCartographicBoundaries()
-            : Pair<AdministrativeUnit, List<CartographicBoundary>> {
+fun AdministrativeUnitNameWithCartographicBoundaries
+        .toAdministrativeUnitNameWithCartographicBoundaries()
+            : Pair<AdministrativeUnitName, List<CartographicBoundary>> {
     return Pair(
-        first = administrativeUnitEntity.toAdministrativeUnit(),
+        first = administrativeUnitNameEntity.toAdministrativeUnitName(),
         second = cartographicBoundaryEntities.toCartographicBoundaries()
     )
 }
 
-fun ImageWithAdministrativeUnitAndGeoLocation.toImage(): Image {
+fun ImageWithAdministrativeUnitNameAndGeoLocation.toImage(): Image {
     return Image(
         uri = imageEntity.uri,
         byteArray = imageEntity.byteArray,
         date = imageEntity.date,
-        geoLocation = geoLocationWithAdministrativeUnit.geoLocationEntity.toGeoLocation()
+        geoLocation = geoLocationWithAdministrativeUnitName.geoLocationEntity.toGeoLocation()
     )
 }
 
-fun ImageWithAdministrativeUnitAndGeoLocation
-    .toAdministrativeUnitAndImage(): Pair<AdministrativeUnit?, Image> {
+fun ImageWithAdministrativeUnitNameAndGeoLocation
+    .toAdministrativeUnitNameAndImage(): Pair<AdministrativeUnitName?, Image> {
     return Pair(
-        first = geoLocationWithAdministrativeUnit.administrativeUnitEntity?.toAdministrativeUnit(),
+        first = geoLocationWithAdministrativeUnitName.administrativeUnitNameEntity?.toAdministrativeUnitName(),
         second = Image(
             uri = imageEntity.uri,
             byteArray = imageEntity.byteArray,
             date = imageEntity.date,
-            geoLocation = geoLocationWithAdministrativeUnit.geoLocationEntity.toGeoLocation()
+            geoLocation = geoLocationWithAdministrativeUnitName.geoLocationEntity.toGeoLocation()
         )
     )
 }
@@ -71,7 +71,7 @@ fun List<CartographicBoundaryWithRegions>.toLocations(): List<CartographicBounda
 fun CartographicBoundaryWithRegions.toCartographicBoundary(): CartographicBoundary {
     return CartographicBoundary(
         id = cartographicBoundaryEntity.id,
-        administrativeUnit = administrativeUnitEntity.toAdministrativeUnit(),
+        administrativeUnitName = administrativeUnitNameEntity.toAdministrativeUnitName(),
         regions = regionEntities.map { it.toRegion() },
         boundingBox = BoundingBox(
             southwest = cartographicBoundaryEntity.boundingBoxSouthwest.toGeoLocation(),

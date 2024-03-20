@@ -6,7 +6,7 @@ import io.schiar.fridgnet.model.AdministrativeLevel.CITY
 import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
 import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
 import io.schiar.fridgnet.model.AdministrativeLevel.STATE
-import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.datasource.retriever.CartographicBoundaryRetriever
 import kotlinx.coroutines.delay
@@ -19,90 +19,90 @@ class CartographicBoundaryRetrofitRetriever(
     private var mutex: Mutex = Mutex()
 
     override suspend fun retrieveLocality(
-        administrativeUnit: AdministrativeUnit
+        administrativeUnitName: AdministrativeUnitName
     ): CartographicBoundary? {
-        val newAdministrativeUnit = if (administrativeUnit.locality == null) {
-            extractAdministrativeUnit(administrativeUnit = administrativeUnit)
+        val newAdministrativeUnitName = if (administrativeUnitName.locality == null) {
+            extractAdministrativeUnitName(administrativeUnitName = administrativeUnitName)
         } else {
-            administrativeUnit
+            administrativeUnitName
         }
-        val administrativeUnitStr = newAdministrativeUnit.name()
-        if (fetchingPlaces.contains(administrativeUnitStr)) return null
-        fetchingPlaces = fetchingPlaces + administrativeUnitStr
+        val administrativeUnitNameStr = newAdministrativeUnitName.name()
+        if (fetchingPlaces.contains(administrativeUnitNameStr)) return null
+        fetchingPlaces = fetchingPlaces + administrativeUnitNameStr
         return fetchCartographicBoundary(
-            administrativeUnit = newAdministrativeUnit,
+            administrativeUnitName = newAdministrativeUnitName,
             administrativeLevel = CITY
         )
     }
 
     override suspend fun retrieveSubAdmin(
-        administrativeUnit: AdministrativeUnit
+        administrativeUnitName: AdministrativeUnitName
     ): CartographicBoundary? {
-        administrativeUnit.subAdminArea ?: return null
-        administrativeUnit.adminArea ?: return null
-        administrativeUnit.countryName ?: return null
-        val countyAdministrativeUnitName = administrativeUnit.name(
+        administrativeUnitName.subAdminArea ?: return null
+        administrativeUnitName.adminArea ?: return null
+        administrativeUnitName.countryName ?: return null
+        val countyAdministrativeUnitNameName = administrativeUnitName.name(
             administrativeLevel = COUNTY
         )
-        if (fetchingPlaces.contains(countyAdministrativeUnitName)) return null
-        fetchingPlaces = fetchingPlaces + countyAdministrativeUnitName
+        if (fetchingPlaces.contains(countyAdministrativeUnitNameName)) return null
+        fetchingPlaces = fetchingPlaces + countyAdministrativeUnitNameName
         return fetchCartographicBoundary(
-            administrativeUnit = administrativeUnit,
+            administrativeUnitName = administrativeUnitName,
             administrativeLevel = COUNTY
         )
     }
 
     override suspend fun retrieveAdmin(
-        administrativeUnit: AdministrativeUnit
+        administrativeUnitName: AdministrativeUnitName
     ): CartographicBoundary? {
-        administrativeUnit.adminArea ?: return null
-        administrativeUnit.countryName ?: return null
-        val stateAdministrativeUnitName = administrativeUnit.name(administrativeLevel = STATE)
-        if (fetchingPlaces.contains(stateAdministrativeUnitName)) return null
-        fetchingPlaces = fetchingPlaces + stateAdministrativeUnitName
+        administrativeUnitName.adminArea ?: return null
+        administrativeUnitName.countryName ?: return null
+        val stateAdministrativeUnitNameName = administrativeUnitName.name(administrativeLevel = STATE)
+        if (fetchingPlaces.contains(stateAdministrativeUnitNameName)) return null
+        fetchingPlaces = fetchingPlaces + stateAdministrativeUnitNameName
         return fetchCartographicBoundary(
-            administrativeUnit = administrativeUnit,
+            administrativeUnitName = administrativeUnitName,
             administrativeLevel = STATE
         )
     }
 
     override suspend fun retrieveCountry(
-        administrativeUnit: AdministrativeUnit
+        administrativeUnitName: AdministrativeUnitName
     ): CartographicBoundary? {
-        administrativeUnit.countryName ?: return null
-        val countryAdministrativeUnitName = administrativeUnit.name(administrativeLevel = COUNTRY)
-        if (fetchingPlaces.contains(countryAdministrativeUnitName)) return null
-        fetchingPlaces = fetchingPlaces + countryAdministrativeUnitName
+        administrativeUnitName.countryName ?: return null
+        val countryAdministrativeUnitNameName = administrativeUnitName.name(administrativeLevel = COUNTRY)
+        if (fetchingPlaces.contains(countryAdministrativeUnitNameName)) return null
+        fetchingPlaces = fetchingPlaces + countryAdministrativeUnitNameName
         return fetchCartographicBoundary(
-            administrativeUnit = administrativeUnit,
+            administrativeUnitName = administrativeUnitName,
             administrativeLevel = COUNTRY
         )
     }
 
-    private fun extractAdministrativeUnit(
-        administrativeUnit: AdministrativeUnit
-    ): AdministrativeUnit {
-        val name = administrativeUnit.name()
+    private fun extractAdministrativeUnitName(
+        administrativeUnitName: AdministrativeUnitName
+    ): AdministrativeUnitName {
+        val name = administrativeUnitName.name()
         val add = name.split(", ")
-        if (add.size < 2) return administrativeUnit
+        if (add.size < 2) return administrativeUnitName
         val state = add[1]
         val city = add[0]
-        return AdministrativeUnit(
+        return AdministrativeUnitName(
             locality = city,
             subAdminArea = null,
             adminArea = state,
-            countryName = administrativeUnit.countryName
+            countryName = administrativeUnitName.countryName
         )
     }
 
     private suspend fun fetchCartographicBoundary(
-        administrativeUnit: AdministrativeUnit,
+        administrativeUnitName: AdministrativeUnitName,
         administrativeLevel: AdministrativeLevel
     ): CartographicBoundary? {
-        val city = administrativeUnit.locality ?: ""
-        val county = administrativeUnit.subAdminArea ?: ""
-        val state = administrativeUnit.adminArea ?: ""
-        val country = administrativeUnit.countryName ?: ""
+        val city = administrativeUnitName.locality ?: ""
+        val county = administrativeUnitName.subAdminArea ?: ""
+        val state = administrativeUnitName.adminArea ?: ""
+        val country = administrativeUnitName.countryName ?: ""
         mutex.lock()
         val jsonResult = try {
             when (administrativeLevel) {
@@ -139,11 +139,11 @@ class CartographicBoundaryRetrofitRetriever(
         Log.d(
             tag = "API Result",
             msg = "type: $administrativeLevel, " +
-                  "administrativeUnit: ${administrativeUnit.name()} " +
+                  "administrativeUnitName: ${administrativeUnitName.name()} " +
                   "body.geojson: ${jsonResult.geoJSON}"
         )
         return jsonResult.toCartographicBoundary(
-            administrativeUnit = administrativeUnit,
+            administrativeUnitName = administrativeUnitName,
             administrativeLevel = administrativeLevel
         )
     }

@@ -1,7 +1,7 @@
 package io.schiar.fridgnet.model.datasource.local
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
@@ -24,8 +24,8 @@ class ImageAndroidDBDataSource(
         log(uri = uri, "It's not on the Android!")
     }
 
-    override fun retrieveWithAdministrativeUnit(): Flow<List<Pair<AdministrativeUnit?, Image>>> {
-        return imageService.retrieveWithAdministrativeUnit()
+    override fun retrieveWithAdministrativeUnitName(): Flow<List<Pair<AdministrativeUnitName?, Image>>> {
+        return imageService.retrieveWithAdministrativeUnitName()
     }
 
     override fun retrieve(): Flow<List<Image>> { return imageService.retrieve() }

@@ -4,7 +4,7 @@ import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.AdminUnit
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
-import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
+import io.schiar.fridgnet.model.datasource.AdministrativeUnitNameDataSource
 import io.schiar.fridgnet.model.datasource.CurrentAdminUnitDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.onEach
 class PhotosRepository(
     currentAdminUnitDataSource: CurrentAdminUnitDataSource,
     imageDataSource: ImageDataSource,
-    administrativeUnitDataSource: AdministrativeUnitDataSource
+    administrativeUnitNameDataSource: AdministrativeUnitNameDataSource
 )  {
     private var _adminUnit: AdminUnit? = null
 
@@ -30,8 +30,8 @@ class PhotosRepository(
             if (cartographicBoundary == null) {
                 return@flatMapLatest flowOf(value = emptyList())
             } else {
-                administrativeUnitDataSource.retrieveGeoLocations(
-                    administrativeUnit = cartographicBoundary.administrativeUnit,
+                administrativeUnitNameDataSource.retrieveGeoLocations(
+                    administrativeUnitName = cartographicBoundary.administrativeUnitName,
                     administrativeLevel = cartographicBoundary.administrativeLevel
                 )
             }

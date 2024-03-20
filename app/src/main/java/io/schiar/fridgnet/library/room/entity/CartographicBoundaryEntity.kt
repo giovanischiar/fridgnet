@@ -8,7 +8,7 @@ import androidx.room.PrimaryKey
 data class CartographicBoundaryEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val administrativeUnitCartographicBoundariesID: Long,
+    val administrativeUnitNameCartographicBoundariesID: Long,
     val administrativeLevel: String,
     @Embedded(prefix = "boundingBoxSouthwest_")
     var boundingBoxSouthwest: GeoLocationEntity,
@@ -24,7 +24,7 @@ data class CartographicBoundaryEntity(
     ): CartographicBoundaryEntity {
         return CartographicBoundaryEntity(
             id = id,
-            administrativeUnitCartographicBoundariesID = administrativeUnitCartographicBoundariesID,
+            administrativeUnitNameCartographicBoundariesID = administrativeUnitNameCartographicBoundariesID,
             administrativeLevel = administrativeLevel,
             boundingBoxSouthwest = GeoLocationEntity(
                 id = boundingBoxSouthwest.id,

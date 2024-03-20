@@ -15,7 +15,7 @@ fun List<GeoLocation>.toGeoLocationEntitiesWithID(geoLocationsID: Long): List<Ge
 
 fun CartographicBoundary.toCartographicBoundaryEntity(): CartographicBoundaryEntity {
     return CartographicBoundaryEntity(
-        administrativeUnitCartographicBoundariesID = administrativeUnit.id,
+        administrativeUnitNameCartographicBoundariesID = administrativeUnitName.id,
         administrativeLevel = administrativeLevel.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toGeoLocationEntity(),
         boundingBoxNortheast = boundingBox.northeast.toGeoLocationEntity(),
@@ -26,7 +26,7 @@ fun CartographicBoundary.toCartographicBoundaryEntity(): CartographicBoundaryEnt
 fun CartographicBoundary.toCartographicBoundaryEntity(id: Long): CartographicBoundaryEntity {
     return CartographicBoundaryEntity(
         id = id,
-        administrativeUnitCartographicBoundariesID = administrativeUnit.id,
+        administrativeUnitNameCartographicBoundariesID = administrativeUnitName.id,
         administrativeLevel = administrativeLevel.toString(),
         boundingBoxSouthwest = boundingBox.southwest.toGeoLocationEntity(),
         boundingBoxNortheast = boundingBox.northeast.toGeoLocationEntity(),

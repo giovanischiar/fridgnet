@@ -3,8 +3,8 @@ package io.schiar.fridgnet.library.room.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "AdministrativeUnit")
-data class AdministrativeUnitEntity(
+@Entity(tableName = "AdministrativeUnitName")
+data class AdministrativeUnitNameEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val locality: String?,

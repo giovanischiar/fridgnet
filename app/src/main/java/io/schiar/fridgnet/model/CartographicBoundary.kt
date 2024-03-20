@@ -2,20 +2,20 @@ package io.schiar.fridgnet.model
 
 data class CartographicBoundary(
     val id: Long = 0,
-    val administrativeUnit: AdministrativeUnit,
+    val administrativeUnitName: AdministrativeUnitName,
     val regions: List<Region>,
     val boundingBox: BoundingBox,
     val zIndex: Float,
     val administrativeLevel: AdministrativeLevel,
 ) {
-    fun administrativeUnitName(): String {
-        return administrativeUnit.name(administrativeLevel = administrativeLevel)
+    fun administrativeUnitNameName(): String {
+        return administrativeUnitName.name(administrativeLevel = administrativeLevel)
     }
 
-    fun updateAdministrativeUnit(administrativeUnit: AdministrativeUnit): CartographicBoundary {
+    fun updateAdministrativeUnitName(administrativeUnitName: AdministrativeUnitName): CartographicBoundary {
         return CartographicBoundary(
             id = id,
-            administrativeUnit = administrativeUnit,
+            administrativeUnitName = administrativeUnitName,
             regions = regions,
             boundingBox = boundingBox,
             zIndex = zIndex,
@@ -26,7 +26,7 @@ data class CartographicBoundary(
     fun switchAll(): CartographicBoundary {
         return CartographicBoundary(
             id = id,
-            administrativeUnit = administrativeUnit,
+            administrativeUnitName = administrativeUnitName,
             regions = regions
                 .sortedBy { region -> region.polygon.geoLocations.size }
                 .asReversed()
@@ -49,7 +49,7 @@ data class CartographicBoundary(
         mutableRegions[index] = regions[index].switch()
         return CartographicBoundary(
             id = id,
-            administrativeUnit = administrativeUnit,
+            administrativeUnitName = administrativeUnitName,
             regions = mutableRegions.toList(),
             boundingBox = boundingBox,
             zIndex = zIndex,
@@ -60,7 +60,7 @@ data class CartographicBoundary(
     private fun updateBoundingBox(): CartographicBoundary {
         return CartographicBoundary(
             id = id,
-            administrativeUnit = administrativeUnit,
+            administrativeUnitName = administrativeUnitName,
             regions = regions,
             boundingBox = regions
                 .filter { it.active }
@@ -76,6 +76,6 @@ data class CartographicBoundary(
     override fun toString(): String {
         val regionSize = regions.size
         val regionSizeName = "$regionSize ${if (regions.size == 1) "region" else "regions"}"
-        return "(${administrativeUnitName()}, $regionSizeName)"
+        return "(${administrativeUnitNameName()}, $regionSizeName)"
     }
 }

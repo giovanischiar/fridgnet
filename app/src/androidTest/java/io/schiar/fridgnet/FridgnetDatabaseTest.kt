@@ -72,7 +72,7 @@ class FridgnetDatabaseTest {
             zIndex = 1.0f
         )
 
-        val administrativeUnit = AdministrativeUnit(
+        val administrativeUnitName = AdministrativeUnitName(
             locality = "Donut Square",
             subAdminArea = "Square County",
             adminArea = "Square State",
@@ -80,7 +80,7 @@ class FridgnetDatabaseTest {
         )
 
         val cartographicBoundary = CartographicBoundary(
-            administrativeUnit = administrativeUnit,
+            administrativeUnitName = administrativeUnitName,
             regions = listOf(region),
             boundingBox = BoundingBox(
                 southwest = GeoLocation(latitude = -10, longitude = -10),
@@ -92,7 +92,7 @@ class FridgnetDatabaseTest {
 
         cartographicBoundaryRoomService.create(cartographicBoundary = cartographicBoundary)
         val actual = cartographicBoundaryRoomService
-            .selectCartographicBoundaryByAdministrativeUnit(administrativeUnit = administrativeUnit)
+            .selectCartographicBoundaryByAdministrativeUnitName(administrativeUnitName = administrativeUnitName)
             .first()
         assertThat(actual, equalTo(cartographicBoundary))
     }

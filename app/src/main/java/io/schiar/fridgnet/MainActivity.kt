@@ -6,16 +6,18 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import io.schiar.fridgnet.library.android.ImageAndroidRetriever
-import io.schiar.fridgnet.library.geocoder.AdministrativeUnitGeocoderRetriever
+import io.schiar.fridgnet.library.geocoder.AdministrativeUnitNameGeocoderRetriever
 import io.schiar.fridgnet.library.retrofit.CartographicBoundaryRetrofitRetriever
 import io.schiar.fridgnet.library.retrofit.NominatimAPI
 import io.schiar.fridgnet.library.retrofit.RetrofitHelper
-import io.schiar.fridgnet.library.room.AdministrativeUnitRoomService
+import io.schiar.fridgnet.library.room.AdministrativeUnitNameRoomService
 import io.schiar.fridgnet.library.room.CartographicBoundaryRoomService
 import io.schiar.fridgnet.library.room.FridgnetDatabase
 import io.schiar.fridgnet.library.room.ImageRoomService
+import io.schiar.fridgnet.model.datasource.AdministrativeUnitNameDataSource
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
+import io.schiar.fridgnet.model.datasource.local.AdministrativeUnitNameLocalDataSource
 import io.schiar.fridgnet.model.datasource.local.CartographicBoundaryAPIDBDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentLocalAdminUnitDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
@@ -82,7 +84,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     private fun createRepositories(): Repositories {
         val imageDataSource = createImageDataSource()
-        val administrativeUnitDataSource = createAdministrativeUnitDataSource()
+        val administrativeUnitNameDataSource = createAdministrativeUnitNameDataSource()
         val cartographicBoundaryDataSource = createCartographicBoundaryDataSource()
         val currentRegionDataSource = CurrentRegionLocalDataSource()
         val currentCartographicBoundaryGeoLocationsDataSource
@@ -102,11 +104,11 @@ class MainActivity : ComponentActivity() {
             currentAdminUnitDataSource
                 = currentCartographicBoundaryGeoLocationsDataSource,
             imageDataSource = imageDataSource,
-            administrativeUnitDataSource = administrativeUnitDataSource
+            administrativeUnitNameDataSource = administrativeUnitNameDataSource
         )
 
         val homeRepository = HomeRepository(
-            administrativeUnitDataSource = administrativeUnitDataSource,
+            administrativeUnitNameDataSource = administrativeUnitNameDataSource,
             cartographicBoundaryDataSource = cartographicBoundaryDataSource,
             imageDataSource = imageDataSource,
             currentAdminUnitDataSource =
@@ -131,14 +133,17 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun createAdministrativeUnitDataSource(): io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource {
+    private fun createAdministrativeUnitNameDataSource()
+        : AdministrativeUnitNameDataSource {
         val geocoder = Geocoder(applicationContext, Locale.US)
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
-        val administrativeUnitDAO = fridgnetDatabase.administrativeUnitDAO()
-        return io.schiar.fridgnet.model.datasource.local.AdministrativeUnitDataSource(
-            administrativeUnitRetriever = AdministrativeUnitGeocoderRetriever(geocoder = geocoder),
-            administrativeUnitService = AdministrativeUnitRoomService(
-                administrativeUnitDAO = administrativeUnitDAO
+        val administrativeUnitNameDAO = fridgnetDatabase.administrativeUnitNameDAO()
+        return AdministrativeUnitNameLocalDataSource(
+            administrativeUnitNameRetriever = AdministrativeUnitNameGeocoderRetriever(
+                geocoder = geocoder
+            ),
+            administrativeUnitNameService = AdministrativeUnitNameRoomService(
+                administrativeUnitNameDAO = administrativeUnitNameDAO
             )
         )
     }

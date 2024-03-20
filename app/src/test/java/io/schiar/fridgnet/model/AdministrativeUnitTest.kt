@@ -3,10 +3,10 @@ package io.schiar.fridgnet.model
 import org.junit.Assert
 import org.junit.Test
 
-class AdministrativeUnitTest {
+class AdministrativeUnitNameTest {
     @Test
-    fun `AdministrativeUnit with everything null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with everything null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = null,
             subAdminArea = null,
             adminArea = null,
@@ -14,12 +14,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = ""
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with subAdminArea, adminArea and countryName null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with subAdminArea, adminArea and countryName null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = "Sunnyvale",
             subAdminArea = null,
             adminArea = null,
@@ -27,12 +27,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Sunnyvale"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with locality, adminArea and countryName null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with locality, adminArea and countryName null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = null,
             subAdminArea = "Santa Clara County",
             adminArea = null,
@@ -40,12 +40,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Santa Clara County"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with AdminArea and countryName null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with AdminArea and countryName null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = "Sunnyvale",
             subAdminArea = "Santa Clara County",
             adminArea = null,
@@ -53,12 +53,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Sunnyvale, Santa Clara County"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with Locality, subAdminArea and countryName null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with Locality, subAdminArea and countryName null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = null,
             subAdminArea = null,
             adminArea = "California",
@@ -66,12 +66,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "California"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with subAdminArea and countryName null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with subAdminArea and countryName null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = "Sunnyvale",
             subAdminArea = null,
             adminArea = "California",
@@ -79,12 +79,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Sunnyvale, California"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with countryName null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with countryName null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = "Sunnyvale",
             subAdminArea = "Santa Clara County",
             adminArea = "California",
@@ -92,12 +92,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Sunnyvale, Santa Clara County, California"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with locality, subAdminArea and adminArea null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with locality, subAdminArea and adminArea null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = null,
             subAdminArea = null,
             adminArea = null,
@@ -105,12 +105,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "United States"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with locality and country null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with locality and country null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = "Sunnyvale",
             subAdminArea = null,
             adminArea = null,
@@ -118,12 +118,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Sunnyvale, United States"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with locality and adminArea null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with locality and adminArea null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = null,
             subAdminArea = "Santa Clara County",
             adminArea = null,
@@ -131,12 +131,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Santa Clara County, United States"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with adminArea null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with adminArea null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = "Sunnyvale",
             subAdminArea = "Santa Clara County",
             adminArea = null,
@@ -144,12 +144,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Sunnyvale, Santa Clara County, United States"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with locality and subAdminArea null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with locality and subAdminArea null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = null,
             subAdminArea = null,
             adminArea = "California",
@@ -157,12 +157,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "California, United States"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with subAdminArea null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with subAdminArea null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = "Sunnyvale",
             subAdminArea = null,
             adminArea = "California",
@@ -170,12 +170,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Sunnyvale, California, United States"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with locality null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with locality null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = null,
             subAdminArea = "Santa Clara County",
             adminArea = "California",
@@ -183,12 +183,12 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Santa Clara County, California, United States"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 
     @Test
-    fun `AdministrativeUnit with nothing null`() {
-        val administrativeUnit = AdministrativeUnit(
+    fun `AdministrativeUnitName with nothing null`() {
+        val administrativeUnitName = AdministrativeUnitName(
             locality = "Sunnyvale",
             subAdminArea = "Santa Clara County",
             adminArea = "California",
@@ -196,6 +196,6 @@ class AdministrativeUnitTest {
         )
 
         val expected = "Sunnyvale, Santa Clara County, California, United States"
-        Assert.assertEquals(expected, administrativeUnit.name())
+        Assert.assertEquals(expected, administrativeUnitName.name())
     }
 }

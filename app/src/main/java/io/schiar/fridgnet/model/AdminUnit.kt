@@ -4,7 +4,7 @@ data class AdminUnit(
     val name: String,
     val administrativeLevel: AdministrativeLevel,
     var cartographicBoundary: CartographicBoundary? = null,
-    val subAdministrativeUnits: List<AdminUnit> = emptyList(),
+    val subAdministrativeUnitNames: List<AdminUnit> = emptyList(),
     val images: MutableList<Image> = mutableListOf()
 ) {
     fun with(images: List<Image>): AdminUnit {
@@ -12,7 +12,7 @@ data class AdminUnit(
             name = name,
             administrativeLevel = administrativeLevel,
             cartographicBoundary = cartographicBoundary,
-            subAdministrativeUnits = subAdministrativeUnits,
+            subAdministrativeUnitNames = subAdministrativeUnitNames,
             images = images.toMutableList()
         )
     }

@@ -2,7 +2,7 @@ package io.schiar.fridgnet.model.datasource.local
 
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.AdministrativeLevel
-import io.schiar.fridgnet.model.AdministrativeUnit
+import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
@@ -19,45 +19,45 @@ class CartographicBoundaryAPIDBDataSource(
     private val cartographicBoundaryRetriever: CartographicBoundaryRetriever,
     private val cartographicBoundaryService: CartographicBoundaryService
 ): CartographicBoundaryDataSource {
-    private val administrativeUnitLocationCache
-        : MutableMap<AdministrativeUnit, CartographicBoundary> = syncMapOf(mutableMapOf())
+    private val administrativeUnitNameLocationCache
+        : MutableMap<AdministrativeUnitName, CartographicBoundary> = syncMapOf(mutableMapOf())
     private val cartographicBoundariesCacheFlow
         : MutableStateFlow<List<CartographicBoundary>> = MutableStateFlow(
-        value = administrativeUnitLocationCache.values.toList()
+        value = administrativeUnitNameLocationCache.values.toList()
     )
 
     private suspend fun create(cartographicBoundary: CartographicBoundary) {
-        cartographicBoundariesCacheFlow.update { administrativeUnitLocationCache.values.toList() }
+        cartographicBoundariesCacheFlow.update { administrativeUnitNameLocationCache.values.toList() }
         cartographicBoundaryService.create(cartographicBoundary = cartographicBoundary)
     }
 
     override suspend fun retrieveLocationFor(
-        administrativeUnit: AdministrativeUnit, administrativeLevel: AdministrativeLevel
+        administrativeUnitName: AdministrativeUnitName, administrativeLevel: AdministrativeLevel
     ) {
-        val administrativeUnitAdministrativeLevel = Pair(administrativeUnit, administrativeLevel)
+        val administrativeUnitNameAdministrativeLevel = Pair(administrativeUnitName, administrativeLevel)
         log(
-            administrativeUnitAdministrativeLevel = administrativeUnitAdministrativeLevel,
+            administrativeUnitNameAdministrativeLevel = administrativeUnitNameAdministrativeLevel,
             msg = "It's not on memory, retrieving using the API"
         )
         val cartographicBoundaryFromRetriever = when(administrativeLevel) {
             AdministrativeLevel.CITY -> {
                 cartographicBoundaryRetriever.retrieveLocality(
-                    administrativeUnit = administrativeUnit
+                    administrativeUnitName = administrativeUnitName
                 )
             }
             AdministrativeLevel.COUNTY -> {
                 cartographicBoundaryRetriever.retrieveSubAdmin(
-                    administrativeUnit = administrativeUnit
+                    administrativeUnitName = administrativeUnitName
                 )
             }
             AdministrativeLevel.STATE -> {
                 cartographicBoundaryRetriever.retrieveAdmin(
-                    administrativeUnit = administrativeUnit
+                    administrativeUnitName = administrativeUnitName
                 )
             }
             AdministrativeLevel.COUNTRY -> {
                 cartographicBoundaryRetriever.retrieveCountry(
-                    administrativeUnit = administrativeUnit
+                    administrativeUnitName = administrativeUnitName
                 )
             }
         }
@@ -66,7 +66,7 @@ class CartographicBoundaryAPIDBDataSource(
             return
         }
         log(
-            administrativeUnitAdministrativeLevel = administrativeUnitAdministrativeLevel,
+            administrativeUnitNameAdministrativeLevel = administrativeUnitNameAdministrativeLevel,
             msg = "It's not on the API!"
         )
     }
@@ -91,16 +91,16 @@ class CartographicBoundaryAPIDBDataSource(
     }
 
     private fun log(
-        administrativeUnitAdministrativeLevel: Pair<AdministrativeUnit, AdministrativeLevel>,
+        administrativeUnitNameAdministrativeLevel: Pair<AdministrativeUnitName, AdministrativeLevel>,
         msg: String
     ) {
-        val (administrativeUnit, administrativeLevel) = administrativeUnitAdministrativeLevel
-        val administrativeUnitName = administrativeUnit.name(
+        val (administrativeUnitName, administrativeLevel) = administrativeUnitNameAdministrativeLevel
+        val administrativeUnitNameName = administrativeUnitName.name(
             administrativeLevel = administrativeLevel
         )
         Log.d(
-            "AdministrativeUnit to Cartographic Boundary Feature",
-            "Retrieving Cartographic Boundary for $administrativeUnitName: $msg"
+            "AdministrativeUnitName to Cartographic Boundary Feature",
+            "Retrieving Cartographic Boundary for $administrativeUnitNameName: $msg"
         )
     }
 }

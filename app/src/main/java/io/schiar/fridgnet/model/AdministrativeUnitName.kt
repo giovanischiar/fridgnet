@@ -5,7 +5,7 @@ import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
 import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
 import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 
-data class AdministrativeUnit(
+data class AdministrativeUnitName(
     val id: Long = 0,
     val locality: String?,
     val subAdminArea: String?,

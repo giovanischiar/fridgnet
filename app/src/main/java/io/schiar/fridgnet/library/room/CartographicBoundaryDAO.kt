@@ -134,10 +134,10 @@ abstract class CartographicBoundaryDAO {
     @Query(
         "SELECT * " +
         "FROM CartographicBoundary " +
-        "WHERE administrativeUnitCartographicBoundariesID = :administrativeUnitID"
+        "WHERE administrativeUnitNameCartographicBoundariesID = :administrativeUnitNameID"
     )
-    abstract fun selectCartographicBoundaryWithRegionsByAdministrativeUnit(
-        administrativeUnitID: Long
+    abstract fun selectCartographicBoundaryWithRegionsByAdministrativeUnitName(
+        administrativeUnitNameID: Long
     ): Flow<CartographicBoundaryWithRegions?>
 
     @Query(

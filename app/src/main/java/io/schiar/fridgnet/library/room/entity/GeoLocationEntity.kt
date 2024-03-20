@@ -8,7 +8,7 @@ data class GeoLocationEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val geoLocationsID: Long? = null,
-    val administrativeUnitGeoLocationsID: Long? = null,
+    val administrativeUnitNameGeoLocationsID: Long? = null,
     val latitude: Double,
     val longitude: Double
 )
