@@ -8,7 +8,7 @@ import io.schiar.fridgnet.model.AdministrativeUnitCartographicBoundariesGeoLocat
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.CartographicBoundaryGeoLocation
 import io.schiar.fridgnet.model.GeoLocation
-import io.schiar.fridgnet.model.ImageAdministrativeUnit
+import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
@@ -55,7 +55,7 @@ class HomeRepository(
 
     val cartographicBoundaryGeoLocations = merge(
         imageDataSource.retrieveWithAdministrativeUnit().onEach { imageAdministrativeUnits ->
-            imageAdministrativeUnits.forEach(::onEachImageAdministrativeUnit)
+            imageAdministrativeUnits.forEach(::onEachAdministrativeUnitAndImage)
         },
         administrativeUnitDataSource.retrieve().onEach { administrativeUnitLocationsGeoLocations ->
             administrativeUnitLocationsGeoLocations.forEach(
@@ -74,8 +74,10 @@ class HomeRepository(
         _currentCartographicBoundaryGeoLocations
     }
 
-    private fun onEachImageAdministrativeUnit(imageAdministrativeUnit: ImageAdministrativeUnit) {
-        val (image, administrativeUnitRetrieved) = imageAdministrativeUnit
+    private fun onEachAdministrativeUnitAndImage(
+        administrativeUnitAndImage: Pair<AdministrativeUnit?, Image>
+    ) {
+        val (administrativeUnitRetrieved, image) = administrativeUnitAndImage
         val geoLocation = image.geoLocation
         if (administrativeUnitRetrieved != null) {
             assignNewCartographicBoundaryGeoLocation(

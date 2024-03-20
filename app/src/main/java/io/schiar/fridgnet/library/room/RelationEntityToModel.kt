@@ -6,14 +6,13 @@ import io.schiar.fridgnet.library.room.relationentity.ImageWithAdministrativeUni
 import io.schiar.fridgnet.library.room.relationentity.PolygonWithGeoLocations
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
 import io.schiar.fridgnet.model.AdministrativeLevel
+import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.AdministrativeUnitCartographicBoundariesGeoLocations
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.Image
-import io.schiar.fridgnet.model.ImageAdministrativeUnit
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
-
 
 fun List<AdministrativeUnitWithCartographicBoundariesAndGeoLocations>
         .toAdministrativeUnitCartographicBoundariesGeoLocations()
@@ -22,8 +21,8 @@ fun List<AdministrativeUnitWithCartographicBoundariesAndGeoLocations>
 }
 
 fun List<ImageWithAdministrativeUnitAndGeoLocation>
-        .toImageAdministrativeUnits(): List<ImageAdministrativeUnit>{
-    return map { it.toImageAdministrativeUnit() }
+        .toAdministrativeUnitAndImageList(): List<Pair<AdministrativeUnit?, Image>>{
+    return map { it.toAdministrativeUnitAndImage() }
 }
 
 fun List<ImageWithAdministrativeUnitAndGeoLocation>.toImages(): List<Image>{
@@ -51,17 +50,16 @@ fun ImageWithAdministrativeUnitAndGeoLocation.toImage(): Image {
     )
 }
 
-fun ImageWithAdministrativeUnitAndGeoLocation.toImageAdministrativeUnit(): ImageAdministrativeUnit {
-    return ImageAdministrativeUnit(
-        image = Image(
+fun ImageWithAdministrativeUnitAndGeoLocation
+    .toAdministrativeUnitAndImage(): Pair<AdministrativeUnit?, Image> {
+    return Pair(
+        first = geoLocationWithAdministrativeUnit.administrativeUnitEntity?.toAdministrativeUnit(),
+        second = Image(
             uri = imageEntity.uri,
             byteArray = imageEntity.byteArray,
             date = imageEntity.date,
             geoLocation = geoLocationWithAdministrativeUnit.geoLocationEntity.toGeoLocation()
-        ),
-        administrativeUnit = geoLocationWithAdministrativeUnit
-            .administrativeUnitEntity
-            ?.toAdministrativeUnit()
+        )
     )
 }
 

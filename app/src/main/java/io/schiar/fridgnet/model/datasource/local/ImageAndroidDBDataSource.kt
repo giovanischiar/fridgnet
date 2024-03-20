@@ -1,8 +1,8 @@
 package io.schiar.fridgnet.model.datasource.local
 
 import io.schiar.fridgnet.Log
+import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.Image
-import io.schiar.fridgnet.model.ImageAdministrativeUnit
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
 import io.schiar.fridgnet.model.service.ImageService
@@ -18,8 +18,11 @@ class ImageAndroidDBDataSource(
 
     override suspend fun create(image: Image) { imageService.create(image = image) }
 
-    private fun updateSet(imageAdministrativeUnites: List<ImageAdministrativeUnit>) {
-        uriSet.addAll(imageAdministrativeUnites.map { it.image.uri })
+    private fun updateSet(administrativeUnitAndImages: List<Pair<AdministrativeUnit?, Image>>) {
+        uriSet.addAll(administrativeUnitAndImages.map { administrativeUnitAndImage ->
+            val (_, image) = administrativeUnitAndImage
+            image.uri
+        })
     }
 
     override suspend fun createFrom(uri: String) {
@@ -34,7 +37,7 @@ class ImageAndroidDBDataSource(
         log(uri = uri, "It's not on the Android!")
     }
 
-    override fun retrieveWithAdministrativeUnit(): Flow<List<ImageAdministrativeUnit>> {
+    override fun retrieveWithAdministrativeUnit(): Flow<List<Pair<AdministrativeUnit?, Image>>> {
         return imageService.retrieveWithAdministrativeUnit().onEach(::updateSet)
     }
 
