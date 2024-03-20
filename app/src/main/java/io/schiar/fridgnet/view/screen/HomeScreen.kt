@@ -78,7 +78,7 @@ fun HomeScreen(
         )
     )
 
-    val adminUnits by viewModel.adminUnits.collectAsState(initial = emptyList())
+    val administrativeUnits by viewModel.administrativeUnits.collectAsState(initial = emptyList())
 
     fun getColumnSize(): Int {
         return when (currentAdministrativeLevel) {
@@ -98,8 +98,8 @@ fun HomeScreen(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         LazyVerticalGrid(columns = GridCells.Fixed(columnCount)) {
-            items(count = adminUnits.size) { index ->
-                val (_, _, cartographicBoundary, _, images) = adminUnits[index]
+            items(count = administrativeUnits.size) { index ->
+                val (_, _, cartographicBoundary, _, images) = administrativeUnits[index]
                 MapPhotoItem(
                     initialGeoLocation = images.getOrNull(index = 0)?.geoLocation,
                     cartographicBoundary = cartographicBoundary,

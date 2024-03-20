@@ -1,11 +1,11 @@
 package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.model.AdminUnit
+import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitNameDataSource
-import io.schiar.fridgnet.model.datasource.CurrentAdminUnitDataSource
+import io.schiar.fridgnet.model.datasource.CurrentAdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.combine
@@ -15,16 +15,16 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
 
 class PhotosRepository(
-    currentAdminUnitDataSource: CurrentAdminUnitDataSource,
+    currentAdministrativeUnitDataSource: CurrentAdministrativeUnitDataSource,
     imageDataSource: ImageDataSource,
     administrativeUnitNameDataSource: AdministrativeUnitNameDataSource
 )  {
-    private var _adminUnit: AdminUnit? = null
+    private var _administrativeUnit: AdministrativeUnit? = null
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    val adminUnit = currentAdminUnitDataSource
+    val administrativeUnit = currentAdministrativeUnitDataSource
         .retrieve()
-        .onEach { _adminUnit = it }
+        .onEach { _administrativeUnit = it }
         .flatMapLatest {
             val cartographicBoundary = it?.cartographicBoundary
             if (cartographicBoundary == null) {
@@ -42,14 +42,14 @@ class PhotosRepository(
 
     private fun combineGeoLocationImages(
         geoLocations: List<GeoLocation>, images: List<Image>
-    ): AdminUnit? {
+    ): AdministrativeUnit? {
         Log.d(
             tag = "",
             msg = "combineGeoLocationImages(" +
                     "geoLocations = $geoLocations, " +
                     "image geoLocations = ${images.map { it.geoLocation }} )"
         )
-        return _adminUnit?.with(
+        return _administrativeUnit?.with(
             images = images.filter { image -> geoLocations.contains(element = image.geoLocation) }
         )
     }

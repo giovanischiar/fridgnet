@@ -1,7 +1,7 @@
 package io.schiar.fridgnet.viewmodel.util
 
 import android.net.Uri
-import io.schiar.fridgnet.model.AdminUnit
+import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
@@ -9,7 +9,7 @@ import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.mergeToBoundingBox
-import io.schiar.fridgnet.view.viewdata.AdminUnitViewData
+import io.schiar.fridgnet.view.viewdata.AdministrativeUnitViewData
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.CartographicBoundaryViewData
 import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
@@ -84,19 +84,19 @@ fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
     return map { it.toRegionViewData() }
 }
 
-// AdminUnit
-fun AdminUnit.toAdminUnitViewData(): AdminUnitViewData {
-    return AdminUnitViewData(
+// AdministrativeUnit
+fun AdministrativeUnit.toAdministrativeUnitViewData(): AdministrativeUnitViewData {
+    return AdministrativeUnitViewData(
         name = name,
         administrativeLevel = administrativeLevel.toString(),
         cartographicBoundary = cartographicBoundary?.toCartographicBoundaryViewData(),
-        subAdministrativeUnitNames = subAdministrativeUnitNames.toAdminUnitViewDataList(),
+        subAdministrativeUnitNames = subAdministrativeUnitNames.toAdministrativeUnitViewDataList(),
         images = images.toImageViewDataList(),
         imagesBoundingBox = images.mergeToBoundingBox()?.toBoundingBoxViewData()
     )
 }
 
-// AdminUnitList
-fun List<AdminUnit>.toAdminUnitViewDataList(): List<AdminUnitViewData> {
-    return map { it.toAdminUnitViewData() }
+// AdministrativeUnitList
+fun List<AdministrativeUnit>.toAdministrativeUnitViewDataList(): List<AdministrativeUnitViewData> {
+    return map { it.toAdministrativeUnitViewData() }
 }

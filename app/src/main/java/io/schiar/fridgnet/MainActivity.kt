@@ -19,7 +19,7 @@ import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.local.AdministrativeUnitNameLocalDataSource
 import io.schiar.fridgnet.model.datasource.local.CartographicBoundaryAPIDBDataSource
-import io.schiar.fridgnet.model.datasource.local.CurrentLocalAdminUnitDataSource
+import io.schiar.fridgnet.model.datasource.local.CurrentLocalAdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
 import io.schiar.fridgnet.model.datasource.local.ImageAndroidDBDataSource
 import io.schiar.fridgnet.model.repository.AppRepository
@@ -88,7 +88,7 @@ class MainActivity : ComponentActivity() {
         val cartographicBoundaryDataSource = createCartographicBoundaryDataSource()
         val currentRegionDataSource = CurrentRegionLocalDataSource()
         val currentCartographicBoundaryGeoLocationsDataSource
-            = CurrentLocalAdminUnitDataSource()
+            = CurrentLocalAdministrativeUnitDataSource()
 
         val polygonsRepository = PolygonsRepository(
             currentRegionDataSource = currentRegionDataSource,
@@ -101,7 +101,7 @@ class MainActivity : ComponentActivity() {
         )
 
         val photosRepository = PhotosRepository(
-            currentAdminUnitDataSource
+            currentAdministrativeUnitDataSource
                 = currentCartographicBoundaryGeoLocationsDataSource,
             imageDataSource = imageDataSource,
             administrativeUnitNameDataSource = administrativeUnitNameDataSource
@@ -111,7 +111,7 @@ class MainActivity : ComponentActivity() {
             administrativeUnitNameDataSource = administrativeUnitNameDataSource,
             cartographicBoundaryDataSource = cartographicBoundaryDataSource,
             imageDataSource = imageDataSource,
-            currentAdminUnitDataSource =
+            currentAdministrativeUnitDataSource =
                 currentCartographicBoundaryGeoLocationsDataSource,
             externalScope = GlobalScope
         )
