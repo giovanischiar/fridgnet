@@ -21,8 +21,12 @@ abstract class ImageDAO {
 
     @Transaction
     open suspend fun insert(image: Image) {
-        val geoLocationID = insert(geoLocationEntity = image.geoLocation.toGeoLocationEntity())
-        insert(imageEntity = image.toImageEntity(geoLocationID = geoLocationID))
+        val (_, latitude, longitude) = image.geoLocation
+        val imageEntity = selectImageBy(latitude, longitude)
+        if (imageEntity == null) {
+            val geoLocationID = insert(geoLocationEntity = image.geoLocation.toGeoLocationEntity())
+            insert(imageEntity = image.toImageEntity(geoLocationID = geoLocationID))
+        }
     }
 
     @Transaction
