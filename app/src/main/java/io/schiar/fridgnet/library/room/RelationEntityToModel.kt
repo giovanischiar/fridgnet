@@ -1,23 +1,22 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.library.room.relationentity.AdministrativeUnitWithCartographicBoundariesAndGeoLocations
+import io.schiar.fridgnet.library.room.relationentity.AdministrativeUnitWithCartographicBoundaries
 import io.schiar.fridgnet.library.room.relationentity.CartographicBoundaryWithRegions
 import io.schiar.fridgnet.library.room.relationentity.ImageWithAdministrativeUnitAndGeoLocation
 import io.schiar.fridgnet.library.room.relationentity.PolygonWithGeoLocations
 import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeUnit
-import io.schiar.fridgnet.model.AdministrativeUnitCartographicBoundariesGeoLocations
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 
-fun List<AdministrativeUnitWithCartographicBoundariesAndGeoLocations>
-        .toAdministrativeUnitCartographicBoundariesGeoLocations()
-            : List<AdministrativeUnitCartographicBoundariesGeoLocations> {
-    return map { it.toAdministrativeUnitCartographicBoundariesGeoLocations() }
+fun List<AdministrativeUnitWithCartographicBoundaries>
+        .toAdministrativeUnitWithCartographicBoundariesList()
+            : List<Pair<AdministrativeUnit, List<CartographicBoundary>>> {
+    return map { it.toAdministrativeUnitWithCartographicBoundaries() }
 }
 
 fun List<ImageWithAdministrativeUnitAndGeoLocation>
@@ -29,15 +28,12 @@ fun List<ImageWithAdministrativeUnitAndGeoLocation>.toImages(): List<Image>{
     return map { it.toImage() }
 }
 
-fun AdministrativeUnitWithCartographicBoundariesAndGeoLocations
-        .toAdministrativeUnitCartographicBoundariesGeoLocations()
-            : AdministrativeUnitCartographicBoundariesGeoLocations {
-    return AdministrativeUnitCartographicBoundariesGeoLocations(
-        administrativeUnit = administrativeUnitEntity.toAdministrativeUnit(),
-        administrativeLevelCartographicBoundary = run {
-            cartographicBoundaryEntities.toAdministrativeLevelCartographicBoundary()
-        },
-        geoLocations = geoLocationEntities.toGeoLocations()
+fun AdministrativeUnitWithCartographicBoundaries
+        .toAdministrativeUnitWithCartographicBoundaries()
+            : Pair<AdministrativeUnit, List<CartographicBoundary>> {
+    return Pair(
+        first = administrativeUnitEntity.toAdministrativeUnit(),
+        second = cartographicBoundaryEntities.toCartographicBoundaries()
     )
 }
 
@@ -63,14 +59,8 @@ fun ImageWithAdministrativeUnitAndGeoLocation
     )
 }
 
-fun List<CartographicBoundaryWithRegions>
-        .toAdministrativeLevelCartographicBoundary()
-            : Map<AdministrativeLevel, CartographicBoundary> {
-    return associate { cartographyBoundaryWithRegions ->
-        AdministrativeLevel.valueOf(
-            value = cartographyBoundaryWithRegions.cartographicBoundaryEntity.administrativeLevel
-        ) to cartographyBoundaryWithRegions.toCartographicBoundary()
-    }
+fun List<CartographicBoundaryWithRegions>.toCartographicBoundaries(): List<CartographicBoundary> {
+    return map { it.toCartographicBoundary() }
 }
 
 

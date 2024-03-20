@@ -6,7 +6,7 @@ import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
 import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
 import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 import io.schiar.fridgnet.model.AdministrativeUnit
-import io.schiar.fridgnet.model.AdministrativeUnitCartographicBoundariesGeoLocations
+import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.service.AdministrativeUnitService
 import kotlinx.coroutines.flow.Flow
@@ -46,11 +46,12 @@ class AdministrativeUnitRoomService(
         )
     }
 
-    override fun retrieve(): Flow<List<AdministrativeUnitCartographicBoundariesGeoLocations>> {
-        return administrativeUnitDAO.selectAdministrativeUnitWithGeoLocations()
+    override fun retrieve()
+        : Flow<List<Pair<AdministrativeUnit, List<CartographicBoundary>>>> {
+        return administrativeUnitDAO.selectAdministrativeUnitWithCartographicBoundaries()
             .map { administrativeUnitWithGeoLocations ->
                 administrativeUnitWithGeoLocations
-                    .toAdministrativeUnitCartographicBoundariesGeoLocations()
+                    .toAdministrativeUnitWithCartographicBoundariesList()
             }
     }
 }

@@ -4,7 +4,6 @@ import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeLevel.CITY
 import io.schiar.fridgnet.model.AdministrativeUnit
-import io.schiar.fridgnet.model.AdministrativeUnitCartographicBoundariesGeoLocations
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.CartographicBoundaryGeoLocation
 import io.schiar.fridgnet.model.GeoLocation
@@ -57,10 +56,11 @@ class HomeRepository(
         imageDataSource.retrieveWithAdministrativeUnit().onEach { imageAdministrativeUnits ->
             imageAdministrativeUnits.forEach(::onEachAdministrativeUnitAndImage)
         },
-        administrativeUnitDataSource.retrieve().onEach { administrativeUnitLocationsGeoLocations ->
-            administrativeUnitLocationsGeoLocations.forEach(
-                ::onEachAdministrativeUnitLocationsGeoLocations
-            )
+        administrativeUnitDataSource.retrieve()
+            .onEach { administrativeUnitAndCartographicBoundariesList ->
+                administrativeUnitAndCartographicBoundariesList.forEach(
+                    ::onEachAdministrativeUnitAndCartographicBoundaries
+                )
         },
         cartographicBoundaryDataSource.retrieve().onEach { cartographicBoundaries ->
             cartographicBoundaries.forEach(::onEachCartographicBoundary)
@@ -92,22 +92,13 @@ class HomeRepository(
         )
     }
 
-    private fun onEachAdministrativeUnitLocationsGeoLocations(
-        administrativeUnitLocationsGeoLocations:
-            AdministrativeUnitCartographicBoundariesGeoLocations
+    private fun onEachAdministrativeUnitAndCartographicBoundaries(
+        administrativeUnitAndCartographicCoordinates
+            : Pair<AdministrativeUnit, List<CartographicBoundary>>
     ) {
-        val (
-            administrativeUnit,
-            geoLocations,
-            administrativeLevelCartographicBoundary
-        ) = administrativeUnitLocationsGeoLocations
-        val cartographicBoundariesRetrieved = administrativeLevelCartographicBoundary.values
-        assignNewCartographicBoundaryGeoLocation(
-            administrativeLevel = CITY,
-            administrativeUnitName = administrativeUnit.name(),
-            cartographicBoundary = administrativeLevelCartographicBoundary[CITY],
-            initialGeoLocation = geoLocations[0]
-        )
+        val (administrativeUnit,
+            cartographicBoundariesRetrieved
+        ) = administrativeUnitAndCartographicCoordinates
         retrieveCartographicBoundariesForAdministrativeUnit(
             administrativeUnit = administrativeUnit,
             cartographicBoundariesFromAdministrativeUnit = cartographicBoundariesRetrieved

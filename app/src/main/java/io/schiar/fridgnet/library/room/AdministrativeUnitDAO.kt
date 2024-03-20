@@ -9,7 +9,7 @@ import androidx.room.Update
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.library.room.entity.AdministrativeUnitEntity
 import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
-import io.schiar.fridgnet.library.room.relationentity.AdministrativeUnitWithCartographicBoundariesAndGeoLocations
+import io.schiar.fridgnet.library.room.relationentity.AdministrativeUnitWithCartographicBoundaries
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.GeoLocation
 import kotlinx.coroutines.flow.Flow
@@ -176,8 +176,8 @@ abstract class AdministrativeUnitDAO {
     abstract suspend fun update(administrativeUnitEntity: AdministrativeUnitEntity)
 
     @Query("SELECT * FROM AdministrativeUnit")
-    abstract fun selectAdministrativeUnitWithGeoLocations()
-        : Flow<List<AdministrativeUnitWithCartographicBoundariesAndGeoLocations>>
+    abstract fun selectAdministrativeUnitWithCartographicBoundaries()
+        : Flow<List<AdministrativeUnitWithCartographicBoundaries>>
 
     @Query(
         "SELECT * " +

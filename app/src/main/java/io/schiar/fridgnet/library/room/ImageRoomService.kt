@@ -12,7 +12,9 @@ class ImageRoomService(private val imageDAO: ImageDAO) : ImageService {
     }
 
     override fun retrieveWithAdministrativeUnit(): Flow<List<Pair<AdministrativeUnit?, Image>>> {
-        return imageDAO.selectImagesWithGeoLocationAndAdministrativeUnit().map { it.toAdministrativeUnitAndImageList() }
+        return imageDAO.selectImagesWithGeoLocationAndAdministrativeUnit().map {
+            it.toAdministrativeUnitAndImageList()
+        }
     }
 
     override suspend fun create(image: Image) {
