@@ -10,7 +10,7 @@ import io.schiar.fridgnet.model.datasource.retriever.AdministrativeUnitRetriever
 import io.schiar.fridgnet.model.service.AdministrativeUnitService
 import kotlinx.coroutines.flow.Flow
 
-class AdministrativeUnitGeoLocationsDataSource(
+class AdministrativeUnitDataSource(
     private val administrativeUnitRetriever: AdministrativeUnitRetriever,
     private val administrativeUnitService: AdministrativeUnitService
 ): AdministrativeUnitDataSource {

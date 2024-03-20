@@ -1,18 +1,16 @@
 package io.schiar.fridgnet.viewmodel.util
 
 import android.net.Uri
+import io.schiar.fridgnet.model.AdminUnit
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.CartographicBoundary
-import io.schiar.fridgnet.model.CartographicBoundaryGeoLocation
-import io.schiar.fridgnet.model.CartographicBoundaryImages
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.mergeToBoundingBox
+import io.schiar.fridgnet.view.viewdata.AdminUnitViewData
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
-import io.schiar.fridgnet.view.viewdata.CartographicBoundaryGeoLocationViewData
-import io.schiar.fridgnet.view.viewdata.CartographicBoundaryImagesViewData
 import io.schiar.fridgnet.view.viewdata.CartographicBoundaryViewData
 import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
 import io.schiar.fridgnet.view.viewdata.ImageViewData
@@ -86,26 +84,19 @@ fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
     return map { it.toRegionViewData() }
 }
 
-// CartographicBoundaryGeoLocation
-fun CartographicBoundaryGeoLocation
-    .toGeographicBoundaryImagesViewData(): CartographicBoundaryGeoLocationViewData {
-    return CartographicBoundaryGeoLocationViewData(
+// AdminUnit
+fun AdminUnit.toAdminUnitViewData(): AdminUnitViewData {
+    return AdminUnitViewData(
+        name = name,
+        administrativeLevel = administrativeLevel.toString(),
         cartographicBoundary = cartographicBoundary?.toCartographicBoundaryViewData(),
-        initialGeoLocation = initialGeoLocation?.toGeoLocationViewData() ?: GeoLocationViewData()
-    )
-}
-
-fun List<CartographicBoundaryGeoLocation>.toCartographicBoundaryGeoLocationViewDataList()
-        : List<CartographicBoundaryGeoLocationViewData> {
-    return map { it.toGeographicBoundaryImagesViewData() }
-}
-
-// CartographicBoundaryImages
-fun CartographicBoundaryImages
-    .toGeographicBoundaryImagesViewData(): CartographicBoundaryImagesViewData {
-    return CartographicBoundaryImagesViewData(
-        cartographicBoundary = cartographicBoundary.toCartographicBoundaryViewData(),
+        subAdministrativeUnits = subAdministrativeUnits.toAdminUnitViewDataList(),
         images = images.toImageViewDataList(),
         imagesBoundingBox = images.mergeToBoundingBox()?.toBoundingBoxViewData()
     )
+}
+
+// AdminUnitList
+fun List<AdminUnit>.toAdminUnitViewDataList(): List<AdminUnitViewData> {
+    return map { it.toAdminUnitViewData() }
 }

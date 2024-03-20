@@ -50,12 +50,10 @@ fun PhotosScreen(
     var mapLoaded by remember { mutableStateOf(false) }
     var zoomedOut by remember { mutableStateOf(true) }
 
-    val cartographicBoundaryImages by viewModel.cartographicBoundaryImages.collectAsState(
-        initial = null
-    )
+    val adminUnit by viewModel.adminUnit.collectAsState(initial = null)
     val coroutineScope = rememberCoroutineScope()
 
-    val (cartographicBoundary, images, imagesBondingBox) = cartographicBoundaryImages ?: return
+    val (name, _, cartographicBoundary, _, images, imagesBoundingBox) = adminUnit ?: return
 
     val missionDoloresPark = LatLng(37.759773, -122.427063)
     val cameraPositionState = rememberCameraPositionState {
@@ -78,27 +76,31 @@ fun PhotosScreen(
         }
     }
 
-    info(
-        ScreenInfo(title = cartographicBoundary.administrativeUnit)
-    )
+    info(ScreenInfo(title = name))
     Column {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .weight(weight)
         ) {
+            val mapProperties = MapProperties(
+                latLngBoundsForCameraTarget = cartographicBoundary?.boundingBox?.toLatLngBounds()
+            )
             GoogleMap(
                 cameraPositionState = cameraPositionState,
-                properties = MapProperties(
-                    latLngBoundsForCameraTarget = cartographicBoundary.boundingBox.toLatLngBounds()
-                ),
+                properties = mapProperties,
                 uiSettings = MapUiSettings(zoomControlsEnabled = false),
                 onMapLoaded = {
                     mapLoaded = true
-                    moveCamera(boundingBox = cartographicBoundary.boundingBox)
+                    if (cartographicBoundary != null) {
+                        moveCamera(boundingBox = cartographicBoundary.boundingBox)
+                    }
                 }
             ) {
-                CartographicBoundaryDrawer(cartographicBoundary = cartographicBoundary)
+                if (cartographicBoundary != null) {
+                    CartographicBoundaryDrawer(cartographicBoundary = cartographicBoundary)
+                }
+
                 images.map {
                     Marker(
                         state = MarkerState(position = it.geoLocation.toLatLng()),
@@ -116,14 +118,14 @@ fun PhotosScreen(
                     containerColor = colorResource(id = R.color.indigo_dye_500).copy(alpha = 0.40f),
                     elevation = FloatingActionButtonDefaults.elevation(0.dp),
                     onClick = {
-                        val imagesBoundingBox =
-                            imagesBondingBox ?: return@FloatingActionButton
                         val boundingBox = (if (zoomedOut) {
-                            imagesBoundingBox
+                            imagesBoundingBox ?: return@FloatingActionButton
                         } else {
-                            cartographicBoundary.boundingBox
+                            cartographicBoundary?.boundingBox
                         })
-                        moveCamera(boundingBox = boundingBox, animate = true, padding = 27)
+                        if (boundingBox != null) {
+                            moveCamera(boundingBox = boundingBox, animate = true, padding = 27)
+                        }
                         zoomedOut = !zoomedOut
                     }
                 ) {

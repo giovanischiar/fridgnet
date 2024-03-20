@@ -14,12 +14,10 @@ import io.schiar.fridgnet.library.room.AdministrativeUnitRoomService
 import io.schiar.fridgnet.library.room.CartographicBoundaryRoomService
 import io.schiar.fridgnet.library.room.FridgnetDatabase
 import io.schiar.fridgnet.library.room.ImageRoomService
-import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
-import io.schiar.fridgnet.model.datasource.local.AdministrativeUnitGeoLocationsDataSource
 import io.schiar.fridgnet.model.datasource.local.CartographicBoundaryAPIDBDataSource
-import io.schiar.fridgnet.model.datasource.local.CurrentCartographicBoundaryGeoLocationDataSource
+import io.schiar.fridgnet.model.datasource.local.CurrentLocalAdminUnitDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
 import io.schiar.fridgnet.model.datasource.local.ImageAndroidDBDataSource
 import io.schiar.fridgnet.model.repository.AppRepository
@@ -88,7 +86,7 @@ class MainActivity : ComponentActivity() {
         val cartographicBoundaryDataSource = createCartographicBoundaryDataSource()
         val currentRegionDataSource = CurrentRegionLocalDataSource()
         val currentCartographicBoundaryGeoLocationsDataSource
-            = CurrentCartographicBoundaryGeoLocationDataSource()
+            = CurrentLocalAdminUnitDataSource()
 
         val polygonsRepository = PolygonsRepository(
             currentRegionDataSource = currentRegionDataSource,
@@ -101,7 +99,7 @@ class MainActivity : ComponentActivity() {
         )
 
         val photosRepository = PhotosRepository(
-            currentCartographicBoundaryGeoLocationsDataSource
+            currentAdminUnitDataSource
                 = currentCartographicBoundaryGeoLocationsDataSource,
             imageDataSource = imageDataSource,
             administrativeUnitDataSource = administrativeUnitDataSource
@@ -111,7 +109,7 @@ class MainActivity : ComponentActivity() {
             administrativeUnitDataSource = administrativeUnitDataSource,
             cartographicBoundaryDataSource = cartographicBoundaryDataSource,
             imageDataSource = imageDataSource,
-            currentCartographicBoundaryGeoLocationsDataSource =
+            currentAdminUnitDataSource =
                 currentCartographicBoundaryGeoLocationsDataSource,
             externalScope = GlobalScope
         )
@@ -133,11 +131,11 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    private fun createAdministrativeUnitDataSource(): AdministrativeUnitDataSource {
+    private fun createAdministrativeUnitDataSource(): io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource {
         val geocoder = Geocoder(applicationContext, Locale.US)
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
         val administrativeUnitDAO = fridgnetDatabase.administrativeUnitDAO()
-        return AdministrativeUnitGeoLocationsDataSource(
+        return io.schiar.fridgnet.model.datasource.local.AdministrativeUnitDataSource(
             administrativeUnitRetriever = AdministrativeUnitGeocoderRetriever(geocoder = geocoder),
             administrativeUnitService = AdministrativeUnitRoomService(
                 administrativeUnitDAO = administrativeUnitDAO

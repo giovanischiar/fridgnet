@@ -4,14 +4,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.repository.HomeRepository
-import io.schiar.fridgnet.viewmodel.util.toCartographicBoundaryGeoLocationViewDataList
+import io.schiar.fridgnet.viewmodel.util.toAdminUnitViewDataList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
-    val cartographicBoundaryGeoLocations = homeRepository.cartographicBoundaryGeoLocations
-        .map { it.toCartographicBoundaryGeoLocationViewDataList()  }
+    val adminUnits = homeRepository.adminUnits.map { it.toAdminUnitViewDataList()  }
     val administrativeLevels = homeRepository.administrativeLevels.map { administrativeLevels ->
         administrativeLevels.map { it.toString() }
     }
@@ -22,7 +21,7 @@ class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
             tag = "Select Image Feature",
             msg ="Select cartographic boundary geo location at $index"
         )
-        homeRepository.selectCartographicBoundaryGeoLocationAt(index = index)
+        homeRepository.selectAdminUnitAt(index = index)
     }
 
     fun changeCurrentAdministrativeLevel(index: Int) = viewModelScope.launch(Dispatchers.IO) {

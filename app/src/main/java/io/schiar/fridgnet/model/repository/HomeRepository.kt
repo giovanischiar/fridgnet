@@ -1,17 +1,17 @@
 package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
+import io.schiar.fridgnet.model.AdminUnit
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeLevel.CITY
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.CartographicBoundary
-import io.schiar.fridgnet.model.CartographicBoundaryGeoLocation
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
+import io.schiar.fridgnet.model.datasource.CurrentAdminUnitDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
-import io.schiar.fridgnet.model.datasource.local.CurrentCartographicBoundaryGeoLocationDataSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.util.Collections.synchronizedList as syncListOf
 import java.util.Collections.synchronizedMap as syncMapOf
 import java.util.Collections.synchronizedSet as syncSetOf
 
@@ -27,16 +28,19 @@ class HomeRepository(
     private val administrativeUnitDataSource: AdministrativeUnitDataSource,
     private val cartographicBoundaryDataSource: CartographicBoundaryDataSource,
     private val imageDataSource: ImageDataSource,
-    private val currentCartographicBoundaryGeoLocationsDataSource :
-        CurrentCartographicBoundaryGeoLocationDataSource,
+    private val currentAdminUnitDataSource : CurrentAdminUnitDataSource,
     private val externalScope: CoroutineScope
 ) {
-    private var _currentAdministrativeLevel = CITY
+    private var _currentAdminUnits = emptyList<AdminUnit>()
     private val _administrativeLevels = AdministrativeLevel.entries
-    private val _currentAdministrativeLevelStateFlow = MutableStateFlow(_currentAdministrativeLevel)
-    private var _currentCartographicBoundaryGeoLocations: List<CartographicBoundaryGeoLocation>
-        = emptyList()
+    private val adminUnitByName = syncMapOf(mutableMapOf<String, AdminUnit>())
+    private val adminUnitNamesByAdministrativeLevel = run {
+        syncMapOf(_administrativeLevels.associateWith { syncListOf(mutableListOf<String>()) })
+    }
 
+    private var _currentAdministrativeLevel = CITY
+
+    private val _currentAdministrativeLevelStateFlow = MutableStateFlow(_currentAdministrativeLevel)
     val administrativeLevels: Flow<List<AdministrativeLevel>>
         = MutableStateFlow(_administrativeLevels)
     val currentAdministrativeLevel: Flow<AdministrativeLevel>
@@ -46,13 +50,7 @@ class HomeRepository(
     private val administrativeUnitRetrievingCartographicBoundarySet
         = syncSetOf(mutableSetOf<String>())
 
-    private val administrativeLevelAdministrativeUnitNameCartographicBoundaryGeoLocation = run {
-        syncMapOf(_administrativeLevels.associateWith {
-            mutableMapOf<String, CartographicBoundaryGeoLocation>()
-        })
-    }
-
-    val cartographicBoundaryGeoLocations = merge(
+    val adminUnits = merge(
         imageDataSource.retrieveWithAdministrativeUnit().onEach { imageAdministrativeUnits ->
             imageAdministrativeUnits.forEach(::onEachAdministrativeUnitAndImage)
         },
@@ -66,38 +64,46 @@ class HomeRepository(
             cartographicBoundaries.forEach(::onEachCartographicBoundary)
         },
         _currentAdministrativeLevelStateFlow.onEach { _currentAdministrativeLevel = it }
-    ).map {
-        _currentCartographicBoundaryGeoLocations =
-            administrativeLevelAdministrativeUnitNameCartographicBoundaryGeoLocation[
-            _currentAdministrativeLevel
-        ]?.values?.toList() ?: emptyList()
-        _currentCartographicBoundaryGeoLocations
+    ).map { getAdminUnits() }.onEach { _currentAdminUnits = it }
+
+    private fun getAdminUnits(): List<AdminUnit> {
+        val adminUnitNames
+            = adminUnitNamesByAdministrativeLevel[_currentAdministrativeLevel] ?: return emptyList()
+        return adminUnitNames.mapNotNull { adminUnitName -> adminUnitByName[adminUnitName] }
     }
 
     private fun onEachAdministrativeUnitAndImage(
         administrativeUnitAndImage: Pair<AdministrativeUnit?, Image>
     ) {
         val (administrativeUnitRetrieved, image) = administrativeUnitAndImage
-        val geoLocation = image.geoLocation
-        if (administrativeUnitRetrieved != null) {
-            assignNewCartographicBoundaryGeoLocation(
-                administrativeLevel = CITY,
-                administrativeUnitName = administrativeUnitRetrieved.name(),
-                initialGeoLocation = geoLocation
-            )
-        }
         retrieveAdministrativeUnitForGeoLocation(
-            geoLocation = geoLocation,
+            geoLocation = image.geoLocation,
             administrativeUnitFromGeoLocation = administrativeUnitRetrieved
         )
+
+        if (administrativeUnitRetrieved != null) {
+            val administrativeUnitName = administrativeUnitRetrieved.name()
+            if (!adminUnitByName.containsKey(administrativeUnitName)) {
+                adminUnitByName[administrativeUnitRetrieved.name()] = AdminUnit(
+                    name = administrativeUnitName,
+                    administrativeLevel = CITY,
+                    subAdministrativeUnits = emptyList(),
+                    images = mutableListOf(image)
+                )
+                adminUnitNamesByAdministrativeLevel[CITY]?.add(administrativeUnitName)
+            } else {
+                adminUnitByName[administrativeUnitRetrieved.name()]?.images?.add(image)
+            }
+            return
+        }
     }
 
     private fun onEachAdministrativeUnitAndCartographicBoundaries(
         administrativeUnitAndCartographicCoordinates
             : Pair<AdministrativeUnit, List<CartographicBoundary>>
     ) {
-        val (administrativeUnit,
-            cartographicBoundariesRetrieved
+        val (
+            administrativeUnit, cartographicBoundariesRetrieved
         ) = administrativeUnitAndCartographicCoordinates
         retrieveCartographicBoundariesForAdministrativeUnit(
             administrativeUnit = administrativeUnit,
@@ -106,23 +112,24 @@ class HomeRepository(
     }
 
     private fun onEachCartographicBoundary(cartographicBoundary: CartographicBoundary) {
-        assignNewCartographicBoundaryGeoLocation(
-            administrativeLevel = cartographicBoundary.administrativeLevel,
-            administrativeUnitName = cartographicBoundary.administrativeUnitName(),
-            cartographicBoundary = cartographicBoundary,
-            initialGeoLocation = cartographicBoundary.boundingBox.center()
-        )
+        val administrativeUnitName = cartographicBoundary.administrativeUnitName()
+        val administrativeLevel = cartographicBoundary.administrativeLevel
+        if (!adminUnitByName.containsKey(administrativeUnitName)) {
+            adminUnitByName[administrativeUnitName] = AdminUnit(
+                name = administrativeUnitName,
+                administrativeLevel = cartographicBoundary.administrativeLevel,
+                cartographicBoundary = cartographicBoundary
+            )
+            adminUnitNamesByAdministrativeLevel[administrativeLevel]?.add(administrativeUnitName)
+        } else {
+            adminUnitByName[administrativeUnitName]?.cartographicBoundary = cartographicBoundary
+        }
     }
 
-    fun selectCartographicBoundaryGeoLocationAt(index: Int) {
-        val cartographicBoundaryGeoLocation = _currentCartographicBoundaryGeoLocations[index]
-        log(
-            method = "selectCartographicBoundaryGeoLocationAt",
-            msg = "CartographicBoundaryGeoLocation at $index is $cartographicBoundaryGeoLocation"
-        )
-        currentCartographicBoundaryGeoLocationsDataSource.update(
-            cartographicBoundaryGeoLocation = cartographicBoundaryGeoLocation
-        )
+    fun selectAdminUnitAt(index: Int) {
+        val adminUnit = _currentAdminUnits[index]
+        log(method = "selectAdminUnitAt", msg = "AdminUnit at $index is $adminUnit")
+        currentAdminUnitDataSource.update(adminUnit = adminUnit)
     }
 
     fun changeCurrentAdministrativeLevel(index: Int) {
@@ -187,39 +194,6 @@ class HomeRepository(
                     administrativeLevel = administrativeLevel
                 )
             }
-        }
-    }
-
-    private fun assignNewCartographicBoundaryGeoLocation(
-        administrativeLevel: AdministrativeLevel,
-        administrativeUnitName: String,
-        cartographicBoundary: CartographicBoundary? = null,
-        initialGeoLocation: GeoLocation
-    ) {
-        val cartographicBoundaryGeoLocation = (
-                administrativeLevelAdministrativeUnitNameCartographicBoundaryGeoLocation[
-            administrativeLevel
-        ] ?: return)[administrativeUnitName]
-        val needToAssignNewCartographicBoundaryGeoLocation
-            = cartographicBoundaryGeoLocation == null ||
-                (cartographicBoundaryGeoLocation.cartographicBoundary == null &&
-                        cartographicBoundary != null)
-
-        if (needToAssignNewCartographicBoundaryGeoLocation) {
-            val newCartographicBoundaryGeoLocation = CartographicBoundaryGeoLocation(
-                cartographicBoundary = cartographicBoundary,
-                initialGeoLocation = initialGeoLocation
-            )
-            log(
-                method = "assignNewCartographicBoundaryGeoLocation",
-                msg = "Assign $newCartographicBoundaryGeoLocation " +
-                        "to " +
-                        "administrativeLevelAdministrativeUnitNameCartographicBoundaryGeoLocation" +
-                        "[$administrativeLevel][$administrativeUnitName]"
-            )
-            administrativeLevelAdministrativeUnitNameCartographicBoundaryGeoLocation[
-                administrativeLevel
-            ]?.set(administrativeUnitName, newCartographicBoundaryGeoLocation)
         }
     }
 
