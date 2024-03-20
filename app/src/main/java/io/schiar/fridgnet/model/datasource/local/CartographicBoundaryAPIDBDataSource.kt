@@ -27,14 +27,18 @@ class CartographicBoundaryAPIDBDataSource(
     )
 
     private suspend fun create(cartographicBoundary: CartographicBoundary) {
-        cartographicBoundariesCacheFlow.update { administrativeUnitNameLocationCache.values.toList() }
+        cartographicBoundariesCacheFlow.update {
+            administrativeUnitNameLocationCache.values.toList()
+        }
         cartographicBoundaryService.create(cartographicBoundary = cartographicBoundary)
     }
 
     override suspend fun retrieveLocationFor(
         administrativeUnitName: AdministrativeUnitName, administrativeLevel: AdministrativeLevel
     ) {
-        val administrativeUnitNameAdministrativeLevel = Pair(administrativeUnitName, administrativeLevel)
+        val administrativeUnitNameAdministrativeLevel = Pair(
+            administrativeUnitName, administrativeLevel
+        )
         log(
             administrativeUnitNameAdministrativeLevel = administrativeUnitNameAdministrativeLevel,
             msg = "It's not on memory, retrieving using the API"
@@ -91,16 +95,20 @@ class CartographicBoundaryAPIDBDataSource(
     }
 
     private fun log(
-        administrativeUnitNameAdministrativeLevel: Pair<AdministrativeUnitName, AdministrativeLevel>,
+        administrativeUnitNameAdministrativeLevel: Pair<
+            AdministrativeUnitName, AdministrativeLevel
+        >,
         msg: String
     ) {
-        val (administrativeUnitName, administrativeLevel) = administrativeUnitNameAdministrativeLevel
-        val administrativeUnitNameName = administrativeUnitName.name(
+        val (
+            administrativeUnitName, administrativeLevel
+        ) = administrativeUnitNameAdministrativeLevel
+        val administrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = administrativeLevel
         )
         Log.d(
             "AdministrativeUnitName to Cartographic Boundary Feature",
-            "Retrieving Cartographic Boundary for $administrativeUnitNameName: $msg"
+            "Retrieving Cartographic Boundary for $administrativeUnitNameString: $msg"
         )
     }
 }

@@ -15,7 +15,7 @@ class AdministrativeUnitNameLocalDataSource(
     private val administrativeUnitNameService: AdministrativeUnitNameService
 ): AdministrativeUnitNameDataSource {
     override suspend fun create(geoLocation: GeoLocation, administrativeUnitName: AdministrativeUnitName) {
-        log(geoLocation, "creating administrativeUnitName ${administrativeUnitName.name()}")
+        log(geoLocation, "creating administrativeUnitName $administrativeUnitName")
         administrativeUnitNameService.create(
             geoLocation = geoLocation, administrativeUnitName = administrativeUnitName
         )

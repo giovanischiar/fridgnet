@@ -55,7 +55,7 @@ fun List<Image>.toImageViewDataList(): List<ImageViewData> {
 // CartographicBoundary
 fun CartographicBoundary.toCartographicBoundaryViewData(): CartographicBoundaryViewData {
     return CartographicBoundaryViewData(
-        administrativeUnitName = administrativeUnitNameName(),
+        administrativeUnitName = administrativeUnitNameString(),
         regions = regions.map { it.toRegionViewData() },
         boundingBox = boundingBox.toBoundingBoxViewData(),
         center = boundingBox.center().toGeoLocationViewData(),

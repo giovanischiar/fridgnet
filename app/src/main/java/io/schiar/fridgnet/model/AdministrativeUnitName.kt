@@ -12,15 +12,15 @@ data class AdministrativeUnitName(
     val adminArea: String?,
     val countryName: String?
 ) {
-    fun name(): String {
+    override fun toString(): String {
         return listOfNotNull(
             locality, subAdminArea, adminArea, countryName
         ).joinToString(separator = ", ")
     }
 
-    fun name(administrativeLevel: AdministrativeLevel): String {
+    fun toString(administrativeLevel: AdministrativeLevel): String {
         return when(administrativeLevel) {
-            CITY -> name()
+            CITY -> toString()
             COUNTY -> {
                 listOfNotNull(subAdminArea, adminArea, countryName).joinToString(separator = ", ")
             }

@@ -26,7 +26,7 @@ class AdministrativeUnitNameGeocoderRetriever(
         if (administrativeUnitName != null) {
             Log.d(
                 "AdministrativeUnitNameGeocoderRetriever.Add Image Feature",
-                "($latitude, $longitude) is ${administrativeUnitName.name()}"
+                "($latitude, $longitude) is $administrativeUnitName"
             )
         } else {
             Log.d(

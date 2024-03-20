@@ -26,9 +26,9 @@ class CartographicBoundaryRetrofitRetriever(
         } else {
             administrativeUnitName
         }
-        val administrativeUnitNameStr = newAdministrativeUnitName.name()
-        if (fetchingPlaces.contains(administrativeUnitNameStr)) return null
-        fetchingPlaces = fetchingPlaces + administrativeUnitNameStr
+        val administrativeUnitNameString = "$newAdministrativeUnitName"
+        if (fetchingPlaces.contains(administrativeUnitNameString)) return null
+        fetchingPlaces = fetchingPlaces + administrativeUnitNameString
         return fetchCartographicBoundary(
             administrativeUnitName = newAdministrativeUnitName,
             administrativeLevel = CITY
@@ -41,11 +41,11 @@ class CartographicBoundaryRetrofitRetriever(
         administrativeUnitName.subAdminArea ?: return null
         administrativeUnitName.adminArea ?: return null
         administrativeUnitName.countryName ?: return null
-        val countyAdministrativeUnitNameName = administrativeUnitName.name(
+        val countyAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = COUNTY
         )
-        if (fetchingPlaces.contains(countyAdministrativeUnitNameName)) return null
-        fetchingPlaces = fetchingPlaces + countyAdministrativeUnitNameName
+        if (fetchingPlaces.contains(countyAdministrativeUnitNameString)) return null
+        fetchingPlaces = fetchingPlaces + countyAdministrativeUnitNameString
         return fetchCartographicBoundary(
             administrativeUnitName = administrativeUnitName,
             administrativeLevel = COUNTY
@@ -57,9 +57,11 @@ class CartographicBoundaryRetrofitRetriever(
     ): CartographicBoundary? {
         administrativeUnitName.adminArea ?: return null
         administrativeUnitName.countryName ?: return null
-        val stateAdministrativeUnitNameName = administrativeUnitName.name(administrativeLevel = STATE)
-        if (fetchingPlaces.contains(stateAdministrativeUnitNameName)) return null
-        fetchingPlaces = fetchingPlaces + stateAdministrativeUnitNameName
+        val stateAdministrativeUnitNameString = administrativeUnitName.toString(
+            administrativeLevel = STATE
+        )
+        if (fetchingPlaces.contains(stateAdministrativeUnitNameString)) return null
+        fetchingPlaces = fetchingPlaces + stateAdministrativeUnitNameString
         return fetchCartographicBoundary(
             administrativeUnitName = administrativeUnitName,
             administrativeLevel = STATE
@@ -70,9 +72,11 @@ class CartographicBoundaryRetrofitRetriever(
         administrativeUnitName: AdministrativeUnitName
     ): CartographicBoundary? {
         administrativeUnitName.countryName ?: return null
-        val countryAdministrativeUnitNameName = administrativeUnitName.name(administrativeLevel = COUNTRY)
-        if (fetchingPlaces.contains(countryAdministrativeUnitNameName)) return null
-        fetchingPlaces = fetchingPlaces + countryAdministrativeUnitNameName
+        val countryAdministrativeUnitNameString = administrativeUnitName.toString(
+            administrativeLevel = COUNTRY
+        )
+        if (fetchingPlaces.contains(countryAdministrativeUnitNameString)) return null
+        fetchingPlaces = fetchingPlaces + countryAdministrativeUnitNameString
         return fetchCartographicBoundary(
             administrativeUnitName = administrativeUnitName,
             administrativeLevel = COUNTRY
@@ -82,7 +86,7 @@ class CartographicBoundaryRetrofitRetriever(
     private fun extractAdministrativeUnitName(
         administrativeUnitName: AdministrativeUnitName
     ): AdministrativeUnitName {
-        val name = administrativeUnitName.name()
+        val name = "$administrativeUnitName"
         val add = name.split(", ")
         if (add.size < 2) return administrativeUnitName
         val state = add[1]
@@ -139,7 +143,7 @@ class CartographicBoundaryRetrofitRetriever(
         Log.d(
             tag = "API Result",
             msg = "type: $administrativeLevel, " +
-                  "administrativeUnitName: ${administrativeUnitName.name()} " +
+                  "administrativeUnitName: $administrativeUnitName" +
                   "body.geojson: ${jsonResult.geoJSON}"
         )
         return jsonResult.toCartographicBoundary(

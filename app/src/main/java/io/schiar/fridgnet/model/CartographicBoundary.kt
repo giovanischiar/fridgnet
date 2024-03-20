@@ -8,19 +8,8 @@ data class CartographicBoundary(
     val zIndex: Float,
     val administrativeLevel: AdministrativeLevel,
 ) {
-    fun administrativeUnitNameName(): String {
-        return administrativeUnitName.name(administrativeLevel = administrativeLevel)
-    }
-
-    fun updateAdministrativeUnitName(administrativeUnitName: AdministrativeUnitName): CartographicBoundary {
-        return CartographicBoundary(
-            id = id,
-            administrativeUnitName = administrativeUnitName,
-            regions = regions,
-            boundingBox = boundingBox,
-            zIndex = zIndex,
-            administrativeLevel = administrativeLevel
-        )
+    fun administrativeUnitNameString(): String {
+        return administrativeUnitName.toString(administrativeLevel = administrativeLevel)
     }
 
     fun switchAll(): CartographicBoundary {
@@ -76,6 +65,6 @@ data class CartographicBoundary(
     override fun toString(): String {
         val regionSize = regions.size
         val regionSizeName = "$regionSize ${if (regions.size == 1) "region" else "regions"}"
-        return "(${administrativeUnitNameName()}, $regionSizeName)"
+        return "(${administrativeUnitNameString()}, $regionSizeName)"
     }
 }
