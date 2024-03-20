@@ -12,16 +12,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import java.util.Collections.synchronizedMap as syncMapOf
-import java.util.Collections.synchronizedSet as syncSetOf
 
 class CartographicBoundaryAPIDBDataSource(
     private val cartographicBoundaryRetriever: CartographicBoundaryRetriever,
     private val cartographicBoundaryService: CartographicBoundaryService
 ): CartographicBoundaryDataSource {
-    private val administrativeUnitSet: MutableSet<String> = syncSetOf(mutableSetOf())
     private val administrativeUnitLocationCache
         : MutableMap<AdministrativeUnit, CartographicBoundary> = syncMapOf(mutableMapOf())
     private val cartographicBoundariesCacheFlow
@@ -34,27 +31,10 @@ class CartographicBoundaryAPIDBDataSource(
         cartographicBoundaryService.create(cartographicBoundary = cartographicBoundary)
     }
 
-    private fun updateCache(
-        administrativeUnit: AdministrativeUnit, cartographicBoundary: CartographicBoundary
-    ) {
-        administrativeUnitLocationCache[administrativeUnit] = cartographicBoundary
-    }
-
-    private fun updateCache(cartographicBoundaries: List<CartographicBoundary>) {
-        cartographicBoundaries.forEach {
-            updateCache(administrativeUnit = it.administrativeUnit, cartographicBoundary = it)
-        }
-    }
-
     override suspend fun retrieveLocationFor(
         administrativeUnit: AdministrativeUnit, administrativeLevel: AdministrativeLevel
     ) {
         val administrativeUnitAdministrativeLevel = Pair(administrativeUnit, administrativeLevel)
-        val administrativeUnitName = administrativeUnit.name(
-            administrativeLevel = administrativeLevel
-        )
-        if (administrativeUnitSet.contains(element = administrativeUnitName)) return
-        administrativeUnitSet.add(element = administrativeUnitName)
         log(
             administrativeUnitAdministrativeLevel = administrativeUnitAdministrativeLevel,
             msg = "It's not on memory, retrieving using the API"
@@ -94,7 +74,7 @@ class CartographicBoundaryAPIDBDataSource(
     override fun retrieve(): Flow<List<CartographicBoundary>> {
         return merge(
             cartographicBoundariesCacheFlow,
-            cartographicBoundaryService.retrieve().onEach(::updateCache)
+            cartographicBoundaryService.retrieve()
         ).distinctUntilChanged()
     }
 
