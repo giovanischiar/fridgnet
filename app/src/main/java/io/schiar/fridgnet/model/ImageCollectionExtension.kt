@@ -1,7 +1,7 @@
 package io.schiar.fridgnet.model
 
-fun List<Image>.mergeToBoundingBox(): BoundingBox? {
+fun Collection<Image>.mergeToBoundingBox(): BoundingBox? {
     if (isEmpty()) return null
-    val boundingBox = this[0].geoLocation.toBoundingBox()
+    val boundingBox = this.first().geoLocation.toBoundingBox()
     return this.fold(initial = boundingBox) { acc, image -> acc + image.geoLocation }
 }

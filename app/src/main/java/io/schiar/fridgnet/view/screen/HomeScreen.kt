@@ -99,10 +99,17 @@ fun HomeScreen(
     ) {
         LazyVerticalGrid(columns = GridCells.Fixed(columnCount)) {
             items(count = administrativeUnits.size) { index ->
-                val (_, _, cartographicBoundary, _, images) = administrativeUnits[index]
+                val (
+                    _, _, cartographicBoundary, subAdministrativeUnits, images, imagesBoundingBox
+                ) = administrativeUnits[index]
                 MapPhotoItem(
-                    initialGeoLocation = images.getOrNull(index = 0)?.geoLocation,
                     cartographicBoundary = cartographicBoundary,
+                    subCartographicBoundaries = subAdministrativeUnits
+                        .mapNotNull { administrativeUnit ->
+                            administrativeUnit.cartographicBoundary
+                        },
+                    images = images,
+                    imagesBoundingBox = imagesBoundingBox,
                     columnCount = columnCount
                 ) {
                     viewModel.selectCartographicBoundaryGeoLocationAt(index = index)

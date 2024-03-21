@@ -48,7 +48,7 @@ fun Image.toViewData(): ImageViewData {
     )
 }
 
-fun List<Image>.toImageViewDataList(): List<ImageViewData> {
+fun Collection<Image>.toImageViewDataList(): List<ImageViewData> {
     return map { it.toViewData() }
 }
 
@@ -90,13 +90,14 @@ fun AdministrativeUnit.toAdministrativeUnitViewData(): AdministrativeUnitViewDat
         name = name,
         administrativeLevel = administrativeLevel.toString(),
         cartographicBoundary = cartographicBoundary?.toCartographicBoundaryViewData(),
-        subAdministrativeUnitNames = subAdministrativeUnitNames.toAdministrativeUnitViewDataList(),
+        subAdministrativeUnits = subAdministrativeUnits.toAdministrativeUnitViewDataList(),
         images = images.toImageViewDataList(),
         imagesBoundingBox = images.mergeToBoundingBox()?.toBoundingBoxViewData()
     )
 }
 
 // AdministrativeUnitList
-fun List<AdministrativeUnit>.toAdministrativeUnitViewDataList(): List<AdministrativeUnitViewData> {
+fun Collection<AdministrativeUnit>
+        .toAdministrativeUnitViewDataList(): List<AdministrativeUnitViewData> {
     return map { it.toAdministrativeUnitViewData() }
 }

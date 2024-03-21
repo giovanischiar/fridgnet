@@ -53,7 +53,9 @@ fun PhotosScreen(
     val administrativeUnit by viewModel.administrativeUnit.collectAsState(initial = null)
     val coroutineScope = rememberCoroutineScope()
 
-    val (name, _, cartographicBoundary, _, images, imagesBoundingBox) = administrativeUnit ?: return
+    val (
+        name, _, cartographicBoundary, subAdministrativeUnits, images, imagesBoundingBox
+    ) = administrativeUnit ?: return
 
     val missionDoloresPark = LatLng(37.759773, -122.427063)
     val cameraPositionState = rememberCameraPositionState {
@@ -106,6 +108,16 @@ fun PhotosScreen(
                         state = MarkerState(position = it.geoLocation.toLatLng()),
                         icon = it.byteArray.toBitmapDescriptor()
                     )
+                }
+
+                subAdministrativeUnits.forEach { subAdministrativeUnit ->
+                    val subCartographicBoundary = subAdministrativeUnit.cartographicBoundary
+                    if (subCartographicBoundary != null) {
+                        CartographicBoundaryDrawer(cartographicBoundary = subCartographicBoundary)
+                        if (cartographicBoundary == null && subAdministrativeUnits.size == 1) {
+                            moveCamera(boundingBox = subCartographicBoundary.boundingBox)
+                        }
+                    }
                 }
             }
             Column(
