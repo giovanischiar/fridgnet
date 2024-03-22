@@ -6,6 +6,10 @@ enum class AdministrativeLevel {
     STATE,
     COUNTRY;
 
+    fun with(administrativeUnitName: AdministrativeUnitName): String {
+        return "$this|${administrativeUnitName.toString(administrativeLevel = this)}"
+    }
+
     fun zIndex(): Float {
         return when (this) {
             CITY -> 1.3f

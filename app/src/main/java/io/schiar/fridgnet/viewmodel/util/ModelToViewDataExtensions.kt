@@ -1,6 +1,8 @@
 package io.schiar.fridgnet.viewmodel.util
 
 import android.net.Uri
+import io.schiar.fridgnet.Log
+import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.CartographicBoundary
@@ -55,7 +57,7 @@ fun Collection<Image>.toImageViewDataList(): List<ImageViewData> {
 // CartographicBoundary
 fun CartographicBoundary.toCartographicBoundaryViewData(): CartographicBoundaryViewData {
     return CartographicBoundaryViewData(
-        administrativeUnitName = administrativeUnitNameString(),
+        administrativeUnitName = administrativeUnitNameString,
         regions = regions.map { it.toRegionViewData() },
         boundingBox = boundingBox.toBoundingBoxViewData(),
         center = boundingBox.center().toGeoLocationViewData(),
@@ -86,6 +88,9 @@ fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
 
 // AdministrativeUnit
 fun AdministrativeUnit.toAdministrativeUnitViewData(): AdministrativeUnitViewData {
+    if (administrativeLevel == AdministrativeLevel.CITY && subAdministrativeUnits.isNotEmpty()) {
+        Log.d("", "WTF")
+    }
     return AdministrativeUnitViewData(
         name = name,
         administrativeLevel = administrativeLevel.toString(),
