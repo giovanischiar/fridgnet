@@ -6,7 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import io.schiar.fridgnet.library.android.ImageAndroidRetriever
-import io.schiar.fridgnet.library.geocoder.AddressGeocoderRetriever
+import io.schiar.fridgnet.library.geocoder.AdministrativeUnitNameGeocoderRetriever
 import io.schiar.fridgnet.library.retrofit.CartographicBoundaryRetrofitRetriever
 import io.schiar.fridgnet.library.retrofit.NominatimAPI
 import io.schiar.fridgnet.library.retrofit.RetrofitHelper
@@ -139,7 +139,7 @@ class MainActivity : ComponentActivity() {
 
     private fun createAdministrativeUnitNameRetriever(): AdministrativeUnitNameRetriever {
         val geocoder = Geocoder(applicationContext, Locale.US)
-        return AddressGeocoderRetriever(geocoder = geocoder)
+        return AdministrativeUnitNameGeocoderRetriever(geocoder = geocoder)
     }
 
     private fun createAdministrativeUnitNameDataSource(): AdministrativeUnitNameDataSource {
