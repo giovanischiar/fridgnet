@@ -3,13 +3,13 @@ package io.schiar.fridgnet.library.room
 import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.Region
-import io.schiar.fridgnet.model.service.CartographicBoundaryService
+import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class CartographicBoundaryRoomService(
+class CartographicBoundaryRoomDataSource(
     private val cartographicBoundaryDAO: CartographicBoundaryDAO
-) : CartographicBoundaryService {
+) : CartographicBoundaryDataSource {
     override fun retrieve(): Flow<List<CartographicBoundary>> {
         return cartographicBoundaryDAO.selectCartographicBoundariesWithRegions()
             .map {
@@ -28,7 +28,9 @@ class CartographicBoundaryRoomService(
             }
     }
 
-    override fun retrieve(administrativeUnitName: AdministrativeUnitName): Flow<CartographicBoundary?> {
+    override fun retrieve(
+        administrativeUnitName: AdministrativeUnitName
+    ): Flow<CartographicBoundary?> {
         return selectCartographicBoundaryByAdministrativeUnitName(
             administrativeUnitName = administrativeUnitName
         )
@@ -37,9 +39,11 @@ class CartographicBoundaryRoomService(
     fun selectCartographicBoundaryByAdministrativeUnitName(
         administrativeUnitName: AdministrativeUnitName
     ): Flow<CartographicBoundary?> {
-        return cartographicBoundaryDAO.selectCartographicBoundaryWithRegionsByAdministrativeUnitName(
-            administrativeUnitNameID = administrativeUnitName.id
-        ).map { it?.toCartographicBoundary() }
+        return cartographicBoundaryDAO
+            .selectCartographicBoundaryWithRegionsByAdministrativeUnitName(
+                administrativeUnitNameID = administrativeUnitName.id
+            )
+            .map { it?.toCartographicBoundary() }
     }
 
     override suspend fun create(cartographicBoundary: CartographicBoundary) {

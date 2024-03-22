@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.onEach
 class PhotosRepository(
     currentAdministrativeUnitDataSource: CurrentAdministrativeUnitDataSource,
     imageDataSource: ImageDataSource,
-    administrativeUnitNameDataSource: AdministrativeUnitNameDataSource
+    administrativeUnitNameService: AdministrativeUnitNameDataSource
 )  {
     private var _administrativeUnit: AdministrativeUnit? = null
 
@@ -30,7 +30,7 @@ class PhotosRepository(
             if (cartographicBoundary == null) {
                 return@flatMapLatest flowOf(value = emptyList())
             } else {
-                administrativeUnitNameDataSource.retrieveGeoLocations(
+                administrativeUnitNameService.retrieveGeoLocations(
                     administrativeUnitName = cartographicBoundary.administrativeUnitName,
                     administrativeLevel = cartographicBoundary.administrativeLevel
                 )

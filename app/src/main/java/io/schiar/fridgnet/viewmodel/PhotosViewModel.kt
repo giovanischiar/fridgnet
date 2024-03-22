@@ -6,5 +6,7 @@ import io.schiar.fridgnet.viewmodel.util.toAdministrativeUnitViewData
 import kotlinx.coroutines.flow.map
 
 class PhotosViewModel(photosRepository: PhotosRepository) : ViewModel() {
-    val administrativeUnit = photosRepository.administrativeUnit.map { administrativeUnit -> administrativeUnit.toAdministrativeUnitViewData() }
+    val administrativeUnit = photosRepository.administrativeUnit.map {
+        administrativeUnit -> administrativeUnit.toAdministrativeUnitViewData()
+    }
 }

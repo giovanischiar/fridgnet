@@ -7,11 +7,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 
 class CurrentRegionLocalDataSource: CurrentRegionDataSource {
-    private var _currentRegion: Region? = null
-    private val currentRegion = MutableStateFlow(_currentRegion)
+    private val currentRegion = MutableStateFlow<Region?>(value = null)
 
     override fun update(region: Region) {
-        _currentRegion = region
         currentRegion.update { region }
     }
 

@@ -8,13 +8,13 @@ import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
-import io.schiar.fridgnet.model.service.AdministrativeUnitNameService
+import io.schiar.fridgnet.model.datasource.AdministrativeUnitNameDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class AdministrativeUnitNameRoomService(
+class AdministrativeUnitNameRoomDataSource(
     private val administrativeUnitNameDAO: AdministrativeUnitNameDAO
-) : AdministrativeUnitNameService {
+) : AdministrativeUnitNameDataSource {
     override fun retrieveGeoLocations(
         administrativeUnitName: AdministrativeUnitName, administrativeLevel: AdministrativeLevel
     ): Flow<List<GeoLocation>> {

@@ -6,22 +6,22 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.lifecycle.ViewModelProvider
 import io.schiar.fridgnet.library.android.ImageAndroidRetriever
-import io.schiar.fridgnet.library.geocoder.AdministrativeUnitNameGeocoderRetriever
+import io.schiar.fridgnet.library.geocoder.AddressGeocoderRetriever
 import io.schiar.fridgnet.library.retrofit.CartographicBoundaryRetrofitRetriever
 import io.schiar.fridgnet.library.retrofit.NominatimAPI
 import io.schiar.fridgnet.library.retrofit.RetrofitHelper
-import io.schiar.fridgnet.library.room.AdministrativeUnitNameRoomService
-import io.schiar.fridgnet.library.room.CartographicBoundaryRoomService
+import io.schiar.fridgnet.library.room.AdministrativeUnitNameRoomDataSource
+import io.schiar.fridgnet.library.room.CartographicBoundaryRoomDataSource
 import io.schiar.fridgnet.library.room.FridgnetDatabase
-import io.schiar.fridgnet.library.room.ImageRoomService
+import io.schiar.fridgnet.library.room.ImageRoomDataSource
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitNameDataSource
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
-import io.schiar.fridgnet.model.datasource.ImageDataSource
-import io.schiar.fridgnet.model.datasource.local.AdministrativeUnitNameLocalDataSource
-import io.schiar.fridgnet.model.datasource.local.CartographicBoundaryAPIDBDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentLocalAdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
-import io.schiar.fridgnet.model.datasource.local.ImageAndroidDBDataSource
+import io.schiar.fridgnet.model.datasource.retriever.AdministrativeUnitNameRetriever
+import io.schiar.fridgnet.model.datasource.retriever.CartographicBoundaryRetriever
+import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
+import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.repository.AppRepository
 import io.schiar.fridgnet.model.repository.HomeRepository
 import io.schiar.fridgnet.model.repository.MapRepository
@@ -84,10 +84,10 @@ class MainActivity : ComponentActivity() {
     @OptIn(DelicateCoroutinesApi::class)
     private fun createRepositories(): Repositories {
         val imageDataSource = createImageDataSource()
-        val administrativeUnitNameDataSource = createAdministrativeUnitNameDataSource()
+        val administrativeUnitNameService = createAdministrativeUnitNameDataSource()
         val cartographicBoundaryDataSource = createCartographicBoundaryDataSource()
         val currentRegionDataSource = CurrentRegionLocalDataSource()
-        val currentCartographicBoundaryGeoLocationsDataSource
+        val currentAdministrativeUnitDataSource
             = CurrentLocalAdministrativeUnitDataSource()
 
         val polygonsRepository = PolygonsRepository(
@@ -101,65 +101,66 @@ class MainActivity : ComponentActivity() {
         )
 
         val photosRepository = PhotosRepository(
-            currentAdministrativeUnitDataSource
-                = currentCartographicBoundaryGeoLocationsDataSource,
+            currentAdministrativeUnitDataSource = currentAdministrativeUnitDataSource,
             imageDataSource = imageDataSource,
-            administrativeUnitNameDataSource = administrativeUnitNameDataSource
+            administrativeUnitNameService = administrativeUnitNameService
         )
 
         val homeRepository = HomeRepository(
-            administrativeUnitNameDataSource = administrativeUnitNameDataSource,
+            administrativeUnitNameRetriever = createAdministrativeUnitNameRetriever(),
+            administrativeUnitNameDataSource = administrativeUnitNameService,
+            cartographicBoundaryRetriever = createCartographicBoundaryRetriever(),
             cartographicBoundaryDataSource = cartographicBoundaryDataSource,
             imageDataSource = imageDataSource,
-            currentAdministrativeUnitDataSource =
-                currentCartographicBoundaryGeoLocationsDataSource,
+            currentAdministrativeUnitDataSource = currentAdministrativeUnitDataSource,
             externalScope = GlobalScope
         )
 
-        val appRepository = AppRepository(imageDataSource = imageDataSource)
+        val appRepository = AppRepository(
+            imageRetriever = createImageRetriever(),
+            imageDataSource = imageDataSource
+        )
 
         return Repositories(
             appRepository, homeRepository, mapRepository, polygonsRepository, photosRepository
         )
     }
 
-    private fun createImageDataSource(): ImageDataSource {
+    private fun createImageRetriever(): ImageRetriever {
         val contentResolver = applicationContext.contentResolver
+        return ImageAndroidRetriever(contentResolver = contentResolver)
+    }
+
+    private fun createImageDataSource(): ImageDataSource {
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
         val imageDAO = fridgnetDatabase.imageDAO()
-        return ImageAndroidDBDataSource(
-            imageRetriever = ImageAndroidRetriever(contentResolver = contentResolver),
-            imageService = ImageRoomService(imageDAO = imageDAO)
+        return ImageRoomDataSource(imageDAO = imageDAO)
+    }
+
+    private fun createAdministrativeUnitNameRetriever(): AdministrativeUnitNameRetriever {
+        val geocoder = Geocoder(applicationContext, Locale.US)
+        return AddressGeocoderRetriever(geocoder = geocoder)
+    }
+
+    private fun createAdministrativeUnitNameDataSource(): AdministrativeUnitNameDataSource {
+        val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
+        val administrativeUnitNameDAO = fridgnetDatabase.administrativeUnitNameDAO()
+        return AdministrativeUnitNameRoomDataSource(
+            administrativeUnitNameDAO = administrativeUnitNameDAO
         )
     }
 
-    private fun createAdministrativeUnitNameDataSource()
-        : AdministrativeUnitNameDataSource {
-        val geocoder = Geocoder(applicationContext, Locale.US)
-        val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
-        val administrativeUnitNameDAO = fridgnetDatabase.administrativeUnitNameDAO()
-        return AdministrativeUnitNameLocalDataSource(
-            administrativeUnitNameRetriever = AdministrativeUnitNameGeocoderRetriever(
-                geocoder = geocoder
-            ),
-            administrativeUnitNameService = AdministrativeUnitNameRoomService(
-                administrativeUnitNameDAO = administrativeUnitNameDAO
-            )
-        )
+    private fun createCartographicBoundaryRetriever(): CartographicBoundaryRetriever {
+        val retrofitHelper = RetrofitHelper.getInstance()
+        val nominatimAPI = retrofitHelper.create(NominatimAPI::class.java)
+        return CartographicBoundaryRetrofitRetriever(nominatimAPI = nominatimAPI)
     }
 
     private fun createCartographicBoundaryDataSource(): CartographicBoundaryDataSource {
         val fridgnetDatabase = FridgnetDatabase.getDatabase(context = applicationContext)
         val cartographicBoundaryDAO = fridgnetDatabase.cartographicBoundaryDAO()
-        val retrofitHelper = RetrofitHelper.getInstance()
-        val nominatimAPI = retrofitHelper.create(NominatimAPI::class.java)
-        return CartographicBoundaryAPIDBDataSource(
-            cartographicBoundaryRetriever = CartographicBoundaryRetrofitRetriever
-                (nominatimAPI = nominatimAPI
-            ),
-            cartographicBoundaryService = CartographicBoundaryRoomService(
-                cartographicBoundaryDAO = cartographicBoundaryDAO
-            )
+        return CartographicBoundaryRoomDataSource(
+            cartographicBoundaryDAO = cartographicBoundaryDAO
         )
     }
 }

@@ -5,7 +5,7 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.espresso.matcher.ViewMatchers.assertThat
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import io.schiar.fridgnet.library.room.CartographicBoundaryRoomService
+import io.schiar.fridgnet.library.room.CartographicBoundaryRoomDataSource
 import io.schiar.fridgnet.library.room.FridgnetDatabase
 import io.schiar.fridgnet.model.*
 import kotlinx.coroutines.flow.first
@@ -20,7 +20,7 @@ import java.io.IOException
 @RunWith(AndroidJUnit4::class)
 class FridgnetDatabaseTest {
     private lateinit var database: FridgnetDatabase
-    private lateinit var cartographicBoundaryRoomService: CartographicBoundaryRoomService
+    private lateinit var cartographicBoundaryRoomService: CartographicBoundaryRoomDataSource
 
     @Before
     fun createDatabase() {
@@ -29,7 +29,7 @@ class FridgnetDatabaseTest {
             context = context,
             klass = FridgnetDatabase::class.java
         ).build()
-        cartographicBoundaryRoomService = CartographicBoundaryRoomService(
+        cartographicBoundaryRoomService = CartographicBoundaryRoomDataSource(
             cartographicBoundaryDAO = database.cartographicBoundaryDAO()
         )
     }

@@ -16,6 +16,8 @@ import io.schiar.fridgnet.model.datasource.AdministrativeUnitNameDataSource
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.datasource.CurrentAdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
+import io.schiar.fridgnet.model.datasource.retriever.AdministrativeUnitNameRetriever
+import io.schiar.fridgnet.model.datasource.retriever.CartographicBoundaryRetriever
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +31,9 @@ import java.util.Collections.synchronizedMap as syncMapOf
 import java.util.Collections.synchronizedSet as syncSetOf
 
 class HomeRepository(
+    private val administrativeUnitNameRetriever: AdministrativeUnitNameRetriever,
     private val administrativeUnitNameDataSource: AdministrativeUnitNameDataSource,
+    private val cartographicBoundaryRetriever: CartographicBoundaryRetriever,
     private val cartographicBoundaryDataSource: CartographicBoundaryDataSource,
     private val imageDataSource: ImageDataSource,
     private val currentAdministrativeUnitDataSource : CurrentAdministrativeUnitDataSource,
@@ -123,7 +127,6 @@ class HomeRepository(
 
         if (county.subAdministrativeUnits.add(element = city)) {
             log(
-                method = "onEachAdministrativeUnitNameAndImage",
                 msg = "Adding the ${city.administrativeLevel} ${city.firstName} " +
                         "to the ${county.administrativeLevel} ${county.firstName}"
             )
@@ -131,7 +134,6 @@ class HomeRepository(
 
         if (state.subAdministrativeUnits.add(element = county)) {
             log(
-                method = "onEachAdministrativeUnitNameAndImage",
                 msg ="Adding the ${county.administrativeLevel} ${county.firstName} " +
                         "to the ${state.administrativeLevel} ${state.firstName}"
             )
@@ -139,7 +141,6 @@ class HomeRepository(
 
         if (country.subAdministrativeUnits.add(element = state)) {
             log(
-                method = "onEachAdministrativeUnitNameAndImage",
                 msg = "Adding the ${state.administrativeLevel} ${state.firstName} " +
                         "to the ${country.administrativeLevel} ${country.firstName}"
             )
@@ -206,10 +207,7 @@ class HomeRepository(
 
     fun selectAdministrativeUnitAt(index: Int) {
         val administrativeUnit = _currentAdministrativeUnits[index]
-        log(
-            method = "selectAdministrativeUnitAt",
-            msg = "AdministrativeUnit at $index is $administrativeUnit"
-        )
+        log(msg = "AdministrativeUnit at $index is $administrativeUnit")
         currentAdministrativeUnitDataSource.update(administrativeUnit = administrativeUnit)
     }
 
@@ -229,13 +227,21 @@ class HomeRepository(
             !geoLocationRetrievingAdministrativeUnitNameSet.contains(geoLocation)
         if (administrativeUnitNameNotBeingRetrieved) {
             geoLocationRetrievingAdministrativeUnitNameSet.add(element = geoLocation)
-            log(
-                method = "retrieveAdministrativeUnitNameForGeoLocation",
-                msg = "Retrieve AdministrativeUnitName for $geoLocation"
-            )
+            log(msg = "Retrieve AdministrativeUnitName for $geoLocation")
             externalScope.launch {
-                administrativeUnitNameDataSource.retrieveAdministrativeUnitNameFor(
+                val administrativeUnitNameFromRetriever = administrativeUnitNameRetriever.retrieve(
                     geoLocation = geoLocation
+                )
+                if (administrativeUnitNameFromRetriever != null) {
+                    administrativeUnitNameDataSource.create(
+                        geoLocation = geoLocation,
+                        administrativeUnitName = administrativeUnitNameFromRetriever
+                    )
+                    return@launch
+                }
+                log(
+                    msg = "There isn't any Administrative Unit Name for " +
+                          "$geoLocation on the Retriever!"
                 )
             }
         }
@@ -269,22 +275,62 @@ class HomeRepository(
             administrativeUnitNameRetrievingCartographicBoundarySet.add(
                 administrativeLevelWithName
             )
+
             externalScope.launch {
-                log(
-                    method = "retrieveCartographicBoundariesForAdministrativeUnitName",
-                    msg = "Retrieve Cartographic Boundary for the $administrativeLevel ${
-                        administrativeUnitName.toString(administrativeLevel = administrativeLevel)
-                    }"
+                val administrativeUnitNameString = administrativeUnitName.toString(
+                    administrativeLevel = administrativeLevel
                 )
-                cartographicBoundaryDataSource.retrieveLocationFor(
+                log(
+                    msg = "Retrieve Cartographic Boundary for $administrativeLevel " +
+                          administrativeUnitNameString
+                )
+                val cartographicBoundaryFromRetriever = retrieveCartographicBoundary(
                     administrativeUnitName = administrativeUnitName,
                     administrativeLevel = administrativeLevel
+                )
+                if (cartographicBoundaryFromRetriever != null) {
+                    cartographicBoundaryDataSource.create(
+                        cartographicBoundary = cartographicBoundaryFromRetriever
+                    )
+                    return@launch
+                }
+                log(
+                    msg = "There isn't any Cartographic Boundary for $administrativeLevel " +
+                            "$administrativeUnitNameString on the Retriever!"
                 )
             }
         }
     }
 
-    private fun log(method: String, msg: String) {
-        Log.d(tag = "HomeRepository.$method", msg = msg)
+    private suspend fun retrieveCartographicBoundary(
+        administrativeUnitName: AdministrativeUnitName, administrativeLevel: AdministrativeLevel
+    ): CartographicBoundary? {
+        return when(administrativeLevel) {
+            CITY -> {
+                cartographicBoundaryRetriever.retrieveLocality(
+                    administrativeUnitName = administrativeUnitName
+                )
+            }
+            COUNTY -> {
+                cartographicBoundaryRetriever.retrieveSubAdmin(
+                    administrativeUnitName = administrativeUnitName
+                )
+            }
+            STATE -> {
+                cartographicBoundaryRetriever.retrieveAdmin(
+                    administrativeUnitName = administrativeUnitName
+                )
+            }
+            COUNTRY -> {
+                cartographicBoundaryRetriever.retrieveCountry(
+                    administrativeUnitName = administrativeUnitName
+                )
+            }
+        }
+    }
+
+    private fun log(msg: String) {
+        val methodName = Thread.currentThread().stackTrace[3].methodName
+        Log.d(tag = "HomeRepository.$methodName", msg = msg)
     }
 }

@@ -9,7 +9,7 @@ import io.schiar.fridgnet.model.datasource.retriever.AdministrativeUnitNameRetri
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
-class AdministrativeUnitNameGeocoderRetriever(
+class AddressGeocoderRetriever(
     private val geocoder: Geocoder
 ) : AdministrativeUnitNameRetriever {
 

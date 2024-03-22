@@ -2,11 +2,11 @@ package io.schiar.fridgnet.library.room
 
 import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.Image
-import io.schiar.fridgnet.model.service.ImageService
+import io.schiar.fridgnet.model.datasource.ImageDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class ImageRoomService(private val imageDAO: ImageDAO) : ImageService {
+class ImageRoomDataSource(private val imageDAO: ImageDAO) : ImageDataSource {
     override fun retrieve(): Flow<List<Image>> {
         return imageDAO.selectImagesWithAdministrativeUnitNameAndGeoLocation().map { it.toImages() }
     }
