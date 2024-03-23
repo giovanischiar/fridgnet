@@ -22,7 +22,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -63,7 +65,18 @@ class HomeRepository(
 
     val administrativeUnits = merge(
         imageDataSource.retrieveWithAdministrativeUnitName()
-            .onEach(::onEachImageAndAdministrativeUnitNameList),
+            .onEach {
+                val (image, administrativeUnitName) = it
+                if (administrativeUnitName != null) {
+                    createAdministrativeUnits(administrativeUnitName, image)
+                    return@onEach
+                }
+                externalScope.launch {
+                    retrieveAdministrativeUnitNameForGeoLocation(it)
+                        .onEach(::createAdministrativeUnitName)
+                        .collect()
+                }
+            },
         administrativeUnitNameDataSource.retrieve()
             .onEach { administrativeUnitNameAndCartographicBoundariesList ->
                 administrativeUnitNameAndCartographicBoundariesList.forEach(
@@ -85,21 +98,15 @@ class HomeRepository(
         }
     }
 
-    private fun onEachImageAndAdministrativeUnitNameList(
-        imageAndAdministrativeUnitNameList: List<Pair<Image, AdministrativeUnitName?>>
+    private fun onEachImageAndAdministrativeUnitName(
+        imageAndAdministrativeUnitName: Pair<Image, AdministrativeUnitName?>
     ) {
-        imageAndAdministrativeUnitNameList.forEach(::onEachImageAndAdministrativeUnitName)
+        val (image, administrativeUnitNameRetrieved) = imageAndAdministrativeUnitName
         externalScope.launch {
-            retrieveAdministrativeUnitNameForGeoLocation(imageAndAdministrativeUnitNameList)
+            retrieveAdministrativeUnitNameForGeoLocation(imageAndAdministrativeUnitName)
                 .onEach(::createAdministrativeUnitName)
                 .collect()
         }
-    }
-
-    private fun onEachImageAndAdministrativeUnitName(
-        imageAndAdministrativeUnit: Pair<Image, AdministrativeUnitName?>
-    ) {
-        val (image, administrativeUnitNameRetrieved) = imageAndAdministrativeUnit
         if (administrativeUnitNameRetrieved != null) {
             createAdministrativeUnits(name = administrativeUnitNameRetrieved, image = image)
         }
@@ -223,18 +230,18 @@ class HomeRepository(
     suspend fun removeAllImages() { imageDataSource.delete() }
 
     private fun retrieveAdministrativeUnitNameForGeoLocation(
-        imageAndAdministrativeUnitNameList: List<Pair<Image, AdministrativeUnitName?>>
+        imageAndAdministrativeUnitName: Pair<Image, AdministrativeUnitName?>
     ): Flow<Pair<GeoLocation, AdministrativeUnitName>> {
-        geoLocationRetrievingAdministrativeUnitNameSet.addAll(
-            imageAndAdministrativeUnitNameList
-                .filter { it.second != null }
-                .map { it.first.geoLocation }
-        )
-        val geolocationsToRetrieve = imageAndAdministrativeUnitNameList
-            .map { it.first.geoLocation }
-            .filterNot(geoLocationRetrievingAdministrativeUnitNameSet::contains)
-        geoLocationRetrievingAdministrativeUnitNameSet.addAll(geolocationsToRetrieve)
-        return administrativeUnitNameRetriever.retrieve(geoLocations = geolocationsToRetrieve)
+        val (image, administrationUnitName) = imageAndAdministrativeUnitName
+        val geoLocation = image.geoLocation
+        if (administrationUnitName != null) {
+            geoLocationRetrievingAdministrativeUnitNameSet.add(element = geoLocation)
+        }
+        return if (!geoLocationRetrievingAdministrativeUnitNameSet.contains(element = geoLocation)) {
+            administrativeUnitNameRetriever.retrieve(geoLocation = geoLocation)
+        } else {
+            flowOf(value = null)
+        }.mapNotNull { it }
     }
 
     private fun retrieveCartographicBoundariesForAdministrativeUnitName(
