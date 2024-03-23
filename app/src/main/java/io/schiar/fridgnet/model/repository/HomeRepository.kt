@@ -21,6 +21,7 @@ import io.schiar.fridgnet.model.datasource.retriever.CartographicBoundaryRetriev
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
@@ -62,9 +63,7 @@ class HomeRepository(
 
     val administrativeUnits = merge(
         imageDataSource.retrieveWithAdministrativeUnitName()
-            .onEach { imageAndAdministrativeUnitNameList ->
-                imageAndAdministrativeUnitNameList.forEach(::onEachAdministrativeUnitNameAndImage)
-            },
+            .onEach(::onEachImageAndAdministrativeUnitNameList),
         administrativeUnitNameDataSource.retrieve()
             .onEach { administrativeUnitNameAndCartographicBoundariesList ->
                 administrativeUnitNameAndCartographicBoundariesList.forEach(
@@ -86,15 +85,21 @@ class HomeRepository(
         }
     }
 
-    private fun onEachAdministrativeUnitNameAndImage(
-        administrativeUnitNameAndImage: Pair<AdministrativeUnitName?, Image>
+    private fun onEachImageAndAdministrativeUnitNameList(
+        imageAndAdministrativeUnitNameList: List<Pair<Image, AdministrativeUnitName?>>
     ) {
-        val (administrativeUnitNameRetrieved, image) = administrativeUnitNameAndImage
-        retrieveAdministrativeUnitNameForGeoLocation(
-            geoLocation = image.geoLocation,
-            administrativeUnitNameFromGeoLocation = administrativeUnitNameRetrieved
-        )
+        imageAndAdministrativeUnitNameList.forEach(::onEachImageAndAdministrativeUnitName)
+        externalScope.launch {
+            retrieveAdministrativeUnitNameForGeoLocation(imageAndAdministrativeUnitNameList)
+                .onEach(::createAdministrativeUnitName)
+                .collect()
+        }
+    }
 
+    private fun onEachImageAndAdministrativeUnitName(
+        imageAndAdministrativeUnit: Pair<Image, AdministrativeUnitName?>
+    ) {
+        val (image, administrativeUnitNameRetrieved) = imageAndAdministrativeUnit
         if (administrativeUnitNameRetrieved != null) {
             createAdministrativeUnits(name = administrativeUnitNameRetrieved, image = image)
         }
@@ -218,33 +223,18 @@ class HomeRepository(
     suspend fun removeAllImages() { imageDataSource.delete() }
 
     private fun retrieveAdministrativeUnitNameForGeoLocation(
-        geoLocation: GeoLocation, administrativeUnitNameFromGeoLocation: AdministrativeUnitName?
-    ) {
-        if (administrativeUnitNameFromGeoLocation != null) {
-            geoLocationRetrievingAdministrativeUnitNameSet.add(geoLocation)
-        }
-        val administrativeUnitNameNotBeingRetrieved =
-            !geoLocationRetrievingAdministrativeUnitNameSet.contains(geoLocation)
-        if (administrativeUnitNameNotBeingRetrieved) {
-            geoLocationRetrievingAdministrativeUnitNameSet.add(element = geoLocation)
-            log(msg = "Retrieve AdministrativeUnitName for $geoLocation")
-            externalScope.launch {
-                val administrativeUnitNameFromRetriever = administrativeUnitNameRetriever.retrieve(
-                    geoLocation = geoLocation
-                )
-                if (administrativeUnitNameFromRetriever != null) {
-                    administrativeUnitNameDataSource.create(
-                        geoLocation = geoLocation,
-                        administrativeUnitName = administrativeUnitNameFromRetriever
-                    )
-                    return@launch
-                }
-                log(
-                    msg = "There isn't any Administrative Unit Name for " +
-                          "$geoLocation on the Retriever!"
-                )
-            }
-        }
+        imageAndAdministrativeUnitNameList: List<Pair<Image, AdministrativeUnitName?>>
+    ): Flow<Pair<GeoLocation, AdministrativeUnitName>> {
+        geoLocationRetrievingAdministrativeUnitNameSet.addAll(
+            imageAndAdministrativeUnitNameList
+                .filter { it.second != null }
+                .map { it.first.geoLocation }
+        )
+        val geolocationsToRetrieve = imageAndAdministrativeUnitNameList
+            .map { it.first.geoLocation }
+            .filterNot(geoLocationRetrievingAdministrativeUnitNameSet::contains)
+        geoLocationRetrievingAdministrativeUnitNameSet.addAll(geolocationsToRetrieve)
+        return administrativeUnitNameRetriever.retrieve(geoLocations = geolocationsToRetrieve)
     }
 
     private fun retrieveCartographicBoundariesForAdministrativeUnitName(
@@ -327,6 +317,16 @@ class HomeRepository(
                 )
             }
         }
+    }
+
+    private suspend fun createAdministrativeUnitName(
+        geoLocationAndAdministrativeUnitName: Pair<GeoLocation, AdministrativeUnitName>
+    ) {
+        val (geoLocation, administrativeUnitName) = geoLocationAndAdministrativeUnitName
+        administrativeUnitNameDataSource.create(
+            geoLocation = geoLocation,
+            administrativeUnitName = administrativeUnitName
+        )
     }
 
     private fun log(msg: String) {

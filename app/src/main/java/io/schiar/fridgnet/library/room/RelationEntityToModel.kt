@@ -20,8 +20,8 @@ fun List<AdministrativeUnitNameWithCartographicBoundaries>
 }
 
 fun List<ImageWithAdministrativeUnitNameAndGeoLocation>
-        .toAdministrativeUnitNameAndImageList(): List<Pair<AdministrativeUnitName?, Image>>{
-    return map { it.toAdministrativeUnitNameAndImage() }
+        .toImageAndAdministrativeUnitNameList(): List<Pair<Image, AdministrativeUnitName?>>{
+    return map { it.toImageAndAdministrativeUnitName() }
 }
 
 fun List<ImageWithAdministrativeUnitNameAndGeoLocation>.toImages(): List<Image>{
@@ -47,15 +47,15 @@ fun ImageWithAdministrativeUnitNameAndGeoLocation.toImage(): Image {
 }
 
 fun ImageWithAdministrativeUnitNameAndGeoLocation
-    .toAdministrativeUnitNameAndImage(): Pair<AdministrativeUnitName?, Image> {
+    .toImageAndAdministrativeUnitName(): Pair<Image, AdministrativeUnitName?> {
     return Pair(
-        first = geoLocationWithAdministrativeUnitName.administrativeUnitNameEntity?.toAdministrativeUnitName(),
-        second = Image(
+        first = Image(
             uri = imageEntity.uri,
             byteArray = imageEntity.byteArray,
             date = imageEntity.date,
             geoLocation = geoLocationWithAdministrativeUnitName.geoLocationEntity.toGeoLocation()
-        )
+        ),
+        second = geoLocationWithAdministrativeUnitName.administrativeUnitNameEntity?.toAdministrativeUnitName()
     )
 }
 

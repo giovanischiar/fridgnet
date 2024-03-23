@@ -11,9 +11,9 @@ class ImageRoomDataSource(private val imageDAO: ImageDAO) : ImageDataSource {
         return imageDAO.selectImagesWithAdministrativeUnitNameAndGeoLocation().map { it.toImages() }
     }
 
-    override fun retrieveWithAdministrativeUnitName(): Flow<List<Pair<AdministrativeUnitName?, Image>>> {
+    override fun retrieveWithAdministrativeUnitName(): Flow<List<Pair<Image, AdministrativeUnitName?>>> {
         return imageDAO.selectImagesWithGeoLocationAndAdministrativeUnitName().map {
-            it.toAdministrativeUnitNameAndImageList()
+            it.toImageAndAdministrativeUnitNameList()
         }
     }
 

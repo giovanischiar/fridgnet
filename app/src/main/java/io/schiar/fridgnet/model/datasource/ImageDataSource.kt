@@ -7,6 +7,6 @@ import kotlinx.coroutines.flow.Flow
 interface ImageDataSource {
     suspend fun create(image: Image)
     fun retrieve(): Flow<List<Image>>
-    fun retrieveWithAdministrativeUnitName(): Flow<List<Pair<AdministrativeUnitName?, Image>>>
+    fun retrieveWithAdministrativeUnitName(): Flow<List<Pair<Image, AdministrativeUnitName?>>>
     suspend fun delete()
 }

@@ -2,7 +2,8 @@ package io.schiar.fridgnet.model.datasource.retriever
 
 import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.GeoLocation
+import kotlinx.coroutines.flow.Flow
 
 interface AdministrativeUnitNameRetriever {
-    suspend fun retrieve(geoLocation: GeoLocation): AdministrativeUnitName?
+    fun retrieve(geoLocations: List<GeoLocation>): Flow<Pair<GeoLocation, AdministrativeUnitName>>
 }
