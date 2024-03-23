@@ -10,6 +10,8 @@ import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.datasource.retriever.CartographicBoundaryRetriever
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 
 class CartographicBoundaryRetrofitRetriever(
@@ -18,7 +20,29 @@ class CartographicBoundaryRetrofitRetriever(
     private var fetchingPlaces: Set<String> = emptySet()
     private var mutex: Mutex = Mutex()
 
-    override suspend fun retrieveLocality(
+    override fun retrieve(
+        administrativeUnitLevelAndAdministrativeUnitNameList: List<
+            Pair<AdministrativeLevel, AdministrativeUnitName>
+        >
+    ): Flow<CartographicBoundary> = flow {
+        for (
+            administrativeUnitLevelAndAdministrativeUnitName in
+            administrativeUnitLevelAndAdministrativeUnitNameList
+        ) {
+            val (
+                administrativeUnitLevel, administrativeUnitName
+            ) = administrativeUnitLevelAndAdministrativeUnitName
+            val cartographicBoundary = when(administrativeUnitLevel) {
+                CITY -> retrieveLocality(administrativeUnitName = administrativeUnitName)
+                COUNTY -> retrieveSubAdmin(administrativeUnitName = administrativeUnitName)
+                STATE -> retrieveAdmin(administrativeUnitName = administrativeUnitName)
+                COUNTRY -> retrieveCountry(administrativeUnitName = administrativeUnitName)
+            } ?: return@flow
+            emit(cartographicBoundary)
+        }
+    }
+
+    private suspend fun retrieveLocality(
         administrativeUnitName: AdministrativeUnitName
     ): CartographicBoundary? {
         val newAdministrativeUnitName = if (administrativeUnitName.locality == null) {
@@ -35,12 +59,20 @@ class CartographicBoundaryRetrofitRetriever(
         )
     }
 
-    override suspend fun retrieveSubAdmin(
+    private suspend fun retrieveSubAdmin(
         administrativeUnitName: AdministrativeUnitName
     ): CartographicBoundary? {
-        administrativeUnitName.subAdminArea ?: return null
-        administrativeUnitName.adminArea ?: return null
-        administrativeUnitName.countryName ?: return null
+        val administrativeUnitNameFullName = "$COUNTY " +
+                administrativeUnitName.toString(administrativeLevel = COUNTY)
+        administrativeUnitName.subAdminArea ?: run {
+            log(msg = "$administrativeUnitNameFullName: subAdminArea is null"); return null
+        }
+        administrativeUnitName.adminArea ?: run {
+            log(msg = "$administrativeUnitNameFullName: adminArea is null"); return null
+        }
+        administrativeUnitName.countryName ?: run {
+            log(msg = "$administrativeUnitNameFullName: countryName is null"); return null
+        }
         val countyAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = COUNTY
         )
@@ -52,11 +84,17 @@ class CartographicBoundaryRetrofitRetriever(
         )
     }
 
-    override suspend fun retrieveAdmin(
+    private suspend fun retrieveAdmin(
         administrativeUnitName: AdministrativeUnitName
     ): CartographicBoundary? {
-        administrativeUnitName.adminArea ?: return null
-        administrativeUnitName.countryName ?: return null
+        val administrativeUnitNameFullName = "$STATE " +
+                administrativeUnitName.toString(administrativeLevel = STATE)
+        administrativeUnitName.adminArea ?: run {
+            log(msg = "$administrativeUnitNameFullName: adminArea is null"); return null
+        }
+        administrativeUnitName.countryName ?: run {
+            log(msg = "$administrativeUnitNameFullName: countryName is null"); return null
+        }
         val stateAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = STATE
         )
@@ -68,10 +106,14 @@ class CartographicBoundaryRetrofitRetriever(
         )
     }
 
-    override suspend fun retrieveCountry(
+    private suspend fun retrieveCountry(
         administrativeUnitName: AdministrativeUnitName
     ): CartographicBoundary? {
-        administrativeUnitName.countryName ?: return null
+        val administrativeUnitNameFullName = "$COUNTRY " +
+                administrativeUnitName.toString(administrativeLevel = COUNTRY)
+        administrativeUnitName.countryName ?: run {
+            log(msg = "$administrativeUnitNameFullName: countryName is null"); return null
+        }
         val countryAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = COUNTRY
         )
@@ -139,17 +181,22 @@ class CartographicBoundaryRetrofitRetriever(
         }
         delay(1000) //Requests to Nominatim API should be limit to one per second
         mutex.unlock()
-        jsonResult ?: return null
-        Log.d(
-            tag = "API Result",
-            msg = "type: $administrativeLevel, " +
-                  "administrativeUnitName: $administrativeUnitName" +
-                  "body.geojson: ${jsonResult.geoJSON}"
-        )
-        return jsonResult.toCartographicBoundary(
+        val administrativeUnitNameFullName = "$administrativeLevel " +
+                administrativeUnitName.toString(administrativeLevel = administrativeLevel)
+        if (jsonResult == null) {
+            log(
+                msg = "There is no cartographic boundary for $administrativeUnitNameFullName"
+            )
+            return null
+        }
+        val cartographicBoundary = jsonResult.toCartographicBoundary(
             administrativeUnitName = administrativeUnitName,
             administrativeLevel = administrativeLevel
         )
+        log(
+            msg = "$administrativeUnitNameFullName is $cartographicBoundary"
+        )
+        return cartographicBoundary
     }
 
     private suspend fun searchCity(
@@ -177,24 +224,26 @@ class CartographicBoundaryRetrofitRetriever(
 
         if (type == "Point") {
             if (jsonResults.size == 1) {
-                Log.d("Search for API Polygon", "Trying to using the q")
+                log(msg = "Trying to using the q")
                 return nominatimAPI.getResults(q = "$city, $state, $country")[0]
             }
             val jsonSecondResult = jsonResults[1]
-            Log.d(
-                "Search for API Polygon",
-                "Second Result name: {$jsonSecondResult.name} type: {$jsonSecondResult.type}"
-            )
+            log(msg = "Second Result name: {$jsonSecondResult.name} type: {$jsonSecondResult.type}")
             if (
                 jsonSecondResult.displayName == jsonFirstResult.displayName &&
                 jsonSecondResult.type == "administrative"
             ) {
-                Log.d("Search for API Polygon", "Second body is the administrative")
+                log(msg = "Second body is the administrative")
                 return jsonSecondResult
             }
             return nominatimAPI.getResults(q = "$city, $state, $country")[0]
         }
 
         return jsonFirstResult
+    }
+
+    private fun log(msg: String) {
+        val methodName = Thread.currentThread().stackTrace[3].methodName
+        Log.d(tag = "CartographicBoundaryRetrofitRetriever.$methodName", msg = msg)
     }
 }

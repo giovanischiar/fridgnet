@@ -78,7 +78,14 @@ class HomeRepository(
                 }
             },
         administrativeUnitNameDataSource.retrieve()
-            .onEach(::onEachAdministrativeUnitNameAndCartographicBoundaries),
+            .onEach {
+                externalScope.launch {
+                    retrieveCartographicBoundariesForAdministrativeUnitName(it)
+                        .onEach(::onEachCartographicBoundary)
+                        .onEach(cartographicBoundaryDataSource::create)
+                        .collect()
+                }
+            },
         cartographicBoundaryDataSource.retrieve().onEach { cartographicBoundaries ->
             cartographicBoundaries.forEach(::onEachCartographicBoundary)
         },
@@ -182,19 +189,6 @@ class HomeRepository(
         }
     }
 
-    private fun onEachAdministrativeUnitNameAndCartographicBoundaries(
-        administrativeUnitNameAndCartographicCoordinates
-            : Pair<AdministrativeUnitName, List<CartographicBoundary>>
-    ) {
-        val (
-            administrativeUnitName, cartographicBoundariesRetrieved
-        ) = administrativeUnitNameAndCartographicCoordinates
-        retrieveCartographicBoundariesForAdministrativeUnitName(
-            administrativeUnitName = administrativeUnitName,
-            cartographicBoundariesFromAdministrativeUnitName = cartographicBoundariesRetrieved
-        )
-    }
-
     private fun onEachCartographicBoundary(cartographicBoundary: CartographicBoundary) {
         val administrativeLevel = cartographicBoundary.administrativeLevel
         val administrationLevelWithName = cartographicBoundary.administrationLevelWithName
@@ -241,9 +235,13 @@ class HomeRepository(
     }
 
     private fun retrieveCartographicBoundariesForAdministrativeUnitName(
-        administrativeUnitName: AdministrativeUnitName,
-        cartographicBoundariesFromAdministrativeUnitName: Collection<CartographicBoundary>
-    ) {
+        administrativeUnitNameAndCartographicBoundaries: Pair<
+            AdministrativeUnitName, List<CartographicBoundary>
+        >
+    ): Flow<CartographicBoundary> {
+        val (
+            administrativeUnitName, cartographicBoundariesFromAdministrativeUnitName
+        ) = administrativeUnitNameAndCartographicBoundaries
         administrativeUnitNameRetrievingCartographicBoundarySet.addAll(
             cartographicBoundariesFromAdministrativeUnitName.map {
                 it.administrationLevelWithName
@@ -261,65 +259,21 @@ class HomeRepository(
             }
         }
 
-        for (administrativeLevel in administrativeLevelsWithMissingCartographicBoundary) {
-            val administrativeLevelWithName = administrativeLevel.with(
-                administrativeUnitName = administrativeUnitName
-            )
-            administrativeUnitNameRetrievingCartographicBoundarySet.add(
-                administrativeLevelWithName
-            )
-
-            externalScope.launch {
-                val administrativeUnitNameString = administrativeUnitName.toString(
-                    administrativeLevel = administrativeLevel
-                )
-                log(
-                    msg = "Retrieve Cartographic Boundary for $administrativeLevel " +
-                          administrativeUnitNameString
-                )
-                val cartographicBoundaryFromRetriever = retrieveCartographicBoundary(
-                    administrativeUnitName = administrativeUnitName,
-                    administrativeLevel = administrativeLevel
-                )
-                if (cartographicBoundaryFromRetriever != null) {
-                    cartographicBoundaryDataSource.create(
-                        cartographicBoundary = cartographicBoundaryFromRetriever
+        val administrativeUnitLevelAndAdministrativeUnitNameList
+            = administrativeLevelsWithMissingCartographicBoundary
+                .map { administrativeLevel ->
+                    val administrativeLevelWithName = administrativeLevel.with(
+                        administrativeUnitName = administrativeUnitName
                     )
-                    return@launch
+                    administrativeUnitNameRetrievingCartographicBoundarySet.add(
+                        administrativeLevelWithName
+                    )
+                    Pair(administrativeLevel, administrativeUnitName)
                 }
-                log(
-                    msg = "There isn't any Cartographic Boundary for $administrativeLevel " +
-                            "$administrativeUnitNameString on the Retriever!"
-                )
-            }
-        }
-    }
 
-    private suspend fun retrieveCartographicBoundary(
-        administrativeUnitName: AdministrativeUnitName, administrativeLevel: AdministrativeLevel
-    ): CartographicBoundary? {
-        return when(administrativeLevel) {
-            CITY -> {
-                cartographicBoundaryRetriever.retrieveLocality(
-                    administrativeUnitName = administrativeUnitName
-                )
-            }
-            COUNTY -> {
-                cartographicBoundaryRetriever.retrieveSubAdmin(
-                    administrativeUnitName = administrativeUnitName
-                )
-            }
-            STATE -> {
-                cartographicBoundaryRetriever.retrieveAdmin(
-                    administrativeUnitName = administrativeUnitName
-                )
-            }
-            COUNTRY -> {
-                cartographicBoundaryRetriever.retrieveCountry(
-                    administrativeUnitName = administrativeUnitName
-                )
-            }
-        }
+        return cartographicBoundaryRetriever.retrieve(
+            administrativeUnitLevelAndAdministrativeUnitNameList
+        )
     }
 
     private suspend fun createAdministrativeUnitName(
