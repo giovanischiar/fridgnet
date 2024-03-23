@@ -9,12 +9,17 @@ import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitNameDataSource
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class AdministrativeUnitNameRoomDataSource(
     private val administrativeUnitNameDAO: AdministrativeUnitNameDAO
 ) : AdministrativeUnitNameDataSource {
+    private val administrativeUnitNameIDS = mutableSetOf<Long>()
+
     override fun retrieveGeoLocations(
         administrativeUnitName: AdministrativeUnitName, administrativeLevel: AdministrativeLevel
     ): Flow<List<GeoLocation>> {
@@ -46,12 +51,27 @@ class AdministrativeUnitNameRoomDataSource(
         )
     }
 
-    override fun retrieve()
-        : Flow<List<Pair<AdministrativeUnitName, List<CartographicBoundary>>>> {
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun retrieve(): Flow<Pair<AdministrativeUnitName, List<CartographicBoundary>>> {
         return administrativeUnitNameDAO.selectAdministrativeUnitNameWithCartographicBoundaries()
-            .map { administrativeUnitNameWithGeoLocations ->
-                administrativeUnitNameWithGeoLocations
-                    .toAdministrativeUnitNameWithCartographicBoundariesList()
+            .flatMapLatest { administrativeUnitNameWithCartographicBoundariesList ->
+                flow {
+                    for (
+                        administrativeUnitNameWithCartographicBoundaries in
+                        administrativeUnitNameWithCartographicBoundariesList
+                    ) {
+                        val administrativeUnitNameID
+                            = administrativeUnitNameWithCartographicBoundaries
+                            .administrativeUnitNameEntity
+                            .id
+                        if (administrativeUnitNameIDS.add(element = administrativeUnitNameID)) {
+                            emit(
+                                administrativeUnitNameWithCartographicBoundaries
+                                    .toAdministrativeUnitNameAndCartographicBoundaries()
+                            )
+                        }
+                    }
+                }
             }
     }
 }

@@ -16,7 +16,7 @@ import io.schiar.fridgnet.model.Region
 fun List<AdministrativeUnitNameWithCartographicBoundaries>
         .toAdministrativeUnitNameWithCartographicBoundariesList()
             : List<Pair<AdministrativeUnitName, List<CartographicBoundary>>> {
-    return map { it.toAdministrativeUnitNameWithCartographicBoundaries() }
+    return map { it.toAdministrativeUnitNameAndCartographicBoundaries() }
 }
 
 fun List<ImageWithAdministrativeUnitNameAndGeoLocation>
@@ -29,7 +29,7 @@ fun List<ImageWithAdministrativeUnitNameAndGeoLocation>.toImages(): List<Image>{
 }
 
 fun AdministrativeUnitNameWithCartographicBoundaries
-        .toAdministrativeUnitNameWithCartographicBoundaries()
+        .toAdministrativeUnitNameAndCartographicBoundaries()
             : Pair<AdministrativeUnitName, List<CartographicBoundary>> {
     return Pair(
         first = administrativeUnitNameEntity.toAdministrativeUnitName(),

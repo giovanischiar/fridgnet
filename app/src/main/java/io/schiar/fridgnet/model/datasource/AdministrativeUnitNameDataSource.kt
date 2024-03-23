@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface AdministrativeUnitNameDataSource {
     suspend fun create(geoLocation: GeoLocation, administrativeUnitName: AdministrativeUnitName)
-    fun retrieve(): Flow<List<Pair<AdministrativeUnitName, List<CartographicBoundary>>>>
+    fun retrieve(): Flow<Pair<AdministrativeUnitName, List<CartographicBoundary>>>
     fun retrieveGeoLocations(
         administrativeUnitName: AdministrativeUnitName, administrativeLevel: AdministrativeLevel
     ): Flow<List<GeoLocation>>

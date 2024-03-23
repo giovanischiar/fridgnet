@@ -78,11 +78,7 @@ class HomeRepository(
                 }
             },
         administrativeUnitNameDataSource.retrieve()
-            .onEach { administrativeUnitNameAndCartographicBoundariesList ->
-                administrativeUnitNameAndCartographicBoundariesList.forEach(
-                    ::onEachAdministrativeUnitNameAndCartographicBoundaries
-                )
-        },
+            .onEach(::onEachAdministrativeUnitNameAndCartographicBoundaries),
         cartographicBoundaryDataSource.retrieve().onEach { cartographicBoundaries ->
             cartographicBoundaries.forEach(::onEachCartographicBoundary)
         },
