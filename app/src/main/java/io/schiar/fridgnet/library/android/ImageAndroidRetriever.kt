@@ -11,27 +11,39 @@ import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
 import kotlin.math.roundToInt
 
 class ImageAndroidRetriever(private val contentResolver: ContentResolver) : ImageRetriever {
-    override suspend fun retrieve(uri: String): Image? {
-        val systemURI = Uri.parse(uri)
-        (contentResolver.openInputStream(systemURI) ?: return null).use { ins ->
-            val exifInterface = ExifInterface(ins)
-            val latLng = exifInterface.latLong ?: return null
-            val geoLocation = GeoLocation(latitude = latLng[0], longitude = latLng[1])
-
-            @SuppressLint("RestrictedApi")
-            val date = exifInterface.dateTime ?: 0L
-            val byteArray = withContext(Dispatchers.Default) { systemURI.toByteArray() }
-            return Image(
-                uri = uri,
-                byteArray = byteArray,
-                date = date,
-                geoLocation = geoLocation
-            )
+    override suspend fun retrieve(uris: List<String>): Flow<Image> = flow {
+        uris.forEach { uri ->
+            val systemURI = Uri.parse(uri)
+            val inputStreamOpened = contentResolver.openInputStream(systemURI)
+            if (inputStreamOpened == null) {
+                log(msg = "Couldn't open the input stream for image of uri $uri")
+                return@forEach
+            }
+            inputStreamOpened.use { ins ->
+                val exifInterface = ExifInterface(ins)
+                val latLng = exifInterface.latLong
+                if (latLng == null) {
+                    log(msg = "Image of $uri doesn't have geo location")
+                    return@forEach
+                }
+                val geoLocation = GeoLocation(latitude = latLng[0], longitude = latLng[1])
+                @SuppressLint("RestrictedApi")
+                val date = exifInterface.dateTime ?: 0L
+                val byteArray = withContext(Dispatchers.Default) { systemURI.toByteArray() }
+                emit(value = Image(
+                    uri = uri,
+                    byteArray = byteArray,
+                    date = date,
+                    geoLocation = geoLocation
+                ))
+            }
         }
     }
 
@@ -52,7 +64,7 @@ class ImageAndroidRetriever(private val contentResolver: ContentResolver) : Imag
                 options
             )
         } catch (e: Exception) {
-            Log.d("Bitmap Loader", "Exception! $e")
+            log(msg = "Caught exception of image of uri $this: $e")
             null
         } ?: return null
         return rawBitmap.resize()
@@ -73,5 +85,10 @@ class ImageAndroidRetriever(private val contentResolver: ContentResolver) : Imag
             finalHeight = (maxWidth / ratioBitmap).toInt()
         }
         return Bitmap.createScaledBitmap(this, finalWidth, finalHeight, true)
+    }
+
+    private fun log(msg: String) {
+        val methodName = Thread.currentThread().stackTrace[3].methodName
+        Log.d(tag = "ImageAndroidRetriever.$methodName", msg = msg)
     }
 }
