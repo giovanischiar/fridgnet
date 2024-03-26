@@ -69,6 +69,7 @@ data class CartographicBoundary(
     override fun toString(): String {
         val regionSize = regions.size
         val regionSizeName = "$regionSize ${if (regions.size == 1) "region" else "regions"}"
-        return "($administrativeUnitNameString, $regionSizeName)"
+        val vertices = regions.map { it.polygon.geoLocations.size }.reduce { acc, i -> acc + i }
+        return "($administrativeUnitNameString, $regionSizeName, $vertices vertices)"
     }
 }

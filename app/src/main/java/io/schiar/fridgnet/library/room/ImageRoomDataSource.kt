@@ -1,6 +1,5 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.datasource.ImageDataSource
@@ -18,7 +17,7 @@ class ImageRoomDataSource(private val imageDAO: ImageDAO) : ImageDataSource {
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun retrieveWithAdministrativeUnitName(): Flow<Pair<Image, AdministrativeUnitName?>> {
+    override fun retrieveImageWithOptionalAdministrativeUnitName(): Flow<Pair<Image, AdministrativeUnitName?>> {
         return imageDAO.selectImagesWithGeoLocationAndAdministrativeUnitName()
             .flatMapLatest { imagesWithGeoLocationAndAdministrativeUnitNameList ->
                 flow {
@@ -30,7 +29,6 @@ class ImageRoomDataSource(private val imageDAO: ImageDAO) : ImageDataSource {
                             = imagesWithGeoLocationAndAdministrativeUnitName
                             .toImageAndAdministrativeUnitName()
                         if (imagesSet.add(element = imageAndAdministrativeUnitName)) {
-                            Log.d("abublébublé", "emitting (${imageAndAdministrativeUnitName.first.geoLocation} ${imageAndAdministrativeUnitName.second})")
                             emit(imageAndAdministrativeUnitName)
                         }
                     }

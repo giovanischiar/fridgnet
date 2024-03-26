@@ -25,19 +25,19 @@ class CartographicBoundaryRetrofitRetriever(
             Pair<AdministrativeLevel, AdministrativeUnitName>
         >
     ): Flow<CartographicBoundary> = flow {
-        for (
-            administrativeUnitLevelAndAdministrativeUnitName in
+        for ((administrativeUnitLevel, administrativeUnitName) in
             administrativeUnitLevelAndAdministrativeUnitNameList
         ) {
-            val (
-                administrativeUnitLevel, administrativeUnitName
-            ) = administrativeUnitLevelAndAdministrativeUnitName
+            log(
+                msg = "Retrieving cartographic boundary for " +
+                      "$administrativeUnitLevel $administrativeUnitName"
+            )
             val cartographicBoundary = when(administrativeUnitLevel) {
                 CITY -> retrieveLocality(administrativeUnitName = administrativeUnitName)
                 COUNTY -> retrieveSubAdmin(administrativeUnitName = administrativeUnitName)
                 STATE -> retrieveAdmin(administrativeUnitName = administrativeUnitName)
                 COUNTRY -> retrieveCountry(administrativeUnitName = administrativeUnitName)
-            } ?: return@flow
+            } ?: continue
             emit(cartographicBoundary)
         }
     }
@@ -65,13 +65,13 @@ class CartographicBoundaryRetrofitRetriever(
         val administrativeUnitNameFullName = "$COUNTY " +
                 administrativeUnitName.toString(administrativeLevel = COUNTY)
         administrativeUnitName.subAdminArea ?: run {
-            log(msg = "$administrativeUnitNameFullName: subAdminArea is null"); return null
+            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because subAdminArea field is null"); return null
         }
         administrativeUnitName.adminArea ?: run {
-            log(msg = "$administrativeUnitNameFullName: adminArea is null"); return null
+            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because adminArea field is null"); return null
         }
         administrativeUnitName.countryName ?: run {
-            log(msg = "$administrativeUnitNameFullName: countryName is null"); return null
+            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because countryName field is null"); return null
         }
         val countyAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = COUNTY
@@ -90,10 +90,10 @@ class CartographicBoundaryRetrofitRetriever(
         val administrativeUnitNameFullName = "$STATE " +
                 administrativeUnitName.toString(administrativeLevel = STATE)
         administrativeUnitName.adminArea ?: run {
-            log(msg = "$administrativeUnitNameFullName: adminArea is null"); return null
+            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because adminArea field is null"); return null
         }
         administrativeUnitName.countryName ?: run {
-            log(msg = "$administrativeUnitNameFullName: countryName is null"); return null
+            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because countryName field is null"); return null
         }
         val stateAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = STATE
@@ -112,7 +112,7 @@ class CartographicBoundaryRetrofitRetriever(
         val administrativeUnitNameFullName = "$COUNTRY " +
                 administrativeUnitName.toString(administrativeLevel = COUNTRY)
         administrativeUnitName.countryName ?: run {
-            log(msg = "$administrativeUnitNameFullName: countryName is null"); return null
+            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because countryName field is null"); return null
         }
         val countryAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = COUNTRY
@@ -217,6 +217,7 @@ class CartographicBoundaryRetrofitRetriever(
                 jsonSecondResult.type == "administrative"
             ) {
                 if (jsonSecondResult.geoJSON.type == "MultiPolygon") {
+                    log(msg = "The second API result's geoJSON type is MultiPolygon, returning this one instead")
                     return jsonSecondResult
                 }
             }
@@ -224,16 +225,15 @@ class CartographicBoundaryRetrofitRetriever(
 
         if (type == "Point") {
             if (jsonResults.size == 1) {
-                log(msg = "Trying to using the q")
+                log(msg = "The API geoJSON type is a point, trying to using the q instead")
                 return nominatimAPI.getResults(q = "$city, $state, $country")[0]
             }
             val jsonSecondResult = jsonResults[1]
-            log(msg = "Second Result name: {$jsonSecondResult.name} type: {$jsonSecondResult.type}")
             if (
                 jsonSecondResult.displayName == jsonFirstResult.displayName &&
                 jsonSecondResult.type == "administrative"
             ) {
-                log(msg = "Second body is the administrative")
+                log(msg = "The second API result's type is administrative, returning this one instead")
                 return jsonSecondResult
             }
             return nominatimAPI.getResults(q = "$city, $state, $country")[0]

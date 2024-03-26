@@ -5,16 +5,18 @@ import androidx.lifecycle.viewModelScope
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.repository.HomeRepository
 import io.schiar.fridgnet.viewmodel.util.toAdministrativeUnitViewDataList
+import io.schiar.fridgnet.viewmodel.util.toStrings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
-    val administrativeUnits = homeRepository.administrativeUnits.map { it.toAdministrativeUnitViewDataList()  }
-    val administrativeLevels = homeRepository.administrativeLevels.map { administrativeLevels ->
-        administrativeLevels.map { it.toString() }
-    }
-    val currentAdministrativeLevel = homeRepository.currentAdministrativeLevel.map { it.toString() }
+    val administrativeUnitsFlow = homeRepository.administrativeUnitsFlow
+        .map { administrativeUnits -> administrativeUnits.toAdministrativeUnitViewDataList() }
+    val administrativeLevelsFlow = homeRepository.administrativeLevelsFlow
+        .map { administrativeLevels -> administrativeLevels.toStrings() }
+    val currentAdministrativeLevelFlow = homeRepository.currentAdministrativeLevelFlow
+        .map { administrativeLevel -> administrativeLevel.toString() }
 
     fun selectCartographicBoundaryGeoLocationAt(index: Int) = viewModelScope.launch {
         Log.d(

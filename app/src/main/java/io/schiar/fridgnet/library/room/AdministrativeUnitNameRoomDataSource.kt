@@ -44,7 +44,9 @@ class AdministrativeUnitNameRoomDataSource(
         }.map { it.toGeoLocations() }
     }
 
-    override suspend fun create(geoLocation: GeoLocation, administrativeUnitName: AdministrativeUnitName) {
+    override suspend fun create(
+        geoLocation: GeoLocation, administrativeUnitName: AdministrativeUnitName
+    ) {
         administrativeUnitNameDAO.insert(
             geoLocation = geoLocation,
             administrativeUnitName = administrativeUnitName
@@ -52,7 +54,7 @@ class AdministrativeUnitNameRoomDataSource(
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun retrieve(): Flow<Pair<AdministrativeUnitName, List<CartographicBoundary>>> {
+    override fun retrieveAdministrativeUnitNameWithExistentCartographicBoundaries(): Flow<Pair<AdministrativeUnitName, List<CartographicBoundary>>> {
         return administrativeUnitNameDAO.selectAdministrativeUnitNameWithCartographicBoundaries()
             .flatMapLatest { administrativeUnitNameWithCartographicBoundariesList ->
                 flow {

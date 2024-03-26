@@ -35,8 +35,8 @@ fun HomeScreen(
     onNavigateImage: () -> Unit,
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
-    val administrativeLevels by viewModel.administrativeLevels.collectAsState(initial = emptyList())
-    val currentAdministrativeLevel by viewModel.currentAdministrativeLevel.collectAsState(
+    val administrativeLevels by viewModel.administrativeLevelsFlow.collectAsState(initial = emptyList())
+    val currentAdministrativeLevel by viewModel.currentAdministrativeLevelFlow.collectAsState(
         initial = ""
     )
 
@@ -78,7 +78,7 @@ fun HomeScreen(
         )
     )
 
-    val administrativeUnits by viewModel.administrativeUnits.collectAsState(initial = emptyList())
+    val administrativeUnits by viewModel.administrativeUnitsFlow.collectAsState(initial = emptyList())
 
     fun getColumnSize(): Int {
         return when (currentAdministrativeLevel) {

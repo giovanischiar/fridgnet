@@ -4,16 +4,30 @@ import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 
 class CartographicBoundaryRoomDataSource(
     private val cartographicBoundaryDAO: CartographicBoundaryDAO
 ) : CartographicBoundaryDataSource {
-    override fun retrieve(): Flow<List<CartographicBoundary>> {
+    private val cartographicBoundariesSet = mutableSetOf<CartographicBoundary>()
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun retrieve(): Flow<CartographicBoundary> {
         return cartographicBoundaryDAO.selectCartographicBoundariesWithRegions()
-            .map {
-                cartographicBoundariesWithRegions -> cartographicBoundariesWithRegions.toLocations()
+            .flatMapLatest { cartographicBoundaryWithRegionsList ->
+                flow {
+                    for (cartographicBoundaryWithRegions in cartographicBoundaryWithRegionsList) {
+                        val cartographicBoundary = cartographicBoundaryWithRegions
+                            .toCartographicBoundary()
+                        if (cartographicBoundariesSet.add(element = cartographicBoundary)) {
+                            emit(cartographicBoundary)
+                        }
+                    }
+                }
             }
     }
 

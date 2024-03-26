@@ -15,18 +15,15 @@ class AdministrativeUnitNameGeocoderRetriever(
     private val geocoder: Geocoder
 ) : AdministrativeUnitNameRetriever {
 
-    override fun retrieve(
-        geoLocation: GeoLocation
-    ): Flow<Pair<GeoLocation, AdministrativeUnitName>> = flow {
+    override fun retrieve(geoLocation: GeoLocation): Flow<AdministrativeUnitName> = flow {
         val (_, latitude, longitude) = geoLocation
-        log(msg = "Retrieving administrative unit for $geoLocation")
         val address = withContext(Dispatchers.IO) {
             getAddress(latitude = latitude, longitude = longitude)
         }
         val administrativeUnitName = address?.toAdministrativeUnitName()
         if (administrativeUnitName != null) {
             log("$geoLocation is $administrativeUnitName")
-            emit(Pair(geoLocation, administrativeUnitName))
+            emit(administrativeUnitName)
         } else {
             log(msg = "Couldn't find administrative unit of $geoLocation }")
         }

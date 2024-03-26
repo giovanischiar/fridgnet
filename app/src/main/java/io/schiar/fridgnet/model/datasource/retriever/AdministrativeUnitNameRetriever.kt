@@ -5,5 +5,5 @@ import io.schiar.fridgnet.model.GeoLocation
 import kotlinx.coroutines.flow.Flow
 
 interface AdministrativeUnitNameRetriever {
-    fun retrieve(geoLocation: GeoLocation): Flow<Pair<GeoLocation, AdministrativeUnitName>>
+    fun retrieve(geoLocation: GeoLocation): Flow<AdministrativeUnitName>
 }

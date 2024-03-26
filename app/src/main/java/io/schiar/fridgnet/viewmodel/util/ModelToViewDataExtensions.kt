@@ -106,3 +106,8 @@ fun Collection<AdministrativeUnit>
         .toAdministrativeUnitViewDataList(): List<AdministrativeUnitViewData> {
     return map { it.toAdministrativeUnitViewData() }
 }
+
+// AdministrativeLevel
+fun List<AdministrativeLevel>.toStrings(): List<String> {
+    return map { it.toString() }
+}

@@ -1,7 +1,6 @@
 package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
-import io.schiar.fridgnet.library.util.IdentitySet
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeLevel.CITY
 import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
@@ -22,9 +21,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -42,19 +41,49 @@ class HomeRepository(
     private val currentAdministrativeUnitDataSource : CurrentAdministrativeUnitDataSource,
     private val externalScope: CoroutineScope
 ) {
-    private var _currentAdministrativeUnits = emptyList<AdministrativeUnit>()
-    private val _administrativeLevels = AdministrativeLevel.entries
-    private val administrativeUnitByName = syncMapOf(mutableMapOf<String, AdministrativeUnit>())
-    private val administrativeUnitNamesByAdministrativeLevel = run {
-        syncMapOf(_administrativeLevels.associateWith { syncListOf(mutableListOf<String>()) })
+    private val administrativeLevels = AdministrativeLevel.entries
+    val administrativeLevelsFlow: Flow<List<AdministrativeLevel>> = MutableStateFlow(
+        administrativeLevels
+    )
+    private var currentAdministrativeLevel = CITY
+    private val currentAdministrativeLevelStateFlow = MutableStateFlow(currentAdministrativeLevel)
+    val currentAdministrativeLevelFlow: Flow<AdministrativeLevel> = run {
+        currentAdministrativeLevelStateFlow
     }
-
-    private var _currentAdministrativeLevel = CITY
-
-    private val _currentAdministrativeLevelStateFlow = MutableStateFlow(_currentAdministrativeLevel)
-    val administrativeLevels: Flow<List<AdministrativeLevel>>
-        = MutableStateFlow(_administrativeLevels)
-    val currentAdministrativeLevel: Flow<AdministrativeLevel> = _currentAdministrativeLevelStateFlow
+    private val administrativeUnitNamesByAdministrativeLevel = syncMapOf(
+        administrativeLevels.associateWith { syncListOf(mutableListOf<String>()) }
+    )
+    private val administrativeUnitByName = syncMapOf(mutableMapOf<String, AdministrativeUnit>())
+    private val administrativeUnits: List<AdministrativeUnit> get() {
+        return (administrativeUnitNamesByAdministrativeLevel[
+            currentAdministrativeLevel
+        ] ?: emptyList()).mapNotNull { administrativeUnitByName[it] }
+    }
+    val administrativeUnitsFlow = merge(
+        imageDataSource.retrieveImageWithOptionalAdministrativeUnitName()
+            .onEach { (image, optionalAdministrativeUnitName) ->
+                if (optionalAdministrativeUnitName != null) {
+                    createEachLevelOfAdministrativeUnitWith(image, optionalAdministrativeUnitName)
+                    return@onEach
+                }
+                val geoLocation = image.geoLocation
+                launchCoroutineToRetrieveMissingAdministrativeUnitNameFrom(geoLocation)
+            },
+        administrativeUnitNameDataSource
+            .retrieveAdministrativeUnitNameWithExistentCartographicBoundaries()
+            .onEach { (administrativeUnitName, existentCartographicBoundaries) ->
+                existentCartographicBoundaries.forEach { cartographicBoundary ->
+                    createAdministrativeUnitFrom(cartographicBoundary)
+                }
+                if (existentCartographicBoundaries.size == administrativeLevels.size) return@onEach
+                launchCoroutineToRetrieveMissingCartographicBoundariesFrom(
+                    administrativeUnitName, existentCartographicBoundaries
+                )
+            },
+        cartographicBoundaryDataSource.retrieve()
+            .onEach { cartographicBoundary -> createAdministrativeUnitFrom(cartographicBoundary) },
+        currentAdministrativeLevelStateFlow.onEach { currentAdministrativeLevel = it }
+    ).map { administrativeUnits }
 
     private val geoLocationRetrievingAdministrativeUnitNameSet = syncSetOf(
         mutableSetOf<GeoLocation>()
@@ -63,98 +92,71 @@ class HomeRepository(
         mutableSetOf<String>()
     )
 
-    val administrativeUnits = merge(
-        imageDataSource.retrieveWithAdministrativeUnitName()
-            .onEach {
-                val (image, administrativeUnitName) = it
-                if (administrativeUnitName != null) {
-                    createAdministrativeUnits(administrativeUnitName, image)
-                    return@onEach
-                }
-                externalScope.launch {
-                    retrieveAdministrativeUnitNameForGeoLocation(it)
-                        .onEach(::createAdministrativeUnitName)
-                        .collect()
-                }
-            },
-        administrativeUnitNameDataSource.retrieve()
-            .onEach {
-                externalScope.launch {
-                    retrieveCartographicBoundariesForAdministrativeUnitName(it)
-                        .onEach(::onEachCartographicBoundary)
-                        .onEach(cartographicBoundaryDataSource::create)
-                        .collect()
-                }
-            },
-        cartographicBoundaryDataSource.retrieve().onEach { cartographicBoundaries ->
-            cartographicBoundaries.forEach(::onEachCartographicBoundary)
-        },
-        _currentAdministrativeLevelStateFlow.onEach { _currentAdministrativeLevel = it }
-    ).map { getAdministrativeUnits() }.onEach { _currentAdministrativeUnits = it }
-
-    private fun getAdministrativeUnits(): List<AdministrativeUnit> {
-        val administrativeUnitNames = administrativeUnitNamesByAdministrativeLevel[
-            _currentAdministrativeLevel
-        ] ?: return emptyList()
-        return administrativeUnitNames.mapNotNull {
-            administrativeUnitName -> administrativeUnitByName[administrativeUnitName]
-        }
+    fun selectAdministrativeUnitAt(index: Int) {
+        val administrativeUnit = administrativeUnits[index]
+        log(msg = "AdministrativeUnit at $index is $administrativeUnit")
+        currentAdministrativeUnitDataSource.update(administrativeUnit)
     }
 
-    private fun onEachImageAndAdministrativeUnitName(
-        imageAndAdministrativeUnitName: Pair<Image, AdministrativeUnitName?>
+    fun changeCurrentAdministrativeLevel(index: Int) {
+        currentAdministrativeLevelStateFlow.update { administrativeLevels[index] }
+    }
+
+    suspend fun removeAllImages() { imageDataSource.delete() }
+
+    private fun launchCoroutineToRetrieveMissingAdministrativeUnitNameFrom(
+        geoLocation: GeoLocation
     ) {
-        val (image, administrativeUnitNameRetrieved) = imageAndAdministrativeUnitName
-        externalScope.launch {
-            retrieveAdministrativeUnitNameForGeoLocation(imageAndAdministrativeUnitName)
-                .onEach(::createAdministrativeUnitName)
-                .collect()
-        }
-        if (administrativeUnitNameRetrieved != null) {
-            createAdministrativeUnits(name = administrativeUnitNameRetrieved, image = image)
-        }
+        val administrativeUnitNameFlow = retrieveAdministrativeUnitNameUsing(geoLocation)
+            .onEach { administrativeUnitName ->
+                administrativeUnitNameDataSource.create(geoLocation, administrativeUnitName)
+            }
+        externalScope.launch { administrativeUnitNameFlow.collect() }
     }
 
-    private fun createAdministrativeUnits(name: AdministrativeUnitName, image: Image) {
+    private fun launchCoroutineToRetrieveMissingCartographicBoundariesFrom(
+        administrativeUnitName: AdministrativeUnitName,
+        existentCartographicBoundaries: List<CartographicBoundary>
+    ) {
+        val cartographicBoundaryFlow = retrieveOnlyNonExistentCartographicBoundariesFrom(
+            administrativeUnitName, existentCartographicBoundaries
+        ).onEach { cartographyBoundary ->
+            createAdministrativeUnitFrom(cartographyBoundary)
+            cartographicBoundaryDataSource.create(cartographyBoundary)
+        }
+        externalScope.launch { cartographicBoundaryFlow.collect() }
+    }
+
+    private fun createEachLevelOfAdministrativeUnitWith(
+        image: Image, administrativeUnitName: AdministrativeUnitName
+    ) {
         val country = createAdministrativeUnit(
-            administrativeUnitName = name,
-            administrativeLevel = COUNTRY,
-            image = image
+            administrativeUnitName, administrativeLevel = COUNTRY, image = image
         )
-
         val state = createAdministrativeUnit(
-            administrativeUnitName = name,
-            administrativeLevel = STATE,
-            image = image
+            administrativeUnitName, administrativeLevel = STATE, image = image
         )
-
         val county = createAdministrativeUnit(
-            administrativeUnitName = name,
-            administrativeLevel = COUNTY,
-            image = image
+            administrativeUnitName, administrativeLevel = COUNTY, image = image
         )
-
         val city = createAdministrativeUnit(
-            administrativeUnitName = name,
-            administrativeLevel = CITY,
-            image = image
+            administrativeUnitName, administrativeLevel = CITY, image = image
         )
-
-        if (county.subAdministrativeUnits.add(element = city)) {
+        if (county.subAdministrativeUnits.add(city)) {
             log(
                 msg = "Adding the ${city.administrativeLevel} ${city.firstName} " +
                         "to the ${county.administrativeLevel} ${county.firstName}"
             )
         }
 
-        if (state.subAdministrativeUnits.add(element = county)) {
+        if (state.subAdministrativeUnits.add(county)) {
             log(
                 msg ="Adding the ${county.administrativeLevel} ${county.firstName} " +
                         "to the ${state.administrativeLevel} ${state.firstName}"
             )
         }
 
-        if (country.subAdministrativeUnits.add(element = state)) {
+        if (country.subAdministrativeUnits.add(state)) {
             log(
                 msg = "Adding the ${state.administrativeLevel} ${state.firstName} " +
                         "to the ${country.administrativeLevel} ${country.firstName}"
@@ -164,19 +166,18 @@ class HomeRepository(
 
     private fun createAdministrativeUnit(
         administrativeUnitName: AdministrativeUnitName,
+        cartographicBoundary: CartographicBoundary? = null,
         administrativeLevel: AdministrativeLevel,
-        image: Image
+        image: Image? = null
     ): AdministrativeUnit {
-        val administrativeLevelWithName = administrativeLevel.with(
-            administrativeUnitName = administrativeUnitName
-        )
+        val administrativeLevelWithName = administrativeLevel.with(administrativeUnitName)
         val administrativeUnit = administrativeUnitByName[administrativeLevelWithName]
         return if (administrativeUnit == null) {
             val newAdministrativeUnit = AdministrativeUnit(
                 name = administrativeUnitName.toString(administrativeLevel = administrativeLevel),
-                administrativeLevel = administrativeLevel,
-                subAdministrativeUnits = IdentitySet(),
-                images = mutableSetOf(image)
+                administrativeLevel,
+                cartographicBoundary,
+                images = if (image == null) mutableSetOf() else mutableSetOf(image)
             )
             administrativeUnitByName[administrativeLevelWithName] = newAdministrativeUnit
             administrativeUnitNamesByAdministrativeLevel[administrativeLevel]?.add(
@@ -184,105 +185,62 @@ class HomeRepository(
             )
             newAdministrativeUnit
         } else {
-            administrativeUnit.images.add(image)
+            if (image != null) administrativeUnit.images.add(image)
+            if (cartographicBoundary != null) {
+                administrativeUnit.cartographicBoundary = cartographicBoundary
+            }
             administrativeUnit
         }
     }
 
-    private fun onEachCartographicBoundary(cartographicBoundary: CartographicBoundary) {
-        val administrativeLevel = cartographicBoundary.administrativeLevel
-        val administrationLevelWithName = cartographicBoundary.administrationLevelWithName
-        val administrativeUnit = administrativeUnitByName[administrationLevelWithName]
-        if (administrativeUnit == null) {
-            administrativeUnitByName[administrationLevelWithName] = AdministrativeUnit(
-                name = cartographicBoundary.administrativeUnitNameString,
-                administrativeLevel = cartographicBoundary.administrativeLevel,
-                cartographicBoundary = cartographicBoundary
-            )
-            administrativeUnitNamesByAdministrativeLevel[administrativeLevel]?.add(
-                administrationLevelWithName
-            )
-        } else {
-            administrativeUnit.cartographicBoundary = cartographicBoundary
-        }
+    private fun createAdministrativeUnitFrom(cartographicBoundary: CartographicBoundary) {
+        val (_, administrativeUnitName, _, _, _, administrativeLevel) = cartographicBoundary
+        createAdministrativeUnit(administrativeUnitName, cartographicBoundary, administrativeLevel)
     }
 
-    fun selectAdministrativeUnitAt(index: Int) {
-        val administrativeUnit = _currentAdministrativeUnits[index]
-        log(msg = "AdministrativeUnit at $index is $administrativeUnit")
-        currentAdministrativeUnitDataSource.update(administrativeUnit = administrativeUnit)
+    private fun retrieveAdministrativeUnitNameUsing(
+        geoLocation: GeoLocation
+    ): Flow<AdministrativeUnitName> {
+        return if (!geoLocationRetrievingAdministrativeUnitNameSet.contains(geoLocation)) {
+            geoLocationRetrievingAdministrativeUnitNameSet.add(geoLocation)
+            administrativeUnitNameRetriever.retrieve(geoLocation)
+        } else { flowOf(value = null) }.filterNotNull()
     }
 
-    fun changeCurrentAdministrativeLevel(index: Int) {
-        _currentAdministrativeLevelStateFlow.update { _administrativeLevels[index] }
-    }
-
-    suspend fun removeAllImages() { imageDataSource.delete() }
-
-    private fun retrieveAdministrativeUnitNameForGeoLocation(
-        imageAndAdministrativeUnitName: Pair<Image, AdministrativeUnitName?>
-    ): Flow<Pair<GeoLocation, AdministrativeUnitName>> {
-        val (image, administrationUnitName) = imageAndAdministrativeUnitName
-        val geoLocation = image.geoLocation
-        if (administrationUnitName != null) {
-            geoLocationRetrievingAdministrativeUnitNameSet.add(element = geoLocation)
-        }
-        return if (!geoLocationRetrievingAdministrativeUnitNameSet.contains(element = geoLocation)) {
-            administrativeUnitNameRetriever.retrieve(geoLocation = geoLocation)
-        } else {
-            flowOf(value = null)
-        }.mapNotNull { it }
-    }
-
-    private fun retrieveCartographicBoundariesForAdministrativeUnitName(
-        administrativeUnitNameAndCartographicBoundaries: Pair<
-            AdministrativeUnitName, List<CartographicBoundary>
-        >
-    ): Flow<CartographicBoundary> {
-        val (
-            administrativeUnitName, cartographicBoundariesFromAdministrativeUnitName
-        ) = administrativeUnitNameAndCartographicBoundaries
+    private fun cartographicBoundariesToRetrieve(
+        administrativeUnitName: AdministrativeUnitName,
+        existentCartographicBoundaries: List<CartographicBoundary>
+    ) : List<Pair<AdministrativeLevel, AdministrativeUnitName>> {
         administrativeUnitNameRetrievingCartographicBoundarySet.addAll(
-            cartographicBoundariesFromAdministrativeUnitName.map {
-                it.administrationLevelWithName
+            existentCartographicBoundaries.map { cartographicBoundary ->
+                cartographicBoundary.administrationLevelWithName
             }
         )
-
-        val administrativeLevelsWithMissingCartographicBoundary = _administrativeLevels.filter {
-            administrativeLevel -> run {
-                val administrativeLevelWithName = administrativeLevel.with(
-                    administrativeUnitName = administrativeUnitName
-                )
-                !administrativeUnitNameRetrievingCartographicBoundarySet.contains(
+        return administrativeLevels.mapNotNull { administrativeLevel ->
+            val administrativeLevelWithName = administrativeLevel.with(administrativeUnitName)
+            val cartographicBoundaryAlreadyBeingRetrieved =
+                administrativeUnitNameRetrievingCartographicBoundarySet.contains(
                     administrativeLevelWithName
                 )
-            }
+            if (!cartographicBoundaryAlreadyBeingRetrieved) {
+                administrativeUnitNameRetrievingCartographicBoundarySet.add(
+                    administrativeLevelWithName
+                )
+                Pair(administrativeLevel, administrativeUnitName)
+            } else { null }
         }
+    }
 
-        val administrativeUnitLevelAndAdministrativeUnitNameList
-            = administrativeLevelsWithMissingCartographicBoundary
-                .map { administrativeLevel ->
-                    val administrativeLevelWithName = administrativeLevel.with(
-                        administrativeUnitName = administrativeUnitName
-                    )
-                    administrativeUnitNameRetrievingCartographicBoundarySet.add(
-                        administrativeLevelWithName
-                    )
-                    Pair(administrativeLevel, administrativeUnitName)
-                }
+    private fun retrieveOnlyNonExistentCartographicBoundariesFrom(
+        administrativeUnitName: AdministrativeUnitName,
+        existentCartographicBoundaries: List<CartographicBoundary>
+    ): Flow<CartographicBoundary> {
+        val administrativeUnitLevelAndAdministrativeUnitNameList = cartographicBoundariesToRetrieve(
+            administrativeUnitName, existentCartographicBoundaries
+        )
 
         return cartographicBoundaryRetriever.retrieve(
             administrativeUnitLevelAndAdministrativeUnitNameList
-        )
-    }
-
-    private suspend fun createAdministrativeUnitName(
-        geoLocationAndAdministrativeUnitName: Pair<GeoLocation, AdministrativeUnitName>
-    ) {
-        val (geoLocation, administrativeUnitName) = geoLocationAndAdministrativeUnitName
-        administrativeUnitNameDataSource.create(
-            geoLocation = geoLocation,
-            administrativeUnitName = administrativeUnitName
         )
     }
 

@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CartographicBoundaryDataSource {
     suspend fun create(cartographicBoundary: CartographicBoundary)
-    fun retrieve(): Flow<List<CartographicBoundary>>
+    fun retrieve(): Flow<CartographicBoundary>
     fun retrieveRegions(): Flow<List<Region>>
     fun retrieve(region: Region): Flow<CartographicBoundary?>
     fun retrieve(administrativeUnitName: AdministrativeUnitName): Flow<CartographicBoundary?>
