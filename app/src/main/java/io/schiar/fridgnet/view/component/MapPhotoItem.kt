@@ -1,7 +1,11 @@
 package io.schiar.fridgnet.view.component
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -10,7 +14,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -60,7 +67,6 @@ fun MapPhotoItem(
                         icon = it.byteArray.toBitmapDescriptor()
                     )
                 }
-
                 if (
                     cartographicBoundary == null &&
                     subCartographicBoundaries.isEmpty() &&
@@ -92,5 +98,18 @@ fun MapPhotoItem(
         if (images.size > 1) {
             Text(modifier=Modifier.align(Alignment.TopEnd), text="${images.size}")
         }
+
+        Button(
+            modifier = Modifier.fillMaxSize(),
+            onClick = { onMapClick(LatLng(0.0, 0.0)) },
+            contentPadding = PaddingValues(all = 0.dp),
+            shape = RectangleShape,
+            colors = ButtonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.Transparent,
+                disabledContainerColor = Color.Transparent,
+                disabledContentColor = Color.Transparent
+            )
+        ) {}
     }
 }
