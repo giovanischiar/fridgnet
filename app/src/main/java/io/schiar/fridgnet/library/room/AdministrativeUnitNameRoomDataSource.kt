@@ -14,8 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class AdministrativeUnitNameRoomDataSource(
+class AdministrativeUnitNameRoomDataSource @Inject constructor(
     private val administrativeUnitNameDAO: AdministrativeUnitNameDAO
 ) : AdministrativeUnitNameDataSource {
     private val administrativeUnitNameIDS = mutableSetOf<Long>()

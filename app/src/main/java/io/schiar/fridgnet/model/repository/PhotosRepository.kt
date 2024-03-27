@@ -13,8 +13,9 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-class PhotosRepository(
+class PhotosRepository @Inject constructor(
     currentAdministrativeUnitDataSource: CurrentAdministrativeUnitDataSource,
     imageDataSource: ImageDataSource,
     administrativeUnitNameService: AdministrativeUnitNameDataSource

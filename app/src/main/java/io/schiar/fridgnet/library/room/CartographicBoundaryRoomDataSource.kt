@@ -9,8 +9,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class CartographicBoundaryRoomDataSource(
+class CartographicBoundaryRoomDataSource @Inject constructor(
     private val cartographicBoundaryDAO: CartographicBoundaryDAO
 ) : CartographicBoundaryDataSource {
     private val cartographicBoundariesSet = mutableSetOf<CartographicBoundary>()

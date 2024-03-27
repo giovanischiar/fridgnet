@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-class ImageRoomDataSource(private val imageDAO: ImageDAO) : ImageDataSource {
+class ImageRoomDataSource @Inject constructor(private val imageDAO: ImageDAO) : ImageDataSource {
     private val imagesSet = mutableSetOf<Pair<Image, AdministrativeUnitName?>>()
 
     override fun retrieve(): Flow<List<Image>> {

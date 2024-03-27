@@ -15,9 +15,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.io.ByteArrayOutputStream
+import javax.inject.Inject
 import kotlin.math.roundToInt
 
-class ImageAndroidRetriever(private val contentResolver: ContentResolver) : ImageRetriever {
+class ImageAndroidRetriever @Inject constructor(
+    private val contentResolver: ContentResolver
+) : ImageRetriever {
     override suspend fun retrieve(uris: List<String>): Flow<Image> = flow {
         uris.forEach { uri ->
             val systemURI = Uri.parse(uri)

@@ -5,8 +5,9 @@ import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.retriever.ImageRetriever
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
+import javax.inject.Inject
 
-class AppRepository(
+class AppRepository @Inject constructor(
     private val imageRetriever: ImageRetriever,
     private val imageDataSource: ImageDataSource
 ) {

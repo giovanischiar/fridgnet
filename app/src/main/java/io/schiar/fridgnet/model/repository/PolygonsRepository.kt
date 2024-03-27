@@ -2,8 +2,8 @@ package io.schiar.fridgnet.model.repository
 
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.CartographicBoundary
-import io.schiar.fridgnet.model.datasource.CurrentRegionDataSource
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
+import io.schiar.fridgnet.model.datasource.CurrentRegionDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -12,8 +12,9 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
+import javax.inject.Inject
 
-class PolygonsRepository(
+class PolygonsRepository @Inject constructor(
     currentRegionDataSource: CurrentRegionDataSource,
     private val cartographicBoundaryDataSource: CartographicBoundaryDataSource
 ) {

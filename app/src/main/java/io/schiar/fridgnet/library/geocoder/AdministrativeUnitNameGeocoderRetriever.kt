@@ -10,8 +10,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class AdministrativeUnitNameGeocoderRetriever(
+class AdministrativeUnitNameGeocoderRetriever @Inject constructor(
     private val geocoder: Geocoder
 ) : AdministrativeUnitNameRetriever {
 

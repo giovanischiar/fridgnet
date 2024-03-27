@@ -13,8 +13,9 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
+import javax.inject.Inject
 
-class CartographicBoundaryRetrofitRetriever(
+class CartographicBoundaryRetrofitRetriever @Inject constructor(
     private val nominatimAPI: NominatimAPI
 ) : CartographicBoundaryRetriever {
     private var fetchingPlaces: Set<String> = emptySet()

@@ -2,6 +2,7 @@ package io.schiar.fridgnet.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.repository.HomeRepository
 import io.schiar.fridgnet.viewmodel.util.toAdministrativeUnitViewDataList
@@ -9,8 +10,10 @@ import io.schiar.fridgnet.viewmodel.util.toStrings
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class HomeViewModel(private val homeRepository: HomeRepository) : ViewModel() {
+@HiltViewModel
+class HomeViewModel @Inject constructor(private val homeRepository: HomeRepository) : ViewModel() {
     val administrativeUnitsFlow = homeRepository.administrativeUnitsFlow
         .map { administrativeUnits -> administrativeUnits.toAdministrativeUnitViewDataList() }
     val administrativeLevelsFlow = homeRepository.administrativeLevelsFlow

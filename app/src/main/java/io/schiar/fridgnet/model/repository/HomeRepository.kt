@@ -28,11 +28,12 @@ import kotlinx.coroutines.flow.merge
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import java.util.Collections.synchronizedList as syncListOf
 import java.util.Collections.synchronizedMap as syncMapOf
 import java.util.Collections.synchronizedSet as syncSetOf
 
-class HomeRepository(
+class HomeRepository @Inject constructor(
     private val administrativeUnitNameRetriever: AdministrativeUnitNameRetriever,
     private val administrativeUnitNameDataSource: AdministrativeUnitNameDataSource,
     private val cartographicBoundaryRetriever: CartographicBoundaryRetriever,

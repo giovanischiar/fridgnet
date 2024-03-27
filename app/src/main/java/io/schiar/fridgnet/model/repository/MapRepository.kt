@@ -4,10 +4,10 @@ import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Region
+import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import io.schiar.fridgnet.model.datasource.CurrentRegionDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.mergeToBoundingBox
-import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,9 +15,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 import kotlin.time.measureTime
 
-class MapRepository(
+class MapRepository @Inject constructor(
     cartographicBoundaryDataSource: CartographicBoundaryDataSource,
     imageDataSource: ImageDataSource,
     private val currentRegionDataSource: CurrentRegionDataSource
