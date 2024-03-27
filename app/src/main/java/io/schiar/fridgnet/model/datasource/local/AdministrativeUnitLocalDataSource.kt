@@ -3,6 +3,9 @@ package io.schiar.fridgnet.model.datasource.local
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeLevel.CITY
+import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
+import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
+import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
@@ -15,10 +18,13 @@ import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.retriever.AdministrativeUnitNameRetriever
 import io.schiar.fridgnet.model.datasource.retriever.CartographicBoundaryRetriever
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
@@ -38,6 +44,8 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
     private val externalScope: CoroutineScope,
     imageDataSource: ImageDataSource
 ): AdministrativeUnitDataSource {
+    private var lastAdministrativeUnitHashCode = -1
+    private val currentAdministrativeUnitIndexFlow = MutableStateFlow(value = -1)
     private val geoLocationRetrievingAdministrativeUnitNameSet = syncSetOf(
         mutableSetOf<GeoLocation>()
     )
@@ -74,7 +82,8 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
             },
         cartographicBoundaryDataSource.retrieve()
             .onEach { cartographicBoundary -> createAdministrativeUnitFrom(cartographicBoundary) },
-        currentAdministrativeLevelStateFlow
+        currentAdministrativeLevelStateFlow,
+        currentAdministrativeUnitIndexFlow
     )
 
     override fun retrieve(
@@ -82,6 +91,27 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
     ): Flow<List<AdministrativeUnit>> {
         currentAdministrativeLevelStateFlow.update { administrativeLevel }
         return administrativeUnitsFlow.map { administrativeUnits(administrativeLevel) }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun retrieveCurrent(): Flow<AdministrativeUnit> {
+        return administrativeUnitsFlow.flatMapLatest { flowOfCurrentAdministrativeUnit() }
+    }
+
+    private fun flowOfCurrentAdministrativeUnit(): Flow<AdministrativeUnit> = flow {
+        val currentAdministrativeLevel = currentAdministrativeLevelStateFlow.value
+        val currentAdministrativeUnitIndex = currentAdministrativeUnitIndexFlow.value
+        val currentAdministrativeUnit = administrativeUnits(currentAdministrativeLevel)
+            .getOrNull(currentAdministrativeUnitIndex) ?: return@flow
+        if (lastAdministrativeUnitHashCode != currentAdministrativeUnit.hashCode()) {
+            lastAdministrativeUnitHashCode = currentAdministrativeUnit.hashCode()
+            emit(currentAdministrativeUnit)
+        }
+    }
+
+    override fun updateCurrentIndex(index: Int) {
+        lastAdministrativeUnitHashCode = -1
+        currentAdministrativeUnitIndexFlow.update { index }
     }
 
     private fun administrativeUnits(
@@ -119,16 +149,16 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
         image: Image, administrativeUnitName: AdministrativeUnitName
     ) {
         val country = createAdministrativeUnit(
-            administrativeUnitName, administrativeLevel = AdministrativeLevel.COUNTRY, image = image
+            administrativeUnitName, administrativeLevel = COUNTRY, image = image
         )
         val state = createAdministrativeUnit(
-            administrativeUnitName, administrativeLevel = AdministrativeLevel.STATE, image = image
+            administrativeUnitName, administrativeLevel = STATE, image = image
         )
         val county = createAdministrativeUnit(
-            administrativeUnitName, administrativeLevel = AdministrativeLevel.COUNTY, image = image
+            administrativeUnitName, administrativeLevel = COUNTY, image = image
         )
         val city = createAdministrativeUnit(
-            administrativeUnitName, administrativeLevel = AdministrativeLevel.CITY, image = image
+            administrativeUnitName, administrativeLevel = CITY, image = image
         )
         if (county.subAdministrativeUnits.add(city)) {
             log(

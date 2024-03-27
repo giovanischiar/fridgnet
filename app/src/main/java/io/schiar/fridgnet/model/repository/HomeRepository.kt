@@ -5,7 +5,6 @@ import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeLevel.CITY
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
-import io.schiar.fridgnet.model.datasource.CurrentAdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -17,9 +16,8 @@ import javax.inject.Inject
 
 
 class HomeRepository @Inject constructor(
-    administrativeUnitDataSource: AdministrativeUnitDataSource,
-    private val imageDataSource: ImageDataSource,
-    private val currentAdministrativeUnitDataSource : CurrentAdministrativeUnitDataSource,
+    private val administrativeUnitDataSource: AdministrativeUnitDataSource,
+    private val imageDataSource: ImageDataSource
 ) {
     private var administrativeUnits: List<AdministrativeUnit> = emptyList()
     private val currentAdministrativeLevelStateFlow = MutableStateFlow(CITY)
@@ -40,7 +38,7 @@ class HomeRepository @Inject constructor(
     fun selectAdministrativeUnitAt(index: Int) {
         val administrativeUnit = administrativeUnits[index]
         log(msg = "AdministrativeUnit at $index is $administrativeUnit")
-        currentAdministrativeUnitDataSource.update(administrativeUnit)
+        administrativeUnitDataSource.updateCurrentIndex(index)
     }
 
     fun changeCurrentAdministrativeLevel(index: Int) {

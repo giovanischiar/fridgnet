@@ -10,11 +10,9 @@ import io.schiar.fridgnet.library.room.ImageRoomDataSource
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitNameDataSource
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
-import io.schiar.fridgnet.model.datasource.CurrentAdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.CurrentRegionDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.datasource.local.AdministrativeUnitLocalDataSource
-import io.schiar.fridgnet.model.datasource.local.CurrentLocalAdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.local.CurrentRegionLocalDataSource
 import javax.inject.Singleton
 
@@ -34,16 +32,11 @@ interface DataSourceBinder {
         cartographicBoundaryRoomDataSource: CartographicBoundaryRoomDataSource
     ): CartographicBoundaryDataSource
 
+    @Singleton
     @Binds
     fun bindAdministrativeUnitDataSource(
         administrativeUnitLocalDataSource: AdministrativeUnitLocalDataSource
     ): AdministrativeUnitDataSource
-
-    @Singleton
-    @Binds
-    fun bindCurrentAdministrativeUnitDataSource(
-        currentLocalAdministrativeUnitDataSource: CurrentLocalAdministrativeUnitDataSource
-    ): CurrentAdministrativeUnitDataSource
 
     @Singleton
     @Binds

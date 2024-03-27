@@ -22,4 +22,12 @@ data class AdministrativeUnit(
             images = images.toMutableSet()
         )
     }
+
+    override fun toString(): String {
+        val imagesSize = images.size
+        val subAdministrativeUnitsSize = subAdministrativeUnits.size
+        val imagesSizeString = "$imagesSize ${if (imagesSize > 1) "images" else "image"}"
+        val subAdministrativeUnitsSizeString = "$subAdministrativeUnitsSize ${if (subAdministrativeUnitsSize > 1) "subAdministrativeUnits" else "subAdministrativeUnit"}"
+        return "($name, $administrativeLevel, $cartographicBoundary, $subAdministrativeUnitsSizeString, $imagesSizeString)"
+    }
 }
