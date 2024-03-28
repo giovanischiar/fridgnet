@@ -11,6 +11,7 @@ import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
+import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.AdministrativeUnitNameDataSource
 import io.schiar.fridgnet.model.datasource.CartographicBoundaryDataSource
@@ -91,6 +92,18 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
     ): Flow<List<AdministrativeUnit>> {
         currentAdministrativeLevelStateFlow.update { administrativeLevel }
         return administrativeUnitsFlow.map { administrativeUnits(administrativeLevel) }
+    }
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override fun retrieveRegions(): Flow<List<Region>> {
+        return administrativeUnitsFlow.flatMapLatest { regionsFlow() }
+    }
+
+    private fun regionsFlow(): Flow<List<Region>> = flow {
+        val administrativeUnits = administrativeLevels.flatMap {
+            administrativeUnits(it)
+        }
+        emit(administrativeUnits.flatMap { it.cartographicBoundary?.regions ?: emptyList() })
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
