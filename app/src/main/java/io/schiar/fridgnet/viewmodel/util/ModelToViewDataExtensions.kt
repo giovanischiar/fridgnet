@@ -95,7 +95,9 @@ fun AdministrativeUnit.toAdministrativeUnitViewData(): AdministrativeUnitViewDat
         name = name,
         administrativeLevel = administrativeLevel.toString(),
         cartographicBoundary = cartographicBoundary?.toCartographicBoundaryViewData(),
-        subAdministrativeUnits = subAdministrativeUnits.toAdministrativeUnitViewDataList(),
+        subCartographicBoundaries = flatMapSubCartographicBoundariesViewDataList(
+            administrativeUnit = this, mutableListOf()
+        ),
         images = images.toImageViewDataList(),
         imagesBoundingBox = images.mergeToBoundingBox()?.toBoundingBoxViewData()
     )
@@ -110,4 +112,19 @@ fun Collection<AdministrativeUnit>
 // AdministrativeLevel
 fun List<AdministrativeLevel>.toStrings(): List<String> {
     return map { it.toString() }
+}
+
+fun AdministrativeUnit.flatMapSubCartographicBoundariesViewDataList(
+    administrativeUnit: AdministrativeUnit,
+    cartographicBoundaries: MutableList<CartographicBoundaryViewData>
+): List<CartographicBoundaryViewData> {
+    val subCartographicBoundary = administrativeUnit.cartographicBoundary
+    if (subCartographicBoundary != null) {
+        cartographicBoundaries.add(subCartographicBoundary.toCartographicBoundaryViewData())
+    }
+
+    for (subAdministrativeUnit in administrativeUnit.subAdministrativeUnits) {
+        flatMapSubCartographicBoundariesViewDataList(subAdministrativeUnit, cartographicBoundaries)
+    }
+    return cartographicBoundaries
 }

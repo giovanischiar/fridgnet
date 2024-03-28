@@ -6,10 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import io.schiar.fridgnet.view.screen.AppScreen
+import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
 import io.schiar.fridgnet.viewmodel.AppViewModel
 import io.schiar.fridgnet.viewmodel.HomeViewModel
 import io.schiar.fridgnet.viewmodel.MapViewModel
-import io.schiar.fridgnet.viewmodel.PhotosViewModel
 import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 
 @AndroidEntryPoint
@@ -18,7 +18,7 @@ class MainActivity : ComponentActivity() {
     private val homeViewModel: HomeViewModel by viewModels()
     private val mapViewModel: MapViewModel by viewModels()
     private val polygonsViewModel: PolygonsViewModel by viewModels()
-    private val photosViewModel: PhotosViewModel by viewModels()
+    private val administrativeUnitViewModel: AdministrativeUnitViewModel by viewModels()
 
     override fun onCreate(saveBundleInstance: Bundle?) {
         super.onCreate(saveBundleInstance)
@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
                 homeViewModel = homeViewModel,
                 mapViewModel = mapViewModel,
                 polygonsViewModel = polygonsViewModel,
-                photosViewModel = photosViewModel
+                administrativeUnitViewModel = administrativeUnitViewModel
             )
         }
     }

@@ -4,7 +4,7 @@ data class AdministrativeUnitViewData(
     val name: String,
     val administrativeLevel: String,
     val cartographicBoundary: CartographicBoundaryViewData?,
-    val subAdministrativeUnits: List<AdministrativeUnitViewData>,
+    val subCartographicBoundaries: List<CartographicBoundaryViewData>,
     val images: List<ImageViewData>,
     val imagesBoundingBox: BoundingBoxViewData?
 )

@@ -3,13 +3,18 @@ package io.schiar.fridgnet.view.util
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.model.BitmapDescriptor
 import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
+import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.MapUiSettings
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 // GeoLocationViewData
 fun GeoLocationViewData.toLatLng(): LatLng {
@@ -59,4 +64,22 @@ fun ByteArray.toBitmapDescriptor(): BitmapDescriptor {
     return BitmapDescriptorFactory.fromBitmap(
         BitmapFactory.decodeByteArray(this, 0, this.size)
     )
+}
+
+fun CameraPositionState.updateCameraPositionTo(
+    boundingBox: BoundingBoxViewData?,
+    coroutineScope: CoroutineScope,
+    animate: Boolean = false,
+    padding: Int = 2
+) {
+    boundingBox ?: return
+    val latLngBounds = boundingBox.toLatLngBounds()
+    val cameraUpdate = CameraUpdateFactory.newLatLngBounds(latLngBounds, padding)
+    if (animate) {
+        coroutineScope.launch(Dispatchers.Main) {
+            animate(cameraUpdate, durationMs = 1000)
+        }
+        return
+    }
+    move(cameraUpdate)
 }

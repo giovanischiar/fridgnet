@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.DropdownMenu
@@ -23,9 +24,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.AdministrativeLevelDropdown
-import io.schiar.fridgnet.view.component.MapPhotoItem
+import io.schiar.fridgnet.view.component.AdministrativeUnitView
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.viewmodel.HomeViewModel
 
@@ -99,20 +101,12 @@ fun HomeScreen(
     ) {
         LazyVerticalGrid(columns = GridCells.Fixed(columnCount)) {
             items(count = administrativeUnits.size) { index ->
-                val (
-                    _, _, cartographicBoundary, subAdministrativeUnits, images, imagesBoundingBox
-                ) = administrativeUnits[index]
-                MapPhotoItem(
-                    cartographicBoundary = cartographicBoundary,
-                    subCartographicBoundaries = subAdministrativeUnits
-                        .mapNotNull { administrativeUnit ->
-                            administrativeUnit.cartographicBoundary
-                        },
-                    images = images,
-                    imagesBoundingBox = imagesBoundingBox,
-                    columnCount = columnCount
+                AdministrativeUnitView(
+                    modifier = Modifier.size(Dp(100f * 4 / columnCount)),
+                    administrativeUnit = administrativeUnits[index],
+                    areImagesShowing = false
                 ) {
-                    viewModel.selectCartographicBoundaryGeoLocationAt(index = index)
+                    viewModel.selectCartographicBoundaryGeoLocationAt(index)
                     onNavigateImage()
                 }
             }

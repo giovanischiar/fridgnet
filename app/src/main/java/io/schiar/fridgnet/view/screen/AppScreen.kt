@@ -34,10 +34,10 @@ import io.schiar.fridgnet.view.component.PhotoPicker
 import io.schiar.fridgnet.view.util.BottomNavScreen
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether
+import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
 import io.schiar.fridgnet.viewmodel.AppViewModel
 import io.schiar.fridgnet.viewmodel.HomeViewModel
 import io.schiar.fridgnet.viewmodel.MapViewModel
-import io.schiar.fridgnet.viewmodel.PhotosViewModel
 import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,7 +47,7 @@ fun AppScreen(
     homeViewModel: HomeViewModel,
     mapViewModel: MapViewModel,
     polygonsViewModel: PolygonsViewModel,
-    photosViewModel: PhotosViewModel,
+    administrativeUnitViewModel: AdministrativeUnitViewModel,
     navController: NavHostController = rememberNavController()
 ) {
     val items = listOf(BottomNavScreen.Home, BottomNavScreen.Map)
@@ -147,7 +147,7 @@ fun AppScreen(
             composable(route = BottomNavScreen.Home.route) {
                 HomeScreen(
                     viewModel = homeViewModel,
-                    onNavigateImage = { navController.navigate("Photos") },
+                    onNavigateImage = { navController.navigate("AdministrativeUnit") },
                     info = { screenInfo -> currentScreenInfo = screenInfo }
                 )
             }
@@ -160,9 +160,9 @@ fun AppScreen(
                 )
             }
 
-            composable(route = "Photos") {
-                PhotosScreen(
-                    viewModel = photosViewModel,
+            composable(route = "AdministrativeUnit") {
+                AdministrativeUnitScreen(
+                    viewModel = administrativeUnitViewModel,
                     info = { screenInfo -> currentScreenInfo = screenInfo }
                 )
             }
