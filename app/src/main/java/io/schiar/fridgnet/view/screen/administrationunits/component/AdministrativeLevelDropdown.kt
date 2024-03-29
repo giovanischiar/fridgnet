@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.component
+package io.schiar.fridgnet.view.screen.administrationunits.component
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.DropdownMenuItem
@@ -13,24 +13,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import io.schiar.fridgnet.view.util.getResourceString
+import io.schiar.fridgnet.view.viewdata.AdministrativeLevelViewData
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdministrativeLevelDropdown(
-    administrativeLevels: List<String>,
-    currentAdministrativeLevel: String,
+    administrativeLevels: List<AdministrativeLevelViewData>,
+    currentAdministrativeLevel: AdministrativeLevelViewData,
     onDropdown: (index: Int) -> Unit
 ) {
-    fun textOf(administrativeLevel: String): String {
-        return when (administrativeLevel) {
-            "CITY" -> "Cities"
-            "COUNTY" -> "Counties"
-            "STATE" -> "States"
-            "COUNTRY" -> "Countries"
-            else -> "Cities"
-        }
-    }
 
+    val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 
     ExposedDropdownMenuBox(
@@ -39,16 +34,17 @@ fun AdministrativeLevelDropdown(
     ) {
         TextField(
             modifier = Modifier.menuAnchor(),
-            value = textOf(currentAdministrativeLevel),
+            value = currentAdministrativeLevel.getResourceString(context),
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
         )
         ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
             administrativeLevels.mapIndexed { index, administrativeLevel ->
+                val titleResource = administrativeLevel.getResourceString(context)
                 DropdownMenuItem(
                     modifier = Modifier.fillMaxWidth(),
-                    text = { Text(textOf(administrativeLevel)) },
+                    text = { Text(titleResource) },
                     onClick = {
                         expanded = false
                         onDropdown(index)

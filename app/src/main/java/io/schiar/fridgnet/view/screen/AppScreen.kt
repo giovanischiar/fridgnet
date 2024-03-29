@@ -31,12 +31,13 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.PhotoPicker
+import io.schiar.fridgnet.view.screen.administrationunits.AdministrativeUnitsScreen
 import io.schiar.fridgnet.view.util.BottomNavScreen
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether
 import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
+import io.schiar.fridgnet.viewmodel.AdministrativeUnitsViewModel
 import io.schiar.fridgnet.viewmodel.AppViewModel
-import io.schiar.fridgnet.viewmodel.HomeViewModel
 import io.schiar.fridgnet.viewmodel.MapViewModel
 import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 
@@ -44,7 +45,7 @@ import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 @Composable
 fun AppScreen(
     appViewModel: AppViewModel,
-    homeViewModel: HomeViewModel,
+    administrativeUnitsViewModel: AdministrativeUnitsViewModel,
     mapViewModel: MapViewModel,
     polygonsViewModel: PolygonsViewModel,
     administrativeUnitViewModel: AdministrativeUnitViewModel,
@@ -145,8 +146,8 @@ fun AppScreen(
             Modifier.padding(innerPadding)
         ) {
             composable(route = BottomNavScreen.Home.route) {
-                HomeScreen(
-                    viewModel = homeViewModel,
+                AdministrativeUnitsScreen(
+                    viewModel = administrativeUnitsViewModel,
                     onNavigateImage = { navController.navigate("AdministrativeUnit") },
                     info = { screenInfo -> currentScreenInfo = screenInfo }
                 )

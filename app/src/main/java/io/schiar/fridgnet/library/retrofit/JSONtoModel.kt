@@ -41,7 +41,7 @@ fun JSONResult<GeoJSONAttributes>.toCartographicBoundary(
                 polygon = polygon,
                 holes = emptyList(),
                 boundingBox = polygon.findBoundingBox(),
-                zIndex = administrativeLevel.zIndex()
+                zIndex = administrativeLevel.zIndex
             )
             listOf(region)
         }
@@ -53,7 +53,7 @@ fun JSONResult<GeoJSONAttributes>.toCartographicBoundary(
                 polygon = polygon,
                 holes = emptyList(),
                 boundingBox = polygon.findBoundingBox(),
-                zIndex = administrativeLevel.zIndex()
+                zIndex = administrativeLevel.zIndex
             )
             listOf(region)
         }
@@ -68,7 +68,7 @@ fun JSONResult<GeoJSONAttributes>.toCartographicBoundary(
                     1, polygonGeoLocations.size
                 ).map { geoLocations -> Polygon(geoLocations = geoLocations) },
                 boundingBox = polygon.findBoundingBox(),
-                zIndex = administrativeLevel.zIndex()
+                zIndex = administrativeLevel.zIndex
             )
             listOf(region)
         }
@@ -83,7 +83,7 @@ fun JSONResult<GeoJSONAttributes>.toCartographicBoundary(
                         Polygon(geoLocations = geoLocations)
                     },
                     boundingBox = polygon.findBoundingBox(),
-                    zIndex = administrativeLevel.zIndex()
+                    zIndex = administrativeLevel.zIndex
                 )
             }
             regions
@@ -96,7 +96,7 @@ fun JSONResult<GeoJSONAttributes>.toCartographicBoundary(
         administrativeUnitName = administrativeUnitName,
         regions = regions,
         boundingBox = boundingBox.toBoundingBox(),
-        zIndex = administrativeLevel.zIndex(),
+        zIndex = administrativeLevel.zIndex,
         administrativeLevel = administrativeLevel
     )
 }

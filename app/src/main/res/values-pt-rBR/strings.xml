@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string name="home_screen">Início</string>
+  <string name="map_screen">Mapa</string>
+  <string name="polygons_screen">Polígonos</string>
+  <string name="photos_screen">Fotos</string>
+  <string name="cities">Cidades</string>
+  <string name="counties">Condados</string>
+  <string name="states">Estados</string>
+  <string name="countries">Países</string>
+  <string name="remove_all_images">Remova todas as imagens</string>
+</resources>

@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 
-class HomeRepository @Inject constructor(
+class AdministrativeUnitsRepository @Inject constructor(
     private val administrativeUnitDataSource: AdministrativeUnitDataSource,
     private val imageDataSource: ImageDataSource
 ) {

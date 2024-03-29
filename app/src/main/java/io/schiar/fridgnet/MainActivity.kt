@@ -7,15 +7,15 @@ import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
 import io.schiar.fridgnet.view.screen.AppScreen
 import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
+import io.schiar.fridgnet.viewmodel.AdministrativeUnitsViewModel
 import io.schiar.fridgnet.viewmodel.AppViewModel
-import io.schiar.fridgnet.viewmodel.HomeViewModel
 import io.schiar.fridgnet.viewmodel.MapViewModel
 import io.schiar.fridgnet.viewmodel.PolygonsViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val appViewModel: AppViewModel by viewModels()
-    private val homeViewModel: HomeViewModel by viewModels()
+    private val administrativeUnitsViewModel: AdministrativeUnitsViewModel by viewModels()
     private val mapViewModel: MapViewModel by viewModels()
     private val polygonsViewModel: PolygonsViewModel by viewModels()
     private val administrativeUnitViewModel: AdministrativeUnitViewModel by viewModels()
@@ -26,7 +26,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             AppScreen(
                 appViewModel = appViewModel,
-                homeViewModel = homeViewModel,
+                administrativeUnitsViewModel = administrativeUnitsViewModel,
                 mapViewModel = mapViewModel,
                 polygonsViewModel = polygonsViewModel,
                 administrativeUnitViewModel = administrativeUnitViewModel

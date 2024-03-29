@@ -1,7 +1,12 @@
 <resources>
-  <string name="app_name">Fridgnet</string>
+  <string name="app_name" translatable="false">Fridgnet</string>
   <string name="home_screen">Home</string>
   <string name="map_screen">Map</string>
   <string name="polygons_screen">Polygons</string>
   <string name="photos_screen">Photos</string>
+  <string name="cities">Cities</string>
+  <string name="counties">Counties</string>
+  <string name="states">States</string>
+  <string name="countries">Countries</string>
+  <string name="remove_all_images">Remove all images</string>
 </resources>

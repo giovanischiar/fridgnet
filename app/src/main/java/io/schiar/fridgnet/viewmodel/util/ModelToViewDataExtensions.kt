@@ -11,6 +11,7 @@ import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.mergeToBoundingBox
+import io.schiar.fridgnet.view.viewdata.AdministrativeLevelViewData
 import io.schiar.fridgnet.view.viewdata.AdministrativeUnitViewData
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.CartographicBoundaryViewData
@@ -93,7 +94,7 @@ fun AdministrativeUnit.toAdministrativeUnitViewData(): AdministrativeUnitViewDat
     }
     return AdministrativeUnitViewData(
         name = name,
-        administrativeLevel = administrativeLevel.toString(),
+        administrativeLevel = administrativeLevel.toAdministrativeUnitLevelViewData(),
         cartographicBoundary = cartographicBoundary?.toCartographicBoundaryViewData(),
         subCartographicBoundaries = flatMapSubCartographicBoundariesViewDataList(
             administrativeUnit = this, mutableListOf()
@@ -110,8 +111,17 @@ fun Collection<AdministrativeUnit>
 }
 
 // AdministrativeLevel
-fun List<AdministrativeLevel>.toStrings(): List<String> {
-    return map { it.toString() }
+fun AdministrativeLevel.toAdministrativeUnitLevelViewData(): AdministrativeLevelViewData {
+    return AdministrativeLevelViewData(
+        title = name,
+        columnCount = administrativeUnitSize,
+        zIndex = zIndex
+    )
+}
+
+fun List<AdministrativeLevel>
+        .toAdministrativeLevelViewDataList(): List<AdministrativeLevelViewData> {
+    return map { it.toAdministrativeUnitLevelViewData() }
 }
 
 fun AdministrativeUnit.flatMapSubCartographicBoundariesViewDataList(
@@ -128,3 +138,4 @@ fun AdministrativeUnit.flatMapSubCartographicBoundariesViewDataList(
     }
     return cartographicBoundaries
 }
+

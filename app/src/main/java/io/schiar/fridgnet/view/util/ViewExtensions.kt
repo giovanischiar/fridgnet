@@ -1,5 +1,6 @@
 package io.schiar.fridgnet.view.util
 
+import android.content.Context
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -10,6 +11,8 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.CameraPositionState
 import com.google.maps.android.compose.MapUiSettings
+import io.schiar.fridgnet.R
+import io.schiar.fridgnet.view.viewdata.AdministrativeLevelViewData
 import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
 import kotlinx.coroutines.CoroutineScope
@@ -82,4 +85,15 @@ fun CameraPositionState.updateCameraPositionTo(
         return
     }
     move(cameraUpdate)
+}
+
+fun AdministrativeLevelViewData.getResourceString(context: Context): String {
+    return context.resources.getString(when(this.title) {
+            "CITY" -> R.string.cities
+            "COUNTY" -> R.string.counties
+            "STATE" -> R.string.states
+            "COUNTRY" -> R.string.countries
+            else -> R.string.cities
+        }
+    )
 }
