@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.component
+package io.schiar.fridgnet.view.screen.administrationunit.component
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.height

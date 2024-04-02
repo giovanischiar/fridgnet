@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.screen
+package io.schiar.fridgnet.view.screen.administrationunit
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.google.maps.android.compose.MapUiSettings
 import io.schiar.fridgnet.view.component.AdministrativeUnitView
-import io.schiar.fridgnet.view.component.PhotoGrid
+import io.schiar.fridgnet.view.screen.administrationunit.component.PhotoGrid
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
 

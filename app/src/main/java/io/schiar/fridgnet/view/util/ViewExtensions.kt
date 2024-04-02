@@ -73,7 +73,8 @@ fun CameraPositionState.updateCameraPositionTo(
     boundingBox: BoundingBoxViewData?,
     coroutineScope: CoroutineScope,
     animate: Boolean = false,
-    padding: Int = 2
+    padding: Int = 2,
+    onMoveFinished: () -> Unit = {}
 ) {
     boundingBox ?: return
     val latLngBounds = boundingBox.toLatLngBounds()
@@ -81,9 +82,11 @@ fun CameraPositionState.updateCameraPositionTo(
     if (animate) {
         coroutineScope.launch(Dispatchers.Main) {
             animate(cameraUpdate, durationMs = 1000)
+            onMoveFinished()
         }
         return
     }
+    onMoveFinished()
     move(cameraUpdate)
 }
 

@@ -8,74 +8,41 @@ import io.schiar.fridgnet.model.datasource.AdministrativeUnitDataSource
 import io.schiar.fridgnet.model.datasource.CurrentRegionDataSource
 import io.schiar.fridgnet.model.datasource.ImageDataSource
 import io.schiar.fridgnet.model.mergeToBoundingBox
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.time.measureTime
 
 class MapRepository @Inject constructor(
-    administrativeUnitDataSource: AdministrativeUnitDataSource,
+    private val administrativeUnitDataSource: AdministrativeUnitDataSource,
     imageDataSource: ImageDataSource,
     private val currentRegionDataSource: CurrentRegionDataSource
 ) {
     private val currentBoundingBoxFlow = MutableStateFlow<BoundingBox?>(value = null)
-    private val _regionsMutableSet = mutableSetOf<Region>()
-    private var _visibleRegions = emptyList<Region>()
+    private var activeRegionsWithinCurrentBoundingBox = emptyList<Region>()
 
-    val visibleRegions = administrativeUnitDataSource.retrieveRegions()
-        .flowOn(Dispatchers.IO)
-        .combine(
-            flow = currentBoundingBoxFlow,
-            transform = ::combineRegionsCurrentBoundingBox
-        )
-    val visibleImages = imageDataSource.retrieve().combine(
-        flow = currentBoundingBoxFlow,
-        transform = ::combineImagesCurrentBoundingBox
+    @OptIn(ExperimentalCoroutinesApi::class)
+    val activeRegionsWithinCurrentBoundingBoxFlow = currentBoundingBoxFlow.filterNotNull()
+        .flatMapLatest { boundingBox ->
+            administrativeUnitDataSource.retrieveActiveRegionsWithin(boundingBox)
+        }.onEach { activeRegionsWithinCurrentBoundingBox = it }
+    val imagesWithinCurrentBoundingBoxFlow = imageDataSource.retrieve().combine(
+        flow = currentBoundingBoxFlow.filterNotNull(),
+        transform = ::combineImagesAndCurrentBoundingBoxFlows
     )
-    private val boundingBoxPhotosFlow = MutableStateFlow<BoundingBox?>(value = null)
-    val boundingBoxImages: Flow<BoundingBox?> = boundingBoxPhotosFlow
+    private val boundingBoxPhotosStateFlow = MutableStateFlow<BoundingBox?>(value = null)
+    val boundingBoxImagesFlow: Flow<BoundingBox?> = boundingBoxPhotosStateFlow
 
-    private fun combineImagesCurrentBoundingBox(
-        images: List<Image>, currentBoundingBox: BoundingBox?
+    private fun combineImagesAndCurrentBoundingBoxFlows(
+        images: List<Image>, currentBoundingBox: BoundingBox
     ): List<Image> {
-        return if (currentBoundingBox == null) {
-            emptyList()
-        } else {
-            boundingBoxPhotosFlow.update { images.mergeToBoundingBox() }
-            images.filter { currentBoundingBox.contains(geoLocation = it.geoLocation) }
-        }
-    }
-
-    private suspend fun combineRegionsCurrentBoundingBox(
-        regions: List<Region>, currentBoundingBox: BoundingBox?
-    ): List<Region> {
-        Log.d("", "Combining regions")
-        return if (currentBoundingBox == null) {
-            emptyList()
-        } else {
-            withContext(Dispatchers.Default) {
-                Log.d("", "there are ${regions.size} regions")
-                val time = measureTime {
-                    for (region in regions) {
-                        if (region.active && currentBoundingBox.contains(region.boundingBox)) {
-                            _regionsMutableSet.add(element = region)
-                        } else {
-                            _regionsMutableSet.remove(element = region)
-                        }
-                    }
-
-                    _visibleRegions = _regionsMutableSet.toList()
-                }
-                Log.d("", "there are ${_visibleRegions.size} visible regions")
-                Log.d("", "combineLocationsCurrentBoundingBox took $time")
-            }
-            _visibleRegions
-        }
+        boundingBoxPhotosStateFlow.update { images.mergeToBoundingBox() }
+        return images.filter { currentBoundingBox.contains(geoLocation = it.geoLocation) }
     }
 
     fun updateBoundingBox(boundingBox: BoundingBox) {
@@ -83,8 +50,8 @@ class MapRepository @Inject constructor(
         currentBoundingBoxFlow.update { boundingBox }
     }
 
-    fun selectVisibleRegionAt(index: Int) {
-        Log.d("", "selectNewLocationFrom($index)")
-        currentRegionDataSource.update(region = _visibleRegions[index])
+    fun selectActiveRegionAt(index: Int) {
+        Log.d("", "selectActiveRegionAt($index)")
+        currentRegionDataSource.update(region = activeRegionsWithinCurrentBoundingBox[index])
     }
 }

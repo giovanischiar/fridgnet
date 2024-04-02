@@ -8,6 +8,7 @@ import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
 import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.AdministrativeUnitName
+import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Image
@@ -43,7 +44,7 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
     private val cartographicBoundaryRetriever: CartographicBoundaryRetriever,
     private val cartographicBoundaryDataSource: CartographicBoundaryDataSource,
     private val externalScope: CoroutineScope,
-    imageDataSource: ImageDataSource
+    private val imageDataSource: ImageDataSource
 ): AdministrativeUnitDataSource {
     private var lastAdministrativeUnitHashCode = -1
     private val currentAdministrativeUnitIndexFlow = MutableStateFlow(value = -1)
@@ -83,38 +84,51 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
             },
         cartographicBoundaryDataSource.retrieve()
             .onEach { cartographicBoundary -> createAdministrativeUnitFrom(cartographicBoundary) },
-        currentAdministrativeLevelStateFlow,
-        currentAdministrativeUnitIndexFlow
     )
+
+    override fun retrieve(): Flow<List<AdministrativeUnit>> {
+        return administrativeUnitsFlow.map {
+            administrativeLevels.flatMap { administrativeUnitsFrom(it) }
+        }
+    }
 
     override fun retrieve(
         administrativeLevel: AdministrativeLevel
     ): Flow<List<AdministrativeUnit>> {
         currentAdministrativeLevelStateFlow.update { administrativeLevel }
-        return administrativeUnitsFlow.map { administrativeUnits(administrativeLevel) }
+        return merge(administrativeUnitsFlow, currentAdministrativeLevelStateFlow)
+            .map { administrativeUnitsFrom(administrativeLevel) }
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun retrieveRegions(): Flow<List<Region>> {
-        return administrativeUnitsFlow.flatMapLatest { regionsFlow() }
+    override fun retrieveActiveRegionsWithin(boundingBox: BoundingBox): Flow<List<Region>> {
+        return merge(flowOf(boundingBox), administrativeUnitsFlow).flatMapLatest {
+            activeRegionsFlowWithin(boundingBox)
+        }
     }
 
-    private fun regionsFlow(): Flow<List<Region>> = flow {
-        val administrativeUnits = administrativeLevels.flatMap {
-            administrativeUnits(it)
+    private fun activeRegionsFlowWithin(boundingBox: BoundingBox): Flow<List<Region>> = flow {
+        val administrativeUnitsFromEveryLevel = administrativeLevels.flatMap {
+            administrativeLevel -> administrativeUnitsFrom(administrativeLevel)
         }
-        emit(administrativeUnits.flatMap { it.cartographicBoundary?.regions ?: emptyList() })
+        val activeRegionsWithinBoundingBox = administrativeUnitsFromEveryLevel
+            .flatMap { administrativeUnit ->
+                administrativeUnit.activeCartographicBoundaryRegionsWithin(boundingBox)
+            }
+        emit(activeRegionsWithinBoundingBox)
     }
 
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun retrieveCurrent(): Flow<AdministrativeUnit> {
-        return administrativeUnitsFlow.flatMapLatest { flowOfCurrentAdministrativeUnit() }
+        return merge(
+            currentAdministrativeUnitIndexFlow, administrativeUnitsFlow
+        ).flatMapLatest { flowOfCurrentAdministrativeUnit() }
     }
 
     private fun flowOfCurrentAdministrativeUnit(): Flow<AdministrativeUnit> = flow {
         val currentAdministrativeLevel = currentAdministrativeLevelStateFlow.value
         val currentAdministrativeUnitIndex = currentAdministrativeUnitIndexFlow.value
-        val currentAdministrativeUnit = administrativeUnits(currentAdministrativeLevel)
+        val currentAdministrativeUnit = administrativeUnitsFrom(currentAdministrativeLevel)
             .getOrNull(currentAdministrativeUnitIndex) ?: return@flow
         if (lastAdministrativeUnitHashCode != currentAdministrativeUnit.hashCode()) {
             lastAdministrativeUnitHashCode = currentAdministrativeUnit.hashCode()
@@ -127,7 +141,7 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
         currentAdministrativeUnitIndexFlow.update { index }
     }
 
-    private fun administrativeUnits(
+    private fun administrativeUnitsFrom(
         administrativeLevel: AdministrativeLevel
     ): List<AdministrativeUnit> {
         return (administrativeUnitNamesByAdministrativeLevel[

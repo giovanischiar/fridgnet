@@ -13,6 +13,16 @@ data class AdministrativeUnit(
         return name.split(", ").getOrNull(index = 0) ?: name
     }
 
+    fun activeCartographicBoundaryRegionsWithin(boundingBox: BoundingBox): List<Region> {
+        val cartographicBoundary = cartographicBoundary ?: return emptyList()
+        return cartographicBoundary.regions.filter { region ->
+            val regionBoundingBox = region.boundingBox
+            val isRegionActive = region.active
+            val isRegionWithinBoundingBox = boundingBox.contains(regionBoundingBox)
+            isRegionActive && isRegionWithinBoundingBox
+        }
+    }
+
     fun with(images: List<Image>): AdministrativeUnit {
         return AdministrativeUnit(
             name = name,

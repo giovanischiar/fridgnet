@@ -31,7 +31,9 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.component.PhotoPicker
+import io.schiar.fridgnet.view.screen.administrationunit.AdministrativeUnitScreen
 import io.schiar.fridgnet.view.screen.administrationunits.AdministrativeUnitsScreen
+import io.schiar.fridgnet.view.screen.map.MapScreen
 import io.schiar.fridgnet.view.util.BottomNavScreen
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether
