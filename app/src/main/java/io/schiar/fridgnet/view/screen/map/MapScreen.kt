@@ -9,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.screen.map.component.Map
 import io.schiar.fridgnet.view.screen.map.component.TopAppBarActionButton
@@ -18,7 +19,7 @@ import io.schiar.fridgnet.viewmodel.MapViewModel
 
 @Composable
 fun MapScreen(
-    viewModel: MapViewModel,
+    viewModel: MapViewModel = hiltViewModel(),
     onNavigateRegionsFromCartographicBoundary: () -> Unit,
     info: (screenInfo: ScreenInfo) -> Unit
 ) {

@@ -18,7 +18,8 @@ sealed class BottomNavScreen(
         resourceId = R.string.home_screen,
         icon = Icon(
             selected = Icons.Filled.Home,
-            unselected = Icons.Outlined.Home
+            unselected = Icons.Outlined.Home,
+            contentDescriptionStringID = R.string.home_screen
         )
     )
 
@@ -27,7 +28,8 @@ sealed class BottomNavScreen(
         resourceId = R.string.map_screen,
         icon = Icon(
             selected = Icons.Filled.Place,
-            unselected = Icons.Outlined.Place
+            unselected = Icons.Outlined.Place,
+            contentDescriptionStringID = R.string.map_screen
         )
     )
 }

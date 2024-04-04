@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.component
+package io.schiar.fridgnet.view.screen.app.component
 
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts

@@ -10,6 +10,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
+import androidx.hilt.navigation.compose.hiltViewModel
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.screen.regionsfromcartographicboundary.component.RegionsMapCheckableGrid
 import io.schiar.fridgnet.view.util.ScreenInfo
@@ -17,7 +18,8 @@ import io.schiar.fridgnet.viewmodel.RegionsFromCartographicBoundaryViewModel
 
 @Composable
 fun RegionsFromCartographicBoundaryScreen(
-    viewModel: RegionsFromCartographicBoundaryViewModel, info: (screenInfo: ScreenInfo) -> Unit
+    viewModel: RegionsFromCartographicBoundaryViewModel = hiltViewModel(),
+    info: (screenInfo: ScreenInfo) -> Unit
 ) {
     val cartographicBoundary by viewModel
         .currentCartographicBoundaryFlow

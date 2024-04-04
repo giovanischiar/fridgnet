@@ -7,6 +7,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.maps.android.compose.MapUiSettings
 import io.schiar.fridgnet.view.component.AdministrativeUnitView
 import io.schiar.fridgnet.view.screen.administrationunit.component.PhotoGrid
@@ -15,7 +16,7 @@ import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
 
 @Composable
 fun AdministrativeUnitScreen(
-    viewModel: AdministrativeUnitViewModel,
+    viewModel: AdministrativeUnitViewModel = hiltViewModel(),
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
     val optionalAdministrativeUnit by viewModel.administrativeUnitFlow.collectAsState(
@@ -27,7 +28,9 @@ fun AdministrativeUnitScreen(
     info(ScreenInfo(title = name))
     Column {
         AdministrativeUnitView(
-            modifier = Modifier.fillMaxWidth().weight(weight),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(weight),
             administrativeUnit = administrativeUnit,
             mapUISettings = MapUiSettings(zoomControlsEnabled = false),
             areImagesSizeShowing = false,

@@ -3,34 +3,14 @@ package io.schiar.fridgnet
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.viewModels
 import dagger.hilt.android.AndroidEntryPoint
-import io.schiar.fridgnet.view.screen.AppScreen
-import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
-import io.schiar.fridgnet.viewmodel.AdministrativeUnitsViewModel
-import io.schiar.fridgnet.viewmodel.AppViewModel
-import io.schiar.fridgnet.viewmodel.MapViewModel
-import io.schiar.fridgnet.viewmodel.RegionsFromCartographicBoundaryViewModel
+import io.schiar.fridgnet.view.screen.app.AppScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val appViewModel: AppViewModel by viewModels()
-    private val administrativeUnitsViewModel: AdministrativeUnitsViewModel by viewModels()
-    private val mapViewModel: MapViewModel by viewModels()
-    private val polygonsViewModel: RegionsFromCartographicBoundaryViewModel by viewModels()
-    private val administrativeUnitViewModel: AdministrativeUnitViewModel by viewModels()
-
     override fun onCreate(saveBundleInstance: Bundle?) {
         super.onCreate(saveBundleInstance)
         Log.fromAndroid = true
-        setContent {
-            AppScreen(
-                appViewModel = appViewModel,
-                administrativeUnitsViewModel = administrativeUnitsViewModel,
-                mapViewModel = mapViewModel,
-                polygonsViewModel = polygonsViewModel,
-                administrativeUnitViewModel = administrativeUnitViewModel
-            )
-        }
+        setContent { AppScreen() }
     }
 }
