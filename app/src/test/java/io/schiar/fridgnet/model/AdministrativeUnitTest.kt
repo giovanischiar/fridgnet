@@ -14,7 +14,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = ""
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -27,7 +27,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Sunnyvale"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -40,7 +40,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Santa Clara County"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -53,7 +53,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Sunnyvale, Santa Clara County"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -66,7 +66,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "California"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -79,7 +79,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Sunnyvale, California"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -92,7 +92,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Sunnyvale, Santa Clara County, California"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -105,7 +105,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "United States"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -118,7 +118,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Sunnyvale, United States"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -131,7 +131,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Santa Clara County, United States"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -144,7 +144,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Sunnyvale, Santa Clara County, United States"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -157,7 +157,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "California, United States"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -170,7 +170,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Sunnyvale, California, United States"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -183,7 +183,7 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Santa Clara County, California, United States"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 
     @Test
@@ -196,6 +196,6 @@ class AdministrativeUnitNameTest {
         )
 
         val expected = "Sunnyvale, Santa Clara County, California, United States"
-        Assert.assertEquals(expected, administrativeUnitName.name())
+        Assert.assertEquals(expected, administrativeUnitName.toString())
     }
 }
