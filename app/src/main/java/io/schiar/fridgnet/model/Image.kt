@@ -15,9 +15,7 @@ data class Image(
         if (uri != other.uri) return false
         if (!byteArray.contentEquals(other.byteArray)) return false
         if (date != other.date) return false
-        if (geoLocation != other.geoLocation) return false
-
-        return true
+        return geoLocation == other.geoLocation
     }
 
     override fun hashCode(): Int {
