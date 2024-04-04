@@ -1,8 +1,8 @@
-package io.schiar.fridgnet.view.component
+package io.schiar.fridgnet.view.screen.regionsfromcartographicboundary.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Checkbox
+import androidx.compose.material3.Checkbox
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +20,7 @@ import io.schiar.fridgnet.view.util.toLatLngList
 import io.schiar.fridgnet.view.viewdata.RegionViewData
 
 @Composable
-fun MapPolygon(
+fun RegionMapCheckableView(
     modifier: Modifier,
     region: RegionViewData,
     onRegionCheckedChangeAt: ((region: RegionViewData) -> Unit)? = null

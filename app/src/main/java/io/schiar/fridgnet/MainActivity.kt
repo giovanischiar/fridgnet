@@ -10,14 +10,14 @@ import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
 import io.schiar.fridgnet.viewmodel.AdministrativeUnitsViewModel
 import io.schiar.fridgnet.viewmodel.AppViewModel
 import io.schiar.fridgnet.viewmodel.MapViewModel
-import io.schiar.fridgnet.viewmodel.PolygonsViewModel
+import io.schiar.fridgnet.viewmodel.RegionsFromCartographicBoundaryViewModel
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val appViewModel: AppViewModel by viewModels()
     private val administrativeUnitsViewModel: AdministrativeUnitsViewModel by viewModels()
     private val mapViewModel: MapViewModel by viewModels()
-    private val polygonsViewModel: PolygonsViewModel by viewModels()
+    private val polygonsViewModel: RegionsFromCartographicBoundaryViewModel by viewModels()
     private val administrativeUnitViewModel: AdministrativeUnitViewModel by viewModels()
 
     override fun onCreate(saveBundleInstance: Bundle?) {

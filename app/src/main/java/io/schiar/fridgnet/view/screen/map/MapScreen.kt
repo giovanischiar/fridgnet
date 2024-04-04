@@ -19,7 +19,7 @@ import io.schiar.fridgnet.viewmodel.MapViewModel
 @Composable
 fun MapScreen(
     viewModel: MapViewModel,
-    onNavigatePolygons: () -> Unit,
+    onNavigateRegionsFromCartographicBoundary: () -> Unit,
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
     var zoomCameraToFitImages by remember { mutableStateOf(false) }
@@ -51,7 +51,7 @@ fun MapScreen(
         onMoveFinished = { zoomCameraToFitImages = false },
         regionPressedAt = { index ->
             viewModel.selectRegionAt(index = index)
-            onNavigatePolygons()
+            onNavigateRegionsFromCartographicBoundary()
         },
         onVisibleMapRegionChangeTo = { latLngBounds ->
             val bounds = latLngBounds.toBoundingBoxViewData()

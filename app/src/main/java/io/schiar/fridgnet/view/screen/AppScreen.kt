@@ -34,6 +34,7 @@ import io.schiar.fridgnet.view.component.PhotoPicker
 import io.schiar.fridgnet.view.screen.administrationunit.AdministrativeUnitScreen
 import io.schiar.fridgnet.view.screen.administrationunits.AdministrativeUnitsScreen
 import io.schiar.fridgnet.view.screen.map.MapScreen
+import io.schiar.fridgnet.view.screen.regionsfromcartographicboundary.RegionsFromCartographicBoundaryScreen
 import io.schiar.fridgnet.view.util.BottomNavScreen
 import io.schiar.fridgnet.view.util.ScreenInfo
 import io.schiar.fridgnet.view.util.chooseWhether
@@ -41,7 +42,7 @@ import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
 import io.schiar.fridgnet.viewmodel.AdministrativeUnitsViewModel
 import io.schiar.fridgnet.viewmodel.AppViewModel
 import io.schiar.fridgnet.viewmodel.MapViewModel
-import io.schiar.fridgnet.viewmodel.PolygonsViewModel
+import io.schiar.fridgnet.viewmodel.RegionsFromCartographicBoundaryViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -49,7 +50,7 @@ fun AppScreen(
     appViewModel: AppViewModel,
     administrativeUnitsViewModel: AdministrativeUnitsViewModel,
     mapViewModel: MapViewModel,
-    polygonsViewModel: PolygonsViewModel,
+    polygonsViewModel: RegionsFromCartographicBoundaryViewModel,
     administrativeUnitViewModel: AdministrativeUnitViewModel,
     navController: NavHostController = rememberNavController()
 ) {
@@ -158,7 +159,9 @@ fun AppScreen(
             composable(route = BottomNavScreen.Map.route) {
                 MapScreen(
                     viewModel = mapViewModel,
-                    onNavigatePolygons = { navController.navigate("Polygons") },
+                    onNavigateRegionsFromCartographicBoundary = {
+                        navController.navigate("RegionsFromCartographicBoundary")
+                    },
                     info = { screenInfo -> currentScreenInfo = screenInfo }
                 )
             }
@@ -170,8 +173,8 @@ fun AppScreen(
                 )
             }
 
-            composable(route = "Polygons") {
-                PolygonsScreen(
+            composable(route = "RegionsFromCartographicBoundary") {
+                RegionsFromCartographicBoundaryScreen(
                     viewModel = polygonsViewModel,
                     info = { screenInfo -> currentScreenInfo = screenInfo }
                 )

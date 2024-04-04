@@ -9,4 +9,5 @@
   <string name="states">States</string>
   <string name="countries">Countries</string>
   <string name="remove_all_images">Remove all images</string>
+  <string name="switch_all">Switch all</string>
 </resources>

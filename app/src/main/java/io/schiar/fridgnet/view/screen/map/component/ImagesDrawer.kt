@@ -2,6 +2,7 @@ package io.schiar.fridgnet.view.screen.map.component
 
 import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,14 +30,17 @@ fun ImagesDrawer(images: List<ImageViewData>) {
     images.map { image ->
         val (uri, byteArray, _, geoLocation) = image
         if (!(bitmaps.containsKey(uri) || jobs.containsKey(uri))) {
-            jobs[uri] = coroutineScope.launch(Dispatchers.IO) {
-                val bitmap = withContext(Dispatchers.IO) {
-                    byteArray.toBitmapDescriptor()
+            LaunchedEffect(Unit) {
+                jobs[uri] = coroutineScope.launch(Dispatchers.IO) {
+                    val bitmap = withContext(Dispatchers.IO) {
+                        byteArray.toBitmapDescriptor()
+                    }
+                    bitmaps[uri] = bitmap
+                    jobs.remove(uri)
                 }
-                bitmaps[uri] = bitmap
-                jobs.remove(uri)
             }
         }
+
         Marker(
             state = MarkerState(position = geoLocation.toLatLng()),
             icon = bitmaps[uri],

@@ -16,7 +16,7 @@ data class CartographicBoundary(
         return administrativeUnitName.toString(administrativeLevel = administrativeLevel)
     }
 
-    fun switchAll(): CartographicBoundary {
+    fun allRegionsSwitched(): CartographicBoundary {
         return CartographicBoundary(
             id = id,
             administrativeUnitName = administrativeUnitName,
@@ -32,7 +32,7 @@ data class CartographicBoundary(
         ).updateBoundingBox()
     }
 
-    fun switchRegionAt(index: Int): CartographicBoundary {
+    fun regionSwitchedAt(index: Int): CartographicBoundary {
         return switch(region = regions[index])
     }
 
