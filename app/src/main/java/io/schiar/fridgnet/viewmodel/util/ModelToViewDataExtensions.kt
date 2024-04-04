@@ -1,6 +1,5 @@
 package io.schiar.fridgnet.viewmodel.util
 
-import android.net.Uri
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeUnit
@@ -11,14 +10,14 @@ import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import io.schiar.fridgnet.model.mergeToBoundingBox
-import io.schiar.fridgnet.view.viewdata.AdministrativeLevelViewData
-import io.schiar.fridgnet.view.viewdata.AdministrativeUnitViewData
-import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
-import io.schiar.fridgnet.view.viewdata.CartographicBoundaryViewData
-import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
-import io.schiar.fridgnet.view.viewdata.ImageViewData
-import io.schiar.fridgnet.view.viewdata.PolygonViewData
-import io.schiar.fridgnet.view.viewdata.RegionViewData
+import io.schiar.fridgnet.view.shared.viewdata.AdministrativeLevelViewData
+import io.schiar.fridgnet.view.shared.viewdata.AdministrativeUnitViewData
+import io.schiar.fridgnet.view.shared.viewdata.BoundingBoxViewData
+import io.schiar.fridgnet.view.shared.viewdata.CartographicBoundaryViewData
+import io.schiar.fridgnet.view.shared.viewdata.GeoLocationViewData
+import io.schiar.fridgnet.view.shared.viewdata.ImageViewData
+import io.schiar.fridgnet.view.shared.viewdata.PolygonViewData
+import io.schiar.fridgnet.view.shared.viewdata.RegionViewData
 
 // BoundingBox
 fun BoundingBox.toBoundingBoxViewData(): BoundingBoxViewData {
@@ -41,7 +40,7 @@ fun Image.toViewData(): ImageViewData {
     val (uri, byteArray, date, geoLocation) = this
     val (_, latitude, longitude) = geoLocation
     return ImageViewData(
-        uri = Uri.parse(uri),
+        uri = uri,
         byteArray = byteArray,
         date = date.toString(),
         geoLocation = GeoLocationViewData(

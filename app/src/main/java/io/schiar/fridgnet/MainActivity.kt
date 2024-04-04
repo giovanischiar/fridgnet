@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import dagger.hilt.android.AndroidEntryPoint
-import io.schiar.fridgnet.view.screen.app.AppScreen
+import io.schiar.fridgnet.view.app.AppScreen
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {

@@ -2,8 +2,8 @@ package io.schiar.fridgnet.viewmodel.util
 
 import io.schiar.fridgnet.model.BoundingBox
 import io.schiar.fridgnet.model.GeoLocation
-import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
-import io.schiar.fridgnet.view.viewdata.GeoLocationViewData
+import io.schiar.fridgnet.view.shared.viewdata.BoundingBoxViewData
+import io.schiar.fridgnet.view.shared.viewdata.GeoLocationViewData
 
 //view.viewdata.GeoLocationViewData
 fun GeoLocationViewData.toGeoLocation(): GeoLocation {

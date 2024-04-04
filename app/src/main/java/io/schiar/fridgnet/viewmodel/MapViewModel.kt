@@ -3,7 +3,7 @@ package io.schiar.fridgnet.viewmodel
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.schiar.fridgnet.model.repository.MapRepository
-import io.schiar.fridgnet.view.viewdata.BoundingBoxViewData
+import io.schiar.fridgnet.view.shared.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.viewmodel.util.toBoundingBox
 import io.schiar.fridgnet.viewmodel.util.toBoundingBoxViewData
 import io.schiar.fridgnet.viewmodel.util.toImageViewDataList

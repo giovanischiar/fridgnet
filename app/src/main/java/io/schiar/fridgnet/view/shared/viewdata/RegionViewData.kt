@@ -1,0 +1,10 @@
+package io.schiar.fridgnet.view.shared.viewdata
+
+data class RegionViewData(
+    val polygon: PolygonViewData,
+    val holes: List<PolygonViewData>,
+    val active: Boolean = true,
+    val boundingBox: BoundingBoxViewData,
+    val center: GeoLocationViewData,
+    val zIndex: Float
+)
