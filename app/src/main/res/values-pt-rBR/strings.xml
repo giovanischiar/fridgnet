@@ -11,4 +11,5 @@
   <string name="remove_all_images">Remova todas as imagens</string>
   <string name="switch_all">Desmarcar todos</string>
   <string name="add_image">Adicionar imagem</string>
+  <string name="zoom_to_fit">Ampliar para caber</string>
 </resources>

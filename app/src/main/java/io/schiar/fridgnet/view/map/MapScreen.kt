@@ -12,8 +12,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.app.util.ScreenInfo
-import io.schiar.fridgnet.view.map.component.TopAppBarActionButton
 import io.schiar.fridgnet.view.map.component.Map
+import io.schiar.fridgnet.view.map.component.TopAppBarActionButton
 import io.schiar.fridgnet.view.shared.util.toBoundingBoxViewData
 import io.schiar.fridgnet.viewmodel.MapViewModel
 
@@ -34,7 +34,7 @@ fun MapScreen(
             actions = {
                 TopAppBarActionButton(
                     iconResId = R.drawable.ic_fit_screen,
-                    description = "Zoom to fit",
+                    description = stringResource(R.string.zoom_to_fit),
                     enabled = !zoomCameraToFitImages
                 ) {
                     zoomCameraToFitImages = true
