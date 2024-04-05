@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.app.component
+package io.schiar.fridgnet.view.home.component
 
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable

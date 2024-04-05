@@ -14,13 +14,13 @@ import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.administrationunits.component.AdministrativeLevelDropdown
 import io.schiar.fridgnet.view.administrationunits.component.AdministrativeUnitsGrid
 import io.schiar.fridgnet.view.administrationunits.component.ToolbarMenuItems
-import io.schiar.fridgnet.view.app.util.ScreenInfo
+import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.viewmodel.AdministrativeUnitsViewModel
 
 @Composable
 fun AdministrativeUnitsScreen(
     viewModel: AdministrativeUnitsViewModel = hiltViewModel(),
-    onNavigateImage: () -> Unit,
+    onNavigateToAdministrativeUnit: () -> Unit,
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
     val administrativeLevels by viewModel.administrativeLevelsFlow
@@ -33,7 +33,7 @@ fun AdministrativeUnitsScreen(
 
     info(
         ScreenInfo(
-            title = stringResource(id = R.string.home_screen),
+            title = stringResource(id = R.string.administrative_units_screen),
             actions = {
                 AdministrativeLevelDropdown(
                     administrativeLevels = administrativeLevels,
@@ -59,7 +59,7 @@ fun AdministrativeUnitsScreen(
             columnCount = currentAdministrativeLevel.columnCount,
             onAdministrativeUnitPressedAt = { index ->
                 viewModel.selectCartographicBoundaryGeoLocationAt(index)
-                onNavigateImage()
+                onNavigateToAdministrativeUnit()
             }
         )
     }

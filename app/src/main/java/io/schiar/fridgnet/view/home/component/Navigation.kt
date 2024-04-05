@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.app.component
+package io.schiar.fridgnet.view.home.component
 
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
@@ -9,9 +9,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import io.schiar.fridgnet.view.administrationunit.AdministrativeUnitScreen
 import io.schiar.fridgnet.view.administrationunits.AdministrativeUnitsScreen
-import io.schiar.fridgnet.view.app.util.BottomNavScreen
-import io.schiar.fridgnet.view.app.util.ScreenInfo
-import io.schiar.fridgnet.view.map.MapScreen
+import io.schiar.fridgnet.view.home.util.BottomNavScreen
+import io.schiar.fridgnet.view.home.util.Route
+import io.schiar.fridgnet.view.home.util.ScreenInfo
+import io.schiar.fridgnet.view.regionsandimages.RegionsAndImagesScreen
 import io.schiar.fridgnet.view.regionsfromcartographicboundary.RegionsFromCartographicBoundaryScreen
 
 @Composable
@@ -23,29 +24,31 @@ fun Navigation(
     NavHost(
         modifier = Modifier.padding(innerPadding),
         navController = navController,
-        startDestination = BottomNavScreen.Home.route
+        startDestination = BottomNavScreen.AdministrativeUnits.route.id
     ) {
-        composable(route = BottomNavScreen.Home.route) {
+        composable(route = BottomNavScreen.AdministrativeUnits.route.id) {
             AdministrativeUnitsScreen(
-                onNavigateImage = { navController.navigate("AdministrativeUnit") },
-                info = onChangeScreenInfo
-            )
-        }
-
-        composable(route = BottomNavScreen.Map.route) {
-            MapScreen(
-                onNavigateRegionsFromCartographicBoundary = {
-                    navController.navigate("RegionsFromCartographicBoundary")
+                onNavigateToAdministrativeUnit = {
+                    navController.navigate(route = Route.ADMINISTRATIVE_UNIT.id)
                 },
                 info = onChangeScreenInfo
             )
         }
 
-        composable(route = "AdministrativeUnit") {
+        composable(route = BottomNavScreen.RegionsAndImages.route.id) {
+            RegionsAndImagesScreen(
+                onNavigateToRegionsFromCartographicBoundary = {
+                    navController.navigate(route = Route.REGIONS_FROM_CARTOGRAPHIC_BOUNDARY.id)
+                },
+                info = onChangeScreenInfo
+            )
+        }
+
+        composable(route = Route.ADMINISTRATIVE_UNIT.id) {
             AdministrativeUnitScreen(info = onChangeScreenInfo)
         }
 
-        composable(route = "RegionsFromCartographicBoundary") {
+        composable(route = Route.REGIONS_FROM_CARTOGRAPHIC_BOUNDARY.id) {
             RegionsFromCartographicBoundaryScreen(info = onChangeScreenInfo)
         }
     }

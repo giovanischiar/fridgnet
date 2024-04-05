@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
-class AppRepository @Inject constructor(
+class HomeRepository @Inject constructor(
     private val imageRetriever: ImageRetriever,
     private val imageDataSource: ImageDataSource
 ) {

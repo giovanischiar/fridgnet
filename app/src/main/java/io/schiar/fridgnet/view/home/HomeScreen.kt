@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.app
+package io.schiar.fridgnet.view.home
 
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -9,21 +9,23 @@ import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import io.schiar.fridgnet.view.app.component.BottomBar
-import io.schiar.fridgnet.view.app.component.FloatingActionButton
-import io.schiar.fridgnet.view.app.component.Navigation
-import io.schiar.fridgnet.view.app.component.PhotoPicker
-import io.schiar.fridgnet.view.app.component.TopBar
-import io.schiar.fridgnet.view.app.util.BottomNavScreen
-import io.schiar.fridgnet.view.app.util.ScreenInfo
-import io.schiar.fridgnet.viewmodel.AppViewModel
+import io.schiar.fridgnet.view.home.component.BottomBar
+import io.schiar.fridgnet.view.home.component.FloatingActionButton
+import io.schiar.fridgnet.view.home.component.Navigation
+import io.schiar.fridgnet.view.home.component.PhotoPicker
+import io.schiar.fridgnet.view.home.component.TopBar
+import io.schiar.fridgnet.view.home.util.BottomNavScreen
+import io.schiar.fridgnet.view.home.util.ScreenInfo
+import io.schiar.fridgnet.viewmodel.HomeViewModel
 
 @Composable
-fun AppScreen(
-    appViewModel: AppViewModel = hiltViewModel(),
+fun HomeScreen(
+    viewModel: HomeViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController()
 ) {
-    var currentScreenInfo by remember { mutableStateOf(ScreenInfo(BottomNavScreen.Home.route)) }
+    var currentScreenInfo by remember { mutableStateOf(
+        ScreenInfo(BottomNavScreen.AdministrativeUnits.route.id))
+    }
     var isPhotoPickerShowing by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -40,7 +42,7 @@ fun AppScreen(
 
     if (isPhotoPickerShowing) {
         PhotoPicker { uris ->
-            appViewModel.addURIs(uris = uris)
+            viewModel.addURIs(uris = uris)
             isPhotoPickerShowing = false
         }
     }

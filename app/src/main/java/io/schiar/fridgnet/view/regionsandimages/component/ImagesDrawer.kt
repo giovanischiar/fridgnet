@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.map.component
+package io.schiar.fridgnet.view.regionsandimages.component
 
 import android.net.Uri
 import androidx.compose.runtime.Composable

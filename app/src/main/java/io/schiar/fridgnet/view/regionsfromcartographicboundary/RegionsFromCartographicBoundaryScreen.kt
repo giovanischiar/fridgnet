@@ -12,7 +12,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.schiar.fridgnet.R
-import io.schiar.fridgnet.view.app.util.ScreenInfo
+import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.view.regionsfromcartographicboundary.component.RegionsMapCheckableGrid
 import io.schiar.fridgnet.viewmodel.RegionsFromCartographicBoundaryViewModel
 

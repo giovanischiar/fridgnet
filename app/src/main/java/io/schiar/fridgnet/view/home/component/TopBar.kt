@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.app.component
+package io.schiar.fridgnet.view.home.component
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -12,7 +12,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.colorResource
 import androidx.navigation.NavHostController
 import io.schiar.fridgnet.R
-import io.schiar.fridgnet.view.app.util.ScreenInfo
+import io.schiar.fridgnet.view.home.util.ScreenInfo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

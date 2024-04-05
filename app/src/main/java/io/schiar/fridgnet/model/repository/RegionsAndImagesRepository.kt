@@ -18,7 +18,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-class MapRepository @Inject constructor(
+class RegionsAndImagesRepository @Inject constructor(
     private val administrativeUnitDataSource: AdministrativeUnitDataSource,
     imageDataSource: ImageDataSource,
     private val currentRegionDataSource: CurrentRegionDataSource

@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.map.component
+package io.schiar.fridgnet.view.regionsandimages.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize

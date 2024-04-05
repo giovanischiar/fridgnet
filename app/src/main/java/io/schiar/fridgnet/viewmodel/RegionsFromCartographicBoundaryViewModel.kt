@@ -11,15 +11,17 @@ import javax.inject.Inject
 
 @HiltViewModel
 class RegionsFromCartographicBoundaryViewModel @Inject constructor(
-    private val polygonsRepository: RegionsFromCartographicBoundaryRepository
+    private val regionsFromCartographicBoundaryRepository: RegionsFromCartographicBoundaryRepository
 ) : ViewModel() {
-    val currentCartographicBoundaryFlow = polygonsRepository
+    val currentCartographicBoundaryFlow = regionsFromCartographicBoundaryRepository
         .currentCartographicBoundaryFlow
         .map { it.toCartographicBoundaryViewData() }
 
     fun switchRegionAt(index: Int) = viewModelScope.launch {
-        polygonsRepository.switchRegionAt(index = index)
+        regionsFromCartographicBoundaryRepository.switchRegionAt(index = index)
     }
 
-    fun switchAll() = viewModelScope.launch { polygonsRepository.switchAll() }
+    fun switchAll() = viewModelScope.launch {
+        regionsFromCartographicBoundaryRepository.switchAll()
+    }
 }

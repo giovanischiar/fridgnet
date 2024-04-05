@@ -1,7 +1,7 @@
 <resources>
   <string name="app_name" translatable="false">Fridgnet</string>
-  <string name="home_screen">Home</string>
-  <string name="map_screen">Map</string>
+  <string name="administrative_units_screen">Home</string>
+  <string name="regions_and_images_screen">Map</string>
   <string name="polygons_screen">Polygons</string>
   <string name="photos_screen">Photos</string>
   <string name="cities">Cities</string>

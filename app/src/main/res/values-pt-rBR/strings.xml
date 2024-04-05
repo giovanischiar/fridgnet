@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-  <string name="home_screen">Início</string>
-  <string name="map_screen">Mapa</string>
+  <string name="administrative_units_screen">Início</string>
+  <string name="regions_and_images_screen">Mapa</string>
   <string name="polygons_screen">Polígonos</string>
   <string name="photos_screen">Fotos</string>
   <string name="cities">Cidades</string>

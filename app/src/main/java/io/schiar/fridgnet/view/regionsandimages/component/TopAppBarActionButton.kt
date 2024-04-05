@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.map.component
+package io.schiar.fridgnet.view.regionsandimages.component
 
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton

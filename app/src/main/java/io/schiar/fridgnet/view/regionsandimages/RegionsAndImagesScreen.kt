@@ -1,4 +1,4 @@
-package io.schiar.fridgnet.view.map
+package io.schiar.fridgnet.view.regionsandimages
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -11,16 +11,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import io.schiar.fridgnet.R
-import io.schiar.fridgnet.view.app.util.ScreenInfo
-import io.schiar.fridgnet.view.map.component.Map
-import io.schiar.fridgnet.view.map.component.TopAppBarActionButton
+import io.schiar.fridgnet.view.home.util.ScreenInfo
+import io.schiar.fridgnet.view.regionsandimages.component.Map
+import io.schiar.fridgnet.view.regionsandimages.component.TopAppBarActionButton
 import io.schiar.fridgnet.view.shared.util.toBoundingBoxViewData
-import io.schiar.fridgnet.viewmodel.MapViewModel
+import io.schiar.fridgnet.viewmodel.RegionsAndImagesViewModel
 
 @Composable
-fun MapScreen(
-    viewModel: MapViewModel = hiltViewModel(),
-    onNavigateRegionsFromCartographicBoundary: () -> Unit,
+fun RegionsAndImagesScreen(
+    viewModel: RegionsAndImagesViewModel = hiltViewModel(),
+    onNavigateToRegionsFromCartographicBoundary: () -> Unit,
     info: (screenInfo: ScreenInfo) -> Unit
 ) {
     var zoomCameraToFitImages by remember { mutableStateOf(false) }
@@ -30,7 +30,7 @@ fun MapScreen(
 
     info(
         ScreenInfo(
-            title = stringResource(id = R.string.map_screen),
+            title = stringResource(id = R.string.regions_and_images_screen),
             actions = {
                 TopAppBarActionButton(
                     iconResId = R.drawable.ic_fit_screen,
@@ -52,7 +52,7 @@ fun MapScreen(
         onMoveFinished = { zoomCameraToFitImages = false },
         regionPressedAt = { index ->
             viewModel.selectRegionAt(index = index)
-            onNavigateRegionsFromCartographicBoundary()
+            onNavigateToRegionsFromCartographicBoundary()
         },
         onVisibleMapRegionChangeTo = { latLngBounds ->
             val bounds = latLngBounds.toBoundingBoxViewData()
