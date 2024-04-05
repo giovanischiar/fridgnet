@@ -1,8 +1,8 @@
 package io.schiar.fridgnet.view.home.component
 
-import androidx.compose.material.BottomNavigation
-import androidx.compose.material.BottomNavigationItem
 import androidx.compose.material3.Icon
+import androidx.compose.material3.NavigationBar
+import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,7 +22,7 @@ fun BottomBar(navController: NavHostController) {
     val bottomNavScreens = remember {
         listOf(BottomNavScreen.AdministrativeUnits, BottomNavScreen.RegionsAndImages)
     }
-    BottomNavigation(backgroundColor = colorResource(id = R.color.indigo_dye_500)) {
+    NavigationBar(containerColor = colorResource(id = R.color.indigo_dye_500)) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
         bottomNavScreens.forEach { bottomNavScreen ->
@@ -30,7 +30,7 @@ fun BottomBar(navController: NavHostController) {
                 it.route == bottomNavScreen.route.id
             } == true
 
-            BottomNavigationItem(
+            NavigationBarItem(
                 icon = {
                     bottomNavScreen.icon?.chooseWhether(isSelected = selected)?.let { imageVector ->
                         Icon(
