@@ -10,6 +10,7 @@
 
 ## Contents
 
+- [Documentation](#documentation)
 - [Use Cases](#use-cases)
   - [Add Photos](#add-photos)
     - [Add Photos Flow](#add-photos-flow)
@@ -38,6 +39,9 @@
   - [Package `model.repository` and `model.datasource`](package-modelrepository-with-modeldatasource`)
 - [Future Tasks](#future-tasks)
 
+## Documentation
+
+The documentation for the whole project (public artifacts 100% documented) is available [here](https://giovanischiar.github.io/fridgnet-documentation/)
 
 ## Use Cases
 
