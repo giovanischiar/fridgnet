@@ -11,6 +11,11 @@ import io.schiar.fridgnet.library.room.entity.ImageEntity
 import io.schiar.fridgnet.library.room.entity.PolygonEntity
 import io.schiar.fridgnet.library.room.entity.RegionEntity
 
+/**
+ * This abstract class represents a Room database for the Fridgnet application.
+ * It provides access to various DAOs (Data Access Objects) for interacting with
+ * different database entities.
+ */
 @Database(
     entities = [
         ImageEntity::class,
@@ -24,14 +29,39 @@ import io.schiar.fridgnet.library.room.entity.RegionEntity
     exportSchema = false
 )
 abstract class FridgnetDatabase : RoomDatabase() {
+    /**
+     * @return the DAO (Data Access Object) for images, providing methods for CRUD operations
+     * and other interactions with [ImageEntity] objects in the database.
+     */
     abstract fun imageDAO(): ImageDAO
+
+    /**
+     * @return the DAO (Data Access Object) for administrative unit names, providing methods for
+     * CRUD operations and other interactions with [AdministrativeUnitNameEntity] objects in the
+     * database.
+     */
     abstract fun administrativeUnitNameDAO(): AdministrativeUnitNameDAO
+
+    /**
+     * @return the DAO (Data Access Object) for cartographic boundaries, providing methods for
+     * CRUD operations and other interactions with [CartographicBoundaryEntity] objects in the
+     * database.
+     */
     abstract fun cartographicBoundaryDAO(): CartographicBoundaryDAO
 
+    /**
+     * The object that holds the instance to the database.
+     */
     companion object {
         @Volatile
         private var Instance: FridgnetDatabase? = null
 
+        /**
+         * Provides a thread-safe way to obtain the singleton instance of [FridgnetDatabase].
+         *
+         * @param context the context provided by the Android System.
+         * @return the [FridgnetDatabase] instance.
+         */
         fun getDatabase(context: Context): FridgnetDatabase {
             return Instance ?: synchronized(this) {
                 Room.databaseBuilder(

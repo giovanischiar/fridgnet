@@ -4,29 +4,43 @@ import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
 
+/**
+ * The bounding box is the delimited area of something, it could be the map the user is seeing or
+ * the square area of a region of a cartographic boundary.
+ *
+ * @property southwest the geo location of the most southern point.
+ * @property northeast the geo location of the most northern point.
+ */
 data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
+
+    /**
+     * @return true if the there is the antimeridian (-180) inside the boundingbox, false otherwise
+     */
     fun containsAntimeridian(): Boolean {
         return abs(northeast.longitude - southwest.longitude) > 180.0
     }
 
-    fun containsLatitude(latitude: Double): Boolean {
+    private fun containsLatitude(latitude: Double): Boolean {
         return latitude >= southwest.latitude && latitude <= northeast.latitude
     }
 
+    /**
+     * @return true if the bounding box contains geoLocation, false otherwise.
+     */
     fun contains(geoLocation: GeoLocation): Boolean {
         return containsLatitude(latitude = geoLocation.latitude) &&
                 containsLongitude(longitude = geoLocation.longitude)
     }
 
-    fun southOfLatitude(latitude: Double): Boolean {
+    private fun southOfLatitude(latitude: Double): Boolean {
         return latitude <= southwest.latitude
     }
 
-    fun northOfLatitude(latitude: Double): Boolean {
+    private fun northOfLatitude(latitude: Double): Boolean {
         return latitude >= northeast.latitude
     }
 
-    fun containsLongitude(longitude: Double): Boolean {
+    private fun containsLongitude(longitude: Double): Boolean {
         return if (!containsAntimeridian()) {
             longitude >= southwest.longitude && longitude <= northeast.longitude
         } else {
@@ -35,7 +49,7 @@ data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
         }
     }
 
-    fun centerLongitude(): Double {
+    private fun centerLongitude(): Double {
         return if (!containsAntimeridian()) {
             (northeast.longitude + southwest.longitude) / 2.0
         } else {
@@ -52,6 +66,9 @@ data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
         }
     }
 
+    /**
+     * @return the center geo location of the bounding box.
+     */
     fun center(): GeoLocation {
         return GeoLocation(
             latitude = (northeast.latitude + southwest.latitude) / 2.0,
@@ -59,12 +76,12 @@ data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
         )
     }
 
-    fun centerAntipode(): Double {
+    private fun centerAntipode(): Double {
         val centerLongitude = centerLongitude()
         return centerLongitude + if (centerLongitude < 0) 180.0 else -180.0
     }
 
-    fun westOfLongitude(longitude: Double): Boolean {
+    private fun westOfLongitude(longitude: Double): Boolean {
         val centerAntipode = centerAntipode()
 
         return if (!containsAntimeridian()) {
@@ -79,7 +96,7 @@ data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
         }
     }
 
-    fun eastOfLongitude(longitude: Double): Boolean {
+    private fun eastOfLongitude(longitude: Double): Boolean {
         val centerAntipode = centerAntipode()
 
         return if (!containsAntimeridian()) {
@@ -94,6 +111,9 @@ data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
         }
     }
 
+    /**
+     * @return the bounding box that represents the sum of two bounding boxes.
+     */
     operator fun plus(other: BoundingBox): BoundingBox {
         return BoundingBox(
             southwest = GeoLocation(
@@ -108,10 +128,20 @@ data class BoundingBox(val southwest: GeoLocation, val northeast: GeoLocation) {
         )
     }
 
+    /**
+     * @return the bounding box that represents the sum of a bounding box and a geo location.
+     */
     operator fun plus(other: GeoLocation): BoundingBox {
         return plus(other = BoundingBox(southwest = other, northeast = other))
     }
 
+    /**
+     * Verifies if there is any intersection between two bounding boxes. The method also considers
+     * whether both of the bounding boxes cross the antimeridian.
+     *
+     * @param other the bounding box used.
+     * @return      true if the bounding box intersects somehow with the other bounding box, false otherwise.
+     */
     fun contains(other: BoundingBox): Boolean {
         val southwestOrNortheastInside = contains(other.northeast) || contains(other.southwest)
 

@@ -17,11 +17,24 @@ import io.schiar.fridgnet.view.administrationunits.component.ToolbarMenuItems
 import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.viewmodel.AdministrativeUnitsViewModel
 
+/**
+ * The component that represents the Administrative Units Screen. It displays a grid of Google Maps
+ * components, each representing an administrative unit. The map displays the unit's geographic
+ * boundary (if available) and the number of images in the upper right corner.
+ *
+ * @param viewModel the corresponding viewModel that provide access of all necessary data to populate
+ * the screen and methods to manipulate it.
+ * @param onNavigateToAdministrativeUnit when the user selects a Google Maps Component (the
+ * administrative unit) this method is called to redirect the user to the Administrative Unit Unit
+ * screen.
+ * @param onSetToolbarInfo a function to set information for the parent composable's toolbar,
+ * such as title, actions menu, and potentially other elements.
+ */
 @Composable
 fun AdministrativeUnitsScreen(
     viewModel: AdministrativeUnitsViewModel = hiltViewModel(),
     onNavigateToAdministrativeUnit: () -> Unit,
-    info: (screenInfo: ScreenInfo) -> Unit
+    onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
 ) {
     val administrativeLevels by viewModel.administrativeLevelsFlow
         .collectAsState(initial = emptyList())
@@ -31,7 +44,7 @@ fun AdministrativeUnitsScreen(
         .collectAsState(initial = emptyList())
     val currentAdministrativeLevel = optionalCurrentAdministrativeLevel ?: return
 
-    info(
+    onSetToolbarInfo(
         ScreenInfo(
             title = stringResource(id = R.string.administrative_units_screen),
             actions = {

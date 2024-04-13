@@ -8,16 +8,22 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.vectorResource
 import io.schiar.fridgnet.R
 
+/**
+ * Component responsible to display a button as icon.
+ *
+ * @param iconResId the icon id from resources.
+ * @param description the description of the icon action for accessibility.
+ * @param enabled whether the icon is enable.
+ * @param onPressed fired then whe button was pressed.
+ */
 @Composable
 fun TopAppBarActionButton(
     iconResId: Int,
     description: String,
     enabled: Boolean = true,
-    onClick: () -> Unit,
+    onPressed: () -> Unit,
 ) {
-    IconButton(onClick = {
-        onClick()
-    }, enabled = enabled) {
+    IconButton(onClick = onPressed, enabled = enabled) {
         val imageVector = ImageVector.vectorResource(id = iconResId)
 
         Icon(

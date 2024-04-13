@@ -13,21 +13,31 @@ import io.schiar.fridgnet.model.Image
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 
-fun List<AdministrativeUnitNameWithCartographicBoundaries>
-        .toAdministrativeUnitNameWithCartographicBoundariesList()
-            : List<Pair<AdministrativeUnitName, List<CartographicBoundary>>> {
-    return map { it.toAdministrativeUnitNameAndCartographicBoundaries() }
-}
-
-fun List<ImageWithAdministrativeUnitNameAndGeoLocation>
-        .toImageAndAdministrativeUnitNameList(): List<Pair<Image, AdministrativeUnitName?>>{
-    return map { it.toImageAndAdministrativeUnitName() }
-}
-
+/**
+ * Converts a [List] of [ImageWithAdministrativeUnitNameAndGeoLocation] objects to a list of [Image]
+ * objects.
+ *
+ * This method extracts the core [Image] data from each
+ * [ImageWithAdministrativeUnitNameAndGeoLocation] object using the toImage() method.
+ *
+ * @return a new [List] containing the converted [Image] objects.
+ */
 fun List<ImageWithAdministrativeUnitNameAndGeoLocation>.toImages(): List<Image>{
     return map { it.toImage() }
 }
 
+/**
+ * Converts a [AdministrativeUnitNameWithCartographicBoundaries] object into a pair containing
+ * the corresponding [AdministrativeUnitName] and a list of its associated [CartographicBoundary]
+ * objects.
+ *
+ * This function unpacks the data from a single [AdministrativeUnitNameWithCartographicBoundaries]
+ * object into a more convenient structure for separate access to the administrative unit name
+ * and its cartographic boundaries.
+ *
+ * @return A [Pair] containing the extracted [AdministrativeUnitName] and a [List] of
+ * [CartographicBoundary]` objects.
+ */
 fun AdministrativeUnitNameWithCartographicBoundaries
         .toAdministrativeUnitNameAndCartographicBoundaries()
             : Pair<AdministrativeUnitName, List<CartographicBoundary>> {
@@ -37,6 +47,14 @@ fun AdministrativeUnitNameWithCartographicBoundaries
     )
 }
 
+/**
+ * Converts [ImageWithAdministrativeUnitNameAndGeoLocation] object to an [Image] object.
+ *
+ * This method extracts the core [Image] data from each
+ * [ImageWithAdministrativeUnitNameAndGeoLocation]
+ *
+ * @return The converted [Image] object.
+ */
 fun ImageWithAdministrativeUnitNameAndGeoLocation.toImage(): Image {
     return Image(
         uri = imageEntity.uri,
@@ -46,6 +64,12 @@ fun ImageWithAdministrativeUnitNameAndGeoLocation.toImage(): Image {
     )
 }
 
+/**
+ * Converts a [ImageWithAdministrativeUnitNameAndGeoLocation] into a pair of Image and a
+ * AdministrativeUnitName if existent.
+ *
+ * @return the Pair containing the [Image] and the optional [AdministrativeUnitName]
+ */
 fun ImageWithAdministrativeUnitNameAndGeoLocation
     .toImageAndAdministrativeUnitName(): Pair<Image, AdministrativeUnitName?> {
     return Pair(
@@ -55,19 +79,32 @@ fun ImageWithAdministrativeUnitNameAndGeoLocation
             date = imageEntity.date,
             geoLocation = geoLocationWithAdministrativeUnitName.geoLocationEntity.toGeoLocation()
         ),
-        second = geoLocationWithAdministrativeUnitName.administrativeUnitNameEntity?.toAdministrativeUnitName()
+        second = geoLocationWithAdministrativeUnitName.administrativeUnitNameEntity
+            ?.toAdministrativeUnitName()
     )
 }
 
+/**
+ * Converts a list of CartographicBoundaryWithRegions objects to a list of CartographicBoundary
+ * objects.
+ *
+ * This method extracts the core CartographicBoundary data from each CartographicBoundaryWithRegions
+ * object using the toCartographicBoundary() method.
+ *
+ * @return a new List containing the converted CartographicBoundary objects.
+ */
 fun List<CartographicBoundaryWithRegions>.toCartographicBoundaries(): List<CartographicBoundary> {
     return map { it.toCartographicBoundary() }
 }
 
-
-fun List<CartographicBoundaryWithRegions>.toLocations(): List<CartographicBoundary> {
-    return map { it.toCartographicBoundary() }
-}
-
+/**
+ * Converts [CartographicBoundaryWithRegions] object to a [CartographicBoundary] object.
+ *
+ * This method extracts the core [CartographicBoundary] data from each
+ * [CartographicBoundaryWithRegions] object
+ *
+ * @return The converted CartographicBoundary object.
+ */
 fun CartographicBoundaryWithRegions.toCartographicBoundary(): CartographicBoundary {
     return CartographicBoundary(
         id = cartographicBoundaryEntity.id,
@@ -84,14 +121,20 @@ fun CartographicBoundaryWithRegions.toCartographicBoundary(): CartographicBounda
     )
 }
 
+/**
+ * Converts a [PolygonWithGeoLocations] object into a [Polygon] object
+ *
+ * @return the [Polygon] converted
+ */
 fun PolygonWithGeoLocations.toPolygon(): Polygon {
     return Polygon(id = polygon.id, geoLocations = getLocationEntities.map { it.toGeoLocation() })
 }
 
-fun List<RegionWithPolygonAndHoles>.toRegions(): List<Region> {
-    return map { it.toRegion() }
-}
-
+/**
+ * Converts a [RegionWithPolygonAndHoles] object into a [Region] object
+ *
+ * @return the [Region] converted
+ */
 fun RegionWithPolygonAndHoles.toRegion(): Region {
     return Region(
         id = regionEntity.id,

@@ -7,10 +7,17 @@ import io.schiar.fridgnet.viewmodel.util.toAdministrativeUnitViewData
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+/**
+ * The AdministrativeUnitViewModel is the point of connection between the Administrative Unit
+ * screen and its Repository
+ */
 @HiltViewModel
 class AdministrativeUnitViewModel @Inject constructor(
     administrativeUnitRepository: AdministrativeUnitRepository
 ) : ViewModel() {
+    /**
+     * The stream (Flow) of Administrative Unit converted into UI object
+     */
     val administrativeUnitFlow = administrativeUnitRepository.administrativeUnitFlow.map {
         administrativeUnit -> administrativeUnit.toAdministrativeUnitViewData()
     }

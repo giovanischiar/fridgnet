@@ -9,7 +9,7 @@ class GeoLocationTest {
         val geoLocation = GeoLocation(latitude = 0.0, longitude = -90.000001)
         val other = 90.0
 
-        Assert.assertTrue(geoLocation.wasAntimeridianCrossed(other = other))
+        Assert.assertTrue(geoLocation.wasAntimeridianCrossed(otherLongitude = other))
     }
 
     @Test
@@ -17,6 +17,6 @@ class GeoLocationTest {
         val geoLocation = GeoLocation(latitude = 0, longitude = 90)
         val other = 90.0
 
-        Assert.assertFalse(geoLocation.wasAntimeridianCrossed(other = other))
+        Assert.assertFalse(geoLocation.wasAntimeridianCrossed(otherLongitude = other))
     }
 }

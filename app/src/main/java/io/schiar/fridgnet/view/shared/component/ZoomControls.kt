@@ -23,6 +23,16 @@ import io.schiar.fridgnet.view.shared.viewdata.BoundingBoxViewData
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
+/**
+ * A column of Floting Action Buttons used for zoom controls in the map.
+ *
+ * @param modifier the modifier used for the internal [Column].
+ * @param cameraPositionState the object provided by GoogleMaps to manipulate the camera state of
+ * the map to perform zoom actions.
+ * @param boundingBox the bounding Box of the regions used for zoom to the fit action.
+ * @param imagesBoundingBox the bounding Box of the images used for zoom to the fit action.
+ * @param enabled: Boolean if the buttons are enabled or not.
+ */
 @Composable
 fun ZoomControls(
     modifier: Modifier = Modifier,

@@ -14,6 +14,13 @@ import androidx.navigation.NavHostController
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.home.util.ScreenInfo
 
+/**
+ * The component for the application toolbar.
+ *
+ * @param navController the object used to check if the Back arrow should be displayed.
+ * @param screenInfo the data for the toolbar, including title, a list of composable actions
+ * (@Composable functions), and potentially other elements.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TopBar(navController: NavHostController, screenInfo: ScreenInfo) {

@@ -8,6 +8,13 @@ import io.schiar.fridgnet.view.shared.util.debug.showBoundingBoxPolygon
 import io.schiar.fridgnet.view.shared.util.toLatLngList
 import io.schiar.fridgnet.view.shared.viewdata.RegionViewData
 
+/**
+ * The component used to draw the Region inside a Google Maps Component. It creates
+ * a Polygon component. It can also, for debug purposes, draw the region's bounding box around it.
+ *
+ * @param region the data from Region.
+ * @param onPressed fired when the region is pressed.
+ */
 @Composable
 fun RegionDrawer(region: RegionViewData, onPressed: () -> Unit = {}) {
     Polygon(

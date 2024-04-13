@@ -1,10 +1,5 @@
 package io.schiar.fridgnet.library.room
 
-import io.schiar.fridgnet.model.AdministrativeLevel
-import io.schiar.fridgnet.model.AdministrativeLevel.CITY
-import io.schiar.fridgnet.model.AdministrativeLevel.COUNTRY
-import io.schiar.fridgnet.model.AdministrativeLevel.COUNTY
-import io.schiar.fridgnet.model.AdministrativeLevel.STATE
 import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
@@ -13,38 +8,28 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
+/**
+ * Implementation of [AdministrativeUnitNameDataSource] that utilizes Room Database for CRUD
+ * (Create, Read, Update, Delete) operations on [AdministrativeUnitName] data. This class also
+ * handles the association with [GeoLocation] and retrieves [CartographicBoundary] data for existing
+ * [AdministrativeUnitName]s.
+ *
+ * It leverages dependency injection to receive an instance of [AdministrativeUnitNameDAO]
+ * for interacting with the database layer.
+ */
 class AdministrativeUnitNameRoomDataSource @Inject constructor(
     private val administrativeUnitNameDAO: AdministrativeUnitNameDAO
 ) : AdministrativeUnitNameDataSource {
     private val administrativeUnitNameIDS = mutableSetOf<Long>()
 
-    override fun retrieveGeoLocations(
-        administrativeUnitName: AdministrativeUnitName, administrativeLevel: AdministrativeLevel
-    ): Flow<List<GeoLocation>> {
-        val (_, locality, subAdminArea, adminArea, countryName) = administrativeUnitName
-        return when(administrativeLevel) {
-            CITY -> administrativeUnitNameDAO.selectGeoLocations(
-                locality = locality,
-                subAdminArea = subAdminArea,
-                adminArea = adminArea,
-                countryName = countryName
-            )
-            COUNTY -> administrativeUnitNameDAO.selectGeoLocations(
-                subAdminArea = subAdminArea, adminArea = adminArea, countryName = countryName
-            )
-            STATE -> {
-                administrativeUnitNameDAO.selectGeoLocations(
-                    adminArea = adminArea,
-                    countryName = countryName
-                )
-            }
-            COUNTRY -> administrativeUnitNameDAO.selectGeoLocations(countryName = countryName)
-        }.map { it.toGeoLocations() }
-    }
-
+    /**
+     * Create a [AdministrativeUnitName] with its associated [GeoLocation]
+     *
+     * @param geoLocation the [GeoLocation] used to associate
+     * @param administrativeUnitName the [AdministrativeUnitName] used to create (or update)
+     */
     override suspend fun create(
         geoLocation: GeoLocation, administrativeUnitName: AdministrativeUnitName
     ) {
@@ -54,8 +39,18 @@ class AdministrativeUnitNameRoomDataSource @Inject constructor(
         )
     }
 
+    /**
+     * Retrieves a Flow of [Pair]<[AdministrativeUnitName], [List]<[CartographicBoundary]>>.
+     *
+     * This method retrieves [AdministrativeUnitName] data along with any existing associated
+     * [CartographicBoundary] entities. It utilizes [Flow] to emit data asynchronously.
+     *
+     * To avoid emitting duplicate [AdministrativeUnitName] entries, it maintains a set of
+     * IDs (administrativeUnitNameIDS). Only new (unseen) entries are emitted.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
-    override fun retrieveAdministrativeUnitNameWithExistentCartographicBoundaries(): Flow<Pair<AdministrativeUnitName, List<CartographicBoundary>>> {
+    override fun retrieveAdministrativeUnitNameWithExistentCartographicBoundaries()
+        : Flow<Pair<AdministrativeUnitName, List<CartographicBoundary>>> {
         return administrativeUnitNameDAO.selectAdministrativeUnitNameWithCartographicBoundaries()
             .flatMapLatest { administrativeUnitNameWithCartographicBoundariesList ->
                 flow {

@@ -17,18 +17,28 @@ import io.schiar.fridgnet.view.regionsandimages.component.TopAppBarActionButton
 import io.schiar.fridgnet.view.shared.util.toBoundingBoxViewData
 import io.schiar.fridgnet.viewmodel.RegionsAndImagesViewModel
 
+/**
+ * The component representing the Regions and Images Screen. It displays a map with plotted images
+ * and regions, and allows zooming functionality.
+ *
+ * @param viewModel the corresponding viewModel that provides access to data and methods for
+ * manipulating the screen.
+ * @param onNavigateToRegionsFromCartographicBoundary the event fired to navigate to the Regions
+ * From Cartographic Boundary screen.
+ * @param onSetToolbarInfo a function to set information for the parent composable's toolbar.
+ */
 @Composable
 fun RegionsAndImagesScreen(
     viewModel: RegionsAndImagesViewModel = hiltViewModel(),
     onNavigateToRegionsFromCartographicBoundary: () -> Unit,
-    info: (screenInfo: ScreenInfo) -> Unit
+    onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
 ) {
     var zoomCameraToFitImages by remember { mutableStateOf(false) }
     val visibleImages by viewModel.visibleImagesFlow.collectAsState(initial = emptyList())
     val visibleRegions by viewModel.visibleRegionsFlow.collectAsState(initial = emptyList())
     val boundingBoxImages by viewModel.boundingBoxImagesFlow.collectAsState(initial = null)
 
-    info(
+    onSetToolbarInfo(
         ScreenInfo(
             title = stringResource(id = R.string.regions_and_images_screen),
             actions = {
@@ -54,7 +64,7 @@ fun RegionsAndImagesScreen(
             viewModel.selectRegionAt(index = index)
             onNavigateToRegionsFromCartographicBoundary()
         },
-        onVisibleMapRegionChangeTo = { latLngBounds ->
+        onVisibleMapAreaChangeTo = { latLngBounds ->
             val bounds = latLngBounds.toBoundingBoxViewData()
             viewModel.visibleAreaChanged(boundingBoxViewData = bounds)
         }

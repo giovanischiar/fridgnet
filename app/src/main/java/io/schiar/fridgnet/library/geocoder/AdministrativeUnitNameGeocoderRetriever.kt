@@ -12,10 +12,37 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
+/**
+ *  An implementation of the [AdministrativeUnitNameRetriever] interface that utilizes the provided
+ *  [Geocoder] API to retrieve administrative unit information (e.g., city, state, country)
+ *  based on geographical coordinates. This class operates asynchronously and emits successfully
+ *  retrieved information through a returned [Flow] of [AdministrativeUnitName] objects.
+ *
+ *  **Retry Mechanism:** In case of geocoding failures, this class implements a retry mechanism
+ *  with a maximum of 3 attempts. This helps mitigate potential transient issues with the geocoding
+ *  service.
+ *
+ *  **Assumptions:** This class assumes the provided `GeoLocation` object has valid latitude and
+ *  longitude coordinates.
+ */
 class AdministrativeUnitNameGeocoderRetriever @Inject constructor(
     private val geocoder: Geocoder
 ) : AdministrativeUnitNameRetriever {
 
+    /**
+     * Retrieves administrative unit information (e.g., city, state, country) for a given
+     * geographical location using the provided [Geocoder] API. This class operates asynchronously
+     * and emits successfully retrieved [AdministrativeUnitName] objects through the returned [Flow]
+     * of [AdministrativeUnitName].
+     *
+     * In case of geocoding failures, the class implements a retry mechanism with a maximum of 3
+     * attempts.
+     *
+     * @param geoLocation the geographical location (latitude and longitude) for which to retrieve
+     * administrative unit information.
+     * @return a [Flow] that emits successfully retrieved [AdministrativeUnitName] objects for the
+     * provided location.
+     */
     override fun retrieve(geoLocation: GeoLocation): Flow<AdministrativeUnitName> = flow {
         val (_, latitude, longitude) = geoLocation
         val address = withContext(Dispatchers.IO) {

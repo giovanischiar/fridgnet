@@ -17,6 +17,14 @@ import androidx.compose.ui.platform.LocalContext
 import io.schiar.fridgnet.view.shared.util.getResourceString
 import io.schiar.fridgnet.view.shared.viewdata.AdministrativeLevelViewData
 
+/**
+ * The administrative levels dropdown used in the toolbar on Administrative Unit Screen.
+ *
+ * @param administrativeLevels the [List] of administrative levels used in the dropdown.
+ * @param currentAdministrativeLevel the current administrative level displayed.
+ * @param onDropdown the event fired when another option is selected in the dropdown. The index of
+ * the selected option is sent via parameter.
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AdministrativeLevelDropdown(
@@ -24,7 +32,6 @@ fun AdministrativeLevelDropdown(
     currentAdministrativeLevel: AdministrativeLevelViewData,
     onDropdown: (index: Int) -> Unit
 ) {
-
     val context = LocalContext.current
     var expanded by remember { mutableStateOf(false) }
 

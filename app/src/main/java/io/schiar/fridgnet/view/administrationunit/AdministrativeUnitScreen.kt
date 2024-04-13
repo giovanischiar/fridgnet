@@ -14,10 +14,20 @@ import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.view.shared.component.AdministrativeUnitView
 import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
 
+/**
+ * The composable representing the Administrative Unit Screen. It displays a Google Map component
+ * with all images pinned to their locations, along with a grid of all images ordered by date below
+ * the map.
+ *
+ * @param viewModel the corresponding AdministrativeUnitViewModel providing access to data for
+ * populating the screen and methods to interact with it.
+ * @param onSetToolbarInfo a function to set information for the parent composable's toolbar,
+ * such as title and components.
+ */
 @Composable
 fun AdministrativeUnitScreen(
     viewModel: AdministrativeUnitViewModel = hiltViewModel(),
-    info: (screenInfo: ScreenInfo) -> Unit
+    onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
 ) {
     val optionalAdministrativeUnit by viewModel.administrativeUnitFlow.collectAsState(
         initial = null
@@ -25,7 +35,7 @@ fun AdministrativeUnitScreen(
     val administrativeUnit = optionalAdministrativeUnit ?: return
     val (name, _, _, _, images, _) = administrativeUnit
     val weight = remember { 0.65f }
-    info(ScreenInfo(title = name))
+    onSetToolbarInfo(ScreenInfo(title = name))
     Column {
         AdministrativeUnitView(
             modifier = Modifier.fillMaxWidth().weight(weight),

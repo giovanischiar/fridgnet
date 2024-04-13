@@ -23,6 +23,14 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.schiar.fridgnet.view.shared.viewdata.RegionViewData
 
+/**
+ * The component that displays a personalized grid of `RegionMapCheckableView`s. It positions the
+ * main region on top and the others below, with sizes based on the number of regions displayed.
+ *
+ * @param regions the list of region data objects to be displayed.
+ * @param onRegionCheckedChangeAt the event fired when a region's checkbox is pressed. It can be
+ * called with either the region data object or its index within the list.
+ */
 @Composable
 fun RegionsMapCheckableGrid(
     regions: List<RegionViewData>,

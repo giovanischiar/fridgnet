@@ -7,6 +7,12 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import io.schiar.fridgnet.R
 
+/**
+ * A floating action button typically used to initiate adding a new image across various screens in
+ * the application.
+ *
+ * @param onPress the event triggered when the button is pressed.
+ */
 @Composable
 fun FloatingActionButton(onPress: () -> Unit) {
     androidx.compose.material3.FloatingActionButton(

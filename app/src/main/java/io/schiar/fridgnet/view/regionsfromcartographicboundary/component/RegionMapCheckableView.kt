@@ -18,6 +18,15 @@ import io.schiar.fridgnet.view.shared.util.toLatLngBounds
 import io.schiar.fridgnet.view.shared.util.toLatLngList
 import io.schiar.fridgnet.view.shared.viewdata.RegionViewData
 
+/**
+ * The component that displays a map, with the region plotted along with a checkbox on the upper
+ * right.
+ *
+ * @param modifier the modifier used in the internal [Box].
+ * @param region the region used to plot.
+ * @param onRegionCheckedChangeAt the event fired when the checkbox is pressed. It carries the
+ * region as a param.
+ */
 @Composable
 fun RegionMapCheckableView(
     modifier: Modifier,

@@ -14,16 +14,52 @@ import io.schiar.fridgnet.model.AdministrativeUnitName
 import io.schiar.fridgnet.model.GeoLocation
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * The class that serves as an interface between the app and the database for CRUD operations
+ * (Create, Read, Update, Delete) and retrieval of AdministrativeUnitName data, potentially
+ * including related entities.
+ */
 @Dao
 abstract class AdministrativeUnitNameDAO {
+    /**
+     * Inserts a new [AdministrativeUnitNameEntity] object into the database.
+     *
+     * This method is intended for Room to handle basic insert operations. For updates to
+     * AdministrativeUnitName, use `insertOrUpdate` instead.
+     */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(administrativeUnitNameEntity: AdministrativeUnitNameEntity): Long
 
+    /**
+     * Inserts a new [GeoLocationEntity] object into the database.
+     *
+     * This method is intended for Room to handle basic insert operations. For updates to
+     * AdministrativeUnitName, use `insertOrUpdate` instead.
+     */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     abstract suspend fun insert(geoLocationEntity: GeoLocationEntity): Long
 
+    /**
+     * Inserts a [GeoLocation] along with its associated [AdministrativeUnitName]. This method uses
+     * a transaction to ensure data consistency.
+     *
+     * 1. It calls `insertOrUpdate` to check if a similar AdministrativeUnitName (same locality and
+     * admin area) already exists in the database.
+     *      - If an existing AdministrativeUnitName is found but its subAdminArea is null, it's updated
+     * with the provided subAdminArea.
+     *      - If no matching AdministrativeUnitName is found or the existing one has a different
+     * subAdminArea, a new AdministrativeUnitName is inserted.
+     * 2. Based on the result of `insertOrUpdate` (the AdministrativeUnitName entity ID), a new
+     * GeoLocationEntity is created with a foreign key reference to the corresponding
+     * AdministrativeUnitNameEntity.
+     *
+     * @param geoLocation the GeoLocation data to insert.
+     * @param administrativeUnitName the AdministrativeUnitName data to insert.
+     */
     @Transaction
-    open suspend fun insert(geoLocation: GeoLocation, administrativeUnitName: AdministrativeUnitName) {
+    open suspend fun insert(
+        geoLocation: GeoLocation, administrativeUnitName: AdministrativeUnitName
+    ) {
         val administrativeUnitNameEntityID = insertOrUpdate(
             administrativeUnitName = administrativeUnitName
         ) ?: return
@@ -33,68 +69,6 @@ abstract class AdministrativeUnitNameDAO {
             )
         )
     }
-
-    @Query(
-        "SELECT * FROM GeoLocation " +
-        "WHERE administrativeUnitNameGeoLocationsID = (" +
-                    "SELECT id " +
-                    "FROM AdministrativeUnitName " +
-                    "WHERE locality = :locality AND " +
-                          "subAdminArea = :subAdminArea AND " +
-                          "adminArea = :adminArea AND " +
-                          "countryName = :countryName " +
-                    "LIMIT 1" +
-              ")"
-    )
-    abstract fun selectGeoLocations(
-        locality: String?,
-        subAdminArea: String?,
-        adminArea: String?,
-        countryName: String?
-    ): Flow<List<GeoLocationEntity>>
-
-    @Query(
-        "SELECT * " +
-        "FROM GeoLocation " +
-        "WHERE administrativeUnitNameGeoLocationsID IN (" +
-                "SELECT id " +
-                "FROM AdministrativeUnitName " +
-                "WHERE subAdminArea = :subAdminArea AND " +
-                      "adminArea = :adminArea AND " +
-                      "countryName = :countryName" +
-              ")"
-    )
-    abstract fun selectGeoLocations(
-        subAdminArea: String?,
-        adminArea: String?,
-        countryName: String?
-    ): Flow<List<GeoLocationEntity>>
-
-    @Query(
-        "SELECT * " +
-        "FROM GeoLocation " +
-        "WHERE administrativeUnitNameGeoLocationsID IN (" +
-                "SELECT id " +
-                "FROM AdministrativeUnitName " +
-                "WHERE adminArea = :adminArea AND " +
-                      "countryName = :countryName" +
-              ")"
-    )
-    abstract fun selectGeoLocations(
-        adminArea: String?,
-        countryName: String?
-    ): Flow<List<GeoLocationEntity>>
-
-    @Query(
-        "SELECT * " +
-        "FROM GeoLocation " +
-        "WHERE administrativeUnitNameGeoLocationsID IN (" +
-                "SELECT id " +
-                "FROM AdministrativeUnitName " +
-                "WHERE countryName = :countryName" +
-              ")"
-    )
-    abstract fun selectGeoLocations(countryName: String?): Flow<List<GeoLocationEntity>>
 
     private suspend fun insertOrUpdate(administrativeUnitName: AdministrativeUnitName): Long? {
         val (_, locality, subAdminArea, adminArea) = administrativeUnitName
@@ -106,7 +80,8 @@ abstract class AdministrativeUnitNameDAO {
 
         if (storedAdministrativeUnitNameEntities.isEmpty()) {
             return insert(
-                administrativeUnitNameEntity = administrativeUnitName.toAdministrativeUnitNameEntity()
+                administrativeUnitNameEntity = administrativeUnitName
+                    .toAdministrativeUnitNameEntity()
             )
         }
 
@@ -127,9 +102,8 @@ abstract class AdministrativeUnitNameDAO {
                          "$multipleCounties, or $subAdminArea. Create a new AdministrativeUnitName"
                 )
                 insert(
-                    administrativeUnitNameEntity = administrativeUnitName.toAdministrativeUnitNameEntity(
-                        id = administrativeUnitNameID
-                    )
+                    administrativeUnitNameEntity = administrativeUnitName
+                        .toAdministrativeUnitNameEntity(id = administrativeUnitNameID)
                 )
             }
         }
@@ -139,8 +113,8 @@ abstract class AdministrativeUnitNameDAO {
         if (storedAdministrativeUnitNameEntity.subAdminArea == null && subAdminArea != null) {
             Log.d(
                 tag = "Store AdministrativeUnitName",
-                msg = "Assuming ${storedAdministrativeUnitNameEntity.locality} is in $subAdminArea. " +
-                      "Updating stored administrativeUnitName"
+                msg = "Assuming ${storedAdministrativeUnitNameEntity.locality} is in " +
+                      "$subAdminArea. Updating stored administrativeUnitName"
             )
             update(storedAdministrativeUnitNameEntity.updateSubAdminArea(subAdminArea))
             return storedAdministrativeUnitNameEntity.id
@@ -163,7 +137,8 @@ abstract class AdministrativeUnitNameDAO {
                       "Inserting a new AdministrativeUnitName"
             )
             return insert(
-                administrativeUnitNameEntity = administrativeUnitName.toAdministrativeUnitNameEntity()
+                administrativeUnitNameEntity = administrativeUnitName
+                    .toAdministrativeUnitNameEntity()
             )
         }
 
@@ -172,13 +147,41 @@ abstract class AdministrativeUnitNameDAO {
         } else storedAdministrativeUnitNameEntity.id
     }
 
+    /**
+     * Updates an existing [AdministrativeUnitNameEntity] in the database.
+     *
+     * This method is public for Room usage, but updates to AdministrativeUnitName data are
+     * recommended to be done through `insertOrUpdate` to handle potential duplicates.
+     */
     @Update
     abstract suspend fun update(administrativeUnitNameEntity: AdministrativeUnitNameEntity)
 
+    /**
+     * Returns a flow of lists containing information about Administrative Units with their
+     * Cartographic Boundaries.
+     *
+     * This function retrieves data asynchronously using a Flow. Each item in the flow is a list of
+     * custom objects that combine the Administrative Unit name with its associated Cartographic
+     * Boundary data.
+     *
+     * @return a Flow of lists containing `AdministrativeUnitWithBoundary` objects.
+     */
     @Query("SELECT * FROM AdministrativeUnitName")
     abstract fun selectAdministrativeUnitNameWithCartographicBoundaries()
         : Flow<List<AdministrativeUnitNameWithCartographicBoundaries>>
 
+    /**
+     * Returns a list of AdministrativeUnitName entities that share the same locality and adminArea.
+     *
+     * This query is typically used to find potential duplicates or variations in sub-administrative
+     * area data. It retrieves entries where the 'locality' and 'adminArea' fields match the
+     * specified parameters, potentially including AdministrativeUnitNames with different
+     * sub-administrative areas or even null sub-administrative areas.
+     *
+     * @param locality the locality name to match.
+     * @param adminArea the adminArea name to match.
+     * @return a list of AdministrativeUnitNameEntity objects matching the criteria.
+     */
     @Query(
         "SELECT * " +
         "FROM AdministrativeUnitName " +

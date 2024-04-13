@@ -6,6 +6,12 @@ import com.google.maps.android.compose.Polygon
 import io.schiar.fridgnet.view.shared.util.toLatLngList
 import io.schiar.fridgnet.view.shared.viewdata.CartographicBoundaryViewData
 
+/**
+ * The component used to draw the Cartographic Boundary inside a Google Maps Component. It creates
+ * a Polygon component for each region.
+ *
+ * @param cartographicBoundary the data from Cartographic Boundary.
+ */
 @Composable
 fun CartographicBoundaryDrawer(cartographicBoundary: CartographicBoundaryViewData) {
     cartographicBoundary.regions.map {

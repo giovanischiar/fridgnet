@@ -1,6 +1,5 @@
 package io.schiar.fridgnet.viewmodel.util
 
-import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.AdministrativeLevel
 import io.schiar.fridgnet.model.AdministrativeUnit
 import io.schiar.fridgnet.model.BoundingBox
@@ -19,7 +18,12 @@ import io.schiar.fridgnet.view.shared.viewdata.ImageViewData
 import io.schiar.fridgnet.view.shared.viewdata.PolygonViewData
 import io.schiar.fridgnet.view.shared.viewdata.RegionViewData
 
-// BoundingBox
+/**
+ * Converts the [BoundingBox] model into the view object [BoundingBoxViewData] used to represent
+ * bounding boxes in the UI.
+ *
+ * @return the [BoundingBoxViewData] converted
+ */
 fun BoundingBox.toBoundingBoxViewData(): BoundingBoxViewData {
     return BoundingBoxViewData(
         southwest = southwest.toGeoLocationViewData(),
@@ -27,7 +31,12 @@ fun BoundingBox.toBoundingBoxViewData(): BoundingBoxViewData {
     )
 }
 
-// GeoLocation
+/**
+ * Converts the [GeoLocation] model into the view object [GeoLocationViewData] used to represent
+ * geo locations in the UI.
+ *
+ * @return the [GeoLocationViewData] converted
+ */
 fun GeoLocation.toGeoLocationViewData(): GeoLocationViewData {
     return GeoLocationViewData(
         latitude = latitude,
@@ -35,7 +44,12 @@ fun GeoLocation.toGeoLocationViewData(): GeoLocationViewData {
     )
 }
 
-// Image
+/**
+ * Converts the [Image] model into the view object [ImageViewData] used to represent
+ * images in the UI.
+ *
+ * @return the [ImageViewData] converted
+ */
 fun Image.toViewData(): ImageViewData {
     val (uri, byteArray, date, geoLocation) = this
     val (_, latitude, longitude) = geoLocation
@@ -50,11 +64,23 @@ fun Image.toViewData(): ImageViewData {
     )
 }
 
+/**
+ * Converts a collection of [Image] models into a list of [ImageViewData] view objects used to
+ * represent  a list of images in the UI. Each [Image] is converted to an [ImageViewData] object
+ * using its `toViewData` method, which likely extracts relevant data for UI display.
+ *
+ * @return the [List] of [ImageViewData] converted
+ */
 fun Collection<Image>.toImageViewDataList(): List<ImageViewData> {
     return map { it.toViewData() }
 }
 
-// CartographicBoundary
+/**
+ * Converts the [CartographicBoundary] model into the view object [CartographicBoundaryViewData]
+ * used to represent cartographic boundaries in the UI.
+ *
+ * @return the [CartographicBoundaryViewData] converted
+ */
 fun CartographicBoundary.toCartographicBoundaryViewData(): CartographicBoundaryViewData {
     return CartographicBoundaryViewData(
         administrativeUnitName = administrativeUnitNameString,
@@ -65,12 +91,22 @@ fun CartographicBoundary.toCartographicBoundaryViewData(): CartographicBoundaryV
     )
 }
 
-// Polygon
+/**
+ * Converts the [Polygon] model into the view object [PolygonViewData]
+ * used to represent polygons in the UI.
+ *
+ * @return the [PolygonViewData] converted
+ */
 fun Polygon.toPolygonViewData(): PolygonViewData {
     return PolygonViewData(geoLocations = this.geoLocations.map { it.toGeoLocationViewData() })
 }
 
-// Region
+/**
+ * Converts the [Region] model into the view object [RegionViewData]
+ * used to represent polygons in the UI.
+ *
+ * @return the [RegionViewData] converted
+ */
 fun Region.toRegionViewData(): RegionViewData {
     return RegionViewData(
         polygon = polygon.toPolygonViewData(),
@@ -82,34 +118,56 @@ fun Region.toRegionViewData(): RegionViewData {
     )
 }
 
+/**
+ * Converts a collection of [Region] models into a list of [RegionViewData] view objects used to
+ * represent  a list of regions in the UI. Each [Region] is converted to an [RegionViewData] object
+ * using its `toRegionViewData` method, which likely extracts relevant data for UI display.
+ *
+ * @return the [List] of [RegionViewData] converted
+ */
 fun List<Region>.toRegionViewDataList(): List<RegionViewData> {
     return map { it.toRegionViewData() }
 }
 
-// AdministrativeUnit
+/**
+ * Converts the [AdministrativeUnit] model into the view object [AdministrativeUnitViewData]
+ * used to represent administrative units in the UI.
+ *
+ * @return the [AdministrativeUnitViewData] converted
+ */
 fun AdministrativeUnit.toAdministrativeUnitViewData(): AdministrativeUnitViewData {
-    if (administrativeLevel == AdministrativeLevel.CITY && subAdministrativeUnits.isNotEmpty()) {
-        Log.d("", "WTF")
-    }
     return AdministrativeUnitViewData(
         name = name,
         administrativeLevel = administrativeLevel.toAdministrativeUnitLevelViewData(),
         cartographicBoundary = cartographicBoundary?.toCartographicBoundaryViewData(),
         subCartographicBoundaries = flatMapSubCartographicBoundariesViewDataList(
-            administrativeUnit = this, mutableListOf()
+            administrativeUnit = this
         ),
         images = images.toImageViewDataList(),
         imagesBoundingBox = images.mergeToBoundingBox()?.toBoundingBoxViewData()
     )
 }
 
-// AdministrativeUnitList
+/**
+ * Converts a collection of [AdministrativeUnit] models into a list of [AdministrativeUnitViewData]
+ * view objects used to represent  a list of administrative units in the UI. Each
+ * [AdministrativeUnit] is converted to an [AdministrativeUnitViewData] object
+ * using its `toAdministrativeUnitViewData` method, which likely extracts relevant data for UI
+ * display.
+ *
+ * @return the [List] of [AdministrativeUnitViewData] converted
+ */
 fun Collection<AdministrativeUnit>
         .toAdministrativeUnitViewDataList(): List<AdministrativeUnitViewData> {
     return map { it.toAdministrativeUnitViewData() }
 }
 
-// AdministrativeLevel
+/**
+ * Converts the [AdministrativeLevel] model into the view object [AdministrativeLevelViewData]
+ * used to represent administrative units in the UI.
+ *
+ * @return the [AdministrativeLevelViewData] converted
+ */
 fun AdministrativeLevel.toAdministrativeUnitLevelViewData(): AdministrativeLevelViewData {
     return AdministrativeLevelViewData(
         title = name,
@@ -118,14 +176,33 @@ fun AdministrativeLevel.toAdministrativeUnitLevelViewData(): AdministrativeLevel
     )
 }
 
+/**
+ * Converts a collection of [AdministrativeLevel] models into a list of
+ * [AdministrativeLevelViewData] view objects used to represent  a list of administrative levels in
+ * the UI. Each [AdministrativeLevel] is converted to an [AdministrativeLevelViewData] object
+ * using its `toAdministrativeUnitLevelViewData` method, which likely extracts relevant data for UI
+ * display.
+ *
+ * @return the [List] of [AdministrativeLevelViewData] converted
+ */
 fun List<AdministrativeLevel>
         .toAdministrativeLevelViewDataList(): List<AdministrativeLevelViewData> {
     return map { it.toAdministrativeUnitLevelViewData() }
 }
 
+/**
+ * Recursively iterates over all sub-administrative units within an [AdministrativeUnit] and creates
+ * a list of converted [CartographicBoundaryViewData] objects.
+ *
+ * @param administrativeUnit the root [AdministrativeUnit] to start the iteration
+ * @param cartographicBoundaries an empty or pre-populated list to store the converted data
+ * (optional)
+ * @return a list containing [CartographicBoundaryViewData] objects for all encountered cartographic
+ * boundaries
+ */
 fun AdministrativeUnit.flatMapSubCartographicBoundariesViewDataList(
     administrativeUnit: AdministrativeUnit,
-    cartographicBoundaries: MutableList<CartographicBoundaryViewData>
+    cartographicBoundaries: MutableList<CartographicBoundaryViewData> = mutableListOf()
 ): List<CartographicBoundaryViewData> {
     val subCartographicBoundary = administrativeUnit.cartographicBoundary
     if (subCartographicBoundary != null) {

@@ -9,6 +9,16 @@ import androidx.compose.ui.unit.Dp
 import io.schiar.fridgnet.view.shared.component.AdministrativeUnitView
 import io.schiar.fridgnet.view.shared.viewdata.AdministrativeUnitViewData
 
+/**
+ * The grid of administrative units. Each unit is displayed as a Google Maps component with its
+ * geographical outline (cartographic boundary) plotted, if available.
+ *
+ * @param administrativeUnits the administrative units view data to be considered.
+ * @param columnCount the number of columns to lay out the administrative units. This value is also
+ * used to calculate the size of each unit within the grid.
+ * @param onAdministrativeUnitPressedAt event triggered when a administrative unit is pressed. It
+ * contains its index as a param.
+ */
 @Composable
 fun AdministrativeUnitsGrid(
     administrativeUnits: List<AdministrativeUnitViewData>,

@@ -32,6 +32,19 @@ import io.schiar.fridgnet.view.shared.util.toLatLngBounds
 import io.schiar.fridgnet.view.shared.util.updateCameraPositionTo
 import io.schiar.fridgnet.view.shared.viewdata.AdministrativeUnitViewData
 
+/**
+ * The Component that visually shows the Administrative Unit.
+ *
+ * @param modifier the modifier used for the internal [Box].
+ * @param administrativeUnit the administrative unit used.
+ * @param mapUISettings the data for the Google Maps component used.
+ * @param areZoomControlsEnabled whether the zoom controls is showed in the component.
+ * @param areImagesShowing whether the images are shown within the map.
+ * @param areImagesSizeShowing whether the image size info are shown within the map.
+ * @param areSubDivisionsShowing whether the cartographic boundary's subdivisions are shown within the
+ * map.
+ * @param onPress fired when the Administrative Unit is pressed.
+ */
 @Composable
 fun AdministrativeUnitView(
     modifier: Modifier = Modifier,

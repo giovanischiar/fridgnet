@@ -5,12 +5,20 @@ import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.view.shared.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.shared.viewdata.GeoLocationViewData
 
-//view.viewdata.GeoLocationViewData
+/**
+ * Converts the [GeoLocationViewData] into [GeoLocation].
+ *
+ * @return the [GeoLocation] converted
+ */
 fun GeoLocationViewData.toGeoLocation(): GeoLocation {
     return GeoLocation(latitude = latitude, longitude = longitude)
 }
 
-// view.viewdata.BoundingBoxViewData
+/**
+ * Converts the [BoundingBoxViewData] into [BoundingBox].
+ *
+ * @return the [BoundingBox] converted
+ */
 fun BoundingBoxViewData.toBoundingBox(): BoundingBox {
     return BoundingBox(southwest = southwest.toGeoLocation(), northeast = northeast.toGeoLocation())
 }

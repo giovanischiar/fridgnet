@@ -38,13 +38,18 @@ import java.util.Collections.synchronizedList as syncListOf
 import java.util.Collections.synchronizedMap as syncMapOf
 import java.util.Collections.synchronizedSet as syncSetOf
 
+/**
+ * Responsible for interacting with retrievers and data sources of administrative unit names and
+ * cartographic boundaries. It creates new administrative unit names and cartographic boundaries
+ * each time a new image is added.
+ */
 class AdministrativeUnitLocalDataSource @Inject constructor(
     private val administrativeUnitNameRetriever: AdministrativeUnitNameRetriever,
     private val administrativeUnitNameDataSource: AdministrativeUnitNameDataSource,
     private val cartographicBoundaryRetriever: CartographicBoundaryRetriever,
     private val cartographicBoundaryDataSource: CartographicBoundaryDataSource,
     private val externalScope: CoroutineScope,
-    private val imageDataSource: ImageDataSource
+    imageDataSource: ImageDataSource
 ): AdministrativeUnitDataSource {
     private var lastAdministrativeUnitHashCode = -1
     private val currentAdministrativeUnitIndexFlow = MutableStateFlow(value = -1)
@@ -86,12 +91,46 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
             .onEach { cartographicBoundary -> createAdministrativeUnitFrom(cartographicBoundary) },
     )
 
+    /**
+     * The [administrativeUnitsFlow] is triggered in many ways:
+     *
+     * - When a new [Image] is created: It can be triggered when an [Image] is created for the first
+     *   time, so there is no [AdministrativeUnitName]. A coroutine is launched to create the
+     *   [AdministrativeUnitName] using the coordinates extracted from the [Image]. If the [Image]
+     *   has an [AdministrativeUnitName], that means it was already created before. This is when the
+     *   first [AdministrativeUnit]s are created. Initially, they are created without a
+     *   [CartographicBoundary], so the user will see a map without any shapes drawn, but they will
+     *   see a map focused on the [Image] where it was drawn. Each new [AdministrativeUnit] is
+     *   created based on the information of the [AdministrativeUnitName]. If the
+     *   [AdministrativeUnit] was already created, the new image is simply added to the
+     *   [AdministrativeUnit] and its outer levels.
+     *
+     * - When a new [AdministrativeUnitName] is created: Each [AdministrativeUnitName] is received
+     *   by the [AdministrativeUnitNameDataSource] along with the list of up to 4
+     *   [CartographicBoundary]s, one for each [AdministrativeLevel]. The method
+     *   [cartographicBoundariesToRetrieve] filters all missing cartographic boundaries for each
+     *   [AdministrativeLevel], and the method [retrieveOnlyNonExistentCartographicBoundariesFrom]
+     *   uses the [cartographicBoundaryRetriever] to retrieve all missing [CartographicBoundary]s.
+     *
+     * - When a new [CartographicBoundary] is created: The method feeds all existing
+     *   [AdministrativeUnit]s with their missing [CartographicBoundary]s so the user can now see
+     *   the outlines of the [AdministrativeUnit]s inside the map on the screen.
+     *
+     * @return a [Flow] of [List] of [AdministrativeUnit] from all [AdministrativeLevel]s
+     */
     override fun retrieve(): Flow<List<AdministrativeUnit>> {
         return administrativeUnitsFlow.map {
             administrativeLevels.flatMap { administrativeUnitsFrom(it) }
         }
     }
 
+    /**
+     * @see retrieve
+     *
+     * @param administrativeLevel The administrative level used to filter.
+     * @return                    A [Flow] of [List] of [AdministrativeUnit] from a specific
+     * [AdministrativeLevel].
+     */
     override fun retrieve(
         administrativeLevel: AdministrativeLevel
     ): Flow<List<AdministrativeUnit>> {
@@ -100,6 +139,10 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
             .map { administrativeUnitsFrom(administrativeLevel) }
     }
 
+    /**
+     * @param boundingBox The bounding box used to filter.
+     * @return            The active regions within a [BoundingBox].
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun retrieveActiveRegionsWithin(boundingBox: BoundingBox): Flow<List<Region>> {
         return merge(flowOf(boundingBox), administrativeUnitsFlow).flatMapLatest {
@@ -118,6 +161,23 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
         emit(activeRegionsWithinBoundingBox)
     }
 
+    /**
+     * Merge the [currentAdministrativeUnitIndexFlow] with [administrativeUnitsFlow] to receive the
+     * newly updated flow of the current [AdministrativeUnit]. Both flows are necessary because
+     * with the [currentAdministrativeUnitIndexFlow], it's possible to get the currently selected
+     * [AdministrativeUnit] when the user selects one on the screen.
+     * And the [administrativeUnitsFlow] keeps sending changes that happen on that
+     * [AdministrativeUnit] in real-time while the user is on the administrative unit screen.
+     * It's guaranteed that the [Flow] only emits the object when there's a new change in it,
+     * for example, when a new [Image] is added. This [Flow] always emits the same instance of
+     * [AdministrativeUnit] for each index repeatedly. Therefore, you can't compare objects if they
+     * are the same instance. To verify if the object really changed its contents, its hash code is
+     * annotated. So, the next time this same object tries to emit, the hash code is compared to see
+     * if there was really a change, and it is emitted again only if its contents changed.
+     *
+     * @return A [Flow] of [AdministrativeUnit], representing the current one that the user is
+     * seeing on the screen.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     override fun retrieveCurrent(): Flow<AdministrativeUnit> {
         return merge(
@@ -136,6 +196,15 @@ class AdministrativeUnitLocalDataSource @Inject constructor(
         }
     }
 
+    /**
+     * Update the current index selected by the user. This [lastAdministrativeUnitHashCode] property
+     * is used to compare if the contents of the current [AdministrativeUnit] really changed.
+     * If the user goes back to the administrative units screen and selects the same one again,
+     * it won't emit it again. To solve that problem, the [lastAdministrativeUnitHashCode] is reset
+     * each time this method is called.
+     *
+     * @param index The new index value of the [AdministrativeUnit] the user selected on the screen.
+     */
     override fun updateCurrentIndex(index: Int) {
         lastAdministrativeUnitHashCode = -1
         currentAdministrativeUnitIndexFlow.update { index }

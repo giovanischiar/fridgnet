@@ -18,9 +18,34 @@ import java.io.ByteArrayOutputStream
 import javax.inject.Inject
 import kotlin.math.roundToInt
 
+/**
+ *  An implementation of the [ImageRetriever] interface that utilizes the Android system's
+ *  [ContentResolver] to retrieve and process image data from provided URIs. This class operates
+ *  asynchronously and emits successfully processed images through a returned [Flow] of [Image]
+ *  objects.
+ *
+ *  **Threading Model:** This class uses coroutines for asynchronous image retrieval and processing.
+ *  It's recommended to call the `retrieve` function from a background coroutine to avoid blocking
+ *  the main thread.
+ *
+ *  **Assumptions:** This class assumes the provided URIs are content URIs (e.g., from the device's
+ *  media store) and not direct file paths.
+ */
 class ImageAndroidRetriever @Inject constructor(
     private val contentResolver: ContentResolver
 ) : ImageRetriever {
+
+    /**
+     * Uses the Android system ([ContentResolver]) to asynchronously retrieve and convert a list of
+     * URIs into corresponding [Image] objects. Each successful image conversion will be emitted
+     * through the returned [Flow] of [Image].
+     *
+     * @param uris a list of string representations of image URIs.
+     * @return a [Flow] that emits successfully retrieved and processed [Image] objects.
+     *
+     * If an error occurs while processing a specific URI, processing continues for the remaining
+     * URIs in the list. Errors are logged using the class's internal logging mechanism.
+     */
     override suspend fun retrieve(uris: List<String>): Flow<Image> = flow {
         uris.forEach { uri ->
             val systemURI = Uri.parse(uri)

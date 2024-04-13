@@ -15,8 +15,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.home.util.BottomNavScreen
-import io.schiar.fridgnet.view.home.util.chooseWhether
 
+/**
+ * This component is responsible for defining the screens that will be displayed at the bottom bar
+ * of all screens.
+ *
+ * @param navController the object used to navigate from one screen to another
+ */
 @Composable
 fun BottomBar(navController: NavHostController) {
     val bottomNavScreens = remember {

@@ -4,7 +4,13 @@ import android.util.Log
 import com.google.maps.android.compose.CameraPositionState
 import io.schiar.fridgnet.view.shared.viewdata.RegionViewData
 
+/**
+ * A class that generates unit tests for testing the regions being drawn in the map.
+ */
 class BoundsTestCreator {
+    /**
+     * Generates the test in the log of the current regions being showed in the map.
+     */
     fun generateTest(
         cameraPositionState: CameraPositionState,
         visibleRegions: List<RegionViewData>

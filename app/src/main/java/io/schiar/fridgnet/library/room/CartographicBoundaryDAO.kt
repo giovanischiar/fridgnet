@@ -11,29 +11,68 @@ import io.schiar.fridgnet.library.room.entity.GeoLocationEntity
 import io.schiar.fridgnet.library.room.entity.PolygonEntity
 import io.schiar.fridgnet.library.room.entity.RegionEntity
 import io.schiar.fridgnet.library.room.relationentity.CartographicBoundaryWithRegions
-import io.schiar.fridgnet.library.room.relationentity.RegionWithPolygonAndHoles
 import io.schiar.fridgnet.model.CartographicBoundary
 import io.schiar.fridgnet.model.GeoLocation
 import io.schiar.fridgnet.model.Polygon
 import io.schiar.fridgnet.model.Region
 import kotlinx.coroutines.flow.Flow
 
+/**
+ * The class that serves as an interface between the app and the database for CRUD operations
+ * (Create, Read, Update, Delete) and retrieval of CartographicBoundary data, potentially
+ * including related entities.
+ */
 @Dao
 abstract class CartographicBoundaryDAO {
+    /**
+     * Insert a [CartographicBoundaryEntity] into the database.
+     *
+     * This method is intended for Room to handle basic insert operations. For insert a
+     * [CartographicBoundary], use `insert(cartographicBoundary: CartographicBoundary)` instead.
+     */
     @Insert(onConflict = REPLACE)
     abstract suspend fun insert(cartographicBoundaryEntity: CartographicBoundaryEntity): Long
 
+    /**
+     * Insert a [RegionEntity] into the database
+     *
+     * This method is intended for Room to handle basic insert operations. For insert a
+     * [CartographicBoundary], use `insert(cartographicBoundary: CartographicBoundary)` instead.
+     */
     @Insert(onConflict = REPLACE)
     abstract suspend fun insert(regionEntity: RegionEntity): Long
 
+    /**
+     * Insert a [PolygonEntity] into the database
+     *
+     * This method is intended for Room to handle basic insert operations. For insert a
+     * [CartographicBoundary], use `insert(cartographicBoundary: CartographicBoundary)` instead.
+     */
     @Insert(onConflict = REPLACE)
     abstract suspend fun insert(polygonEntity: PolygonEntity): Long
 
+    /**
+     * Insert a [GeoLocationEntity] into the database
+     *
+     * This method is intended for Room to handle basic insert operations. For insert a
+     * [CartographicBoundary], use `insert(cartographicBoundary: CartographicBoundary)` instead.
+     */
     @Insert(onConflict = REPLACE)
     abstract suspend fun insertGeoLocations(
         geoLocationEntities: List<GeoLocationEntity>
     ): List<Long>
 
+    /**
+     * Inserts a [CartographicBoundary] object and its associated regions into the database using a
+     * transaction.
+     *
+     * This method first converts the CartographicBoundary object to a CartographicBoundaryEntity
+     * and inserts it into the database. It then retrieves the generated ID and uses it as a foreign
+     * key to insert the associated regions using a separate method (`insertRegions`).
+     *
+     * @param cartographicBoundary the CartographicBoundary object to insert along with its
+     * associated regions.
+     */
     @Transaction
     open suspend fun insert(cartographicBoundary: CartographicBoundary) {
         val cartographicBoundaryID = insert(
@@ -81,6 +120,18 @@ abstract class CartographicBoundaryDAO {
         insertGeoLocations(geoLocationEntities)
     }
 
+    /**
+     * Updates a [CartographicBoundary] object and its associated regions in the database using a
+     * transaction.
+     *
+     * This method first converts the CartographicBoundary object to a CartographicBoundaryEntity
+     * and updates the database entry identified by the CartographicBoundary's ID. It then uses the
+     * same ID as a foreign key to update the associated regions using a separate method
+     * (`updateRegions`).
+     *
+     * @param cartographicBoundary the CartographicBoundary object with updated data and its
+     * associated regions.
+     */
     @Transaction
     open suspend fun update(cartographicBoundary: CartographicBoundary) {
         update(
@@ -131,6 +182,17 @@ abstract class CartographicBoundaryDAO {
         updateGeoLocations(getLocationEntities)
     }
 
+    /**
+     * Retrieves a [Flow] of [CartographicBoundaryEntity] objects associated with a specific
+     * AdministrativeUnitName identified by its ID.
+     *
+     * This method utilizes a Flow to emit data asynchronously. The Flow might emit null if no
+     * matching CartographicBoundaryEntity is found for the provided administrativeUnitNameID.
+     *
+     * @param administrativeUnitNameID the ID of the AdministrativeUnitName to retrieve associated
+     * boundaries for.
+     * @return a [Flow] of CartographicBoundaryEntity objects or null if no match is found.
+     */
     @Query(
         "SELECT * " +
         "FROM CartographicBoundary " +
@@ -140,6 +202,13 @@ abstract class CartographicBoundaryDAO {
         administrativeUnitNameID: Long
     ): Flow<CartographicBoundaryWithRegions?>
 
+    /**
+     * Retrieves a [Flow] of [CartographicBoundaryEntity] objects associated with a specific
+     * Region identified by its ID.
+     *
+     * @param regionID the id of the Region that belongs the the [CartographicBoundaryEntity]
+     * @return the [Flow] of [CartographicBoundaryWithRegions] objects or null if no match is found.
+     */
     @Query(
         "SELECT * " +
         "FROM CartographicBoundary " +
@@ -151,23 +220,49 @@ abstract class CartographicBoundaryDAO {
     )
     abstract fun select(regionID: Long): Flow<CartographicBoundaryWithRegions?>
 
+    /**
+     * retrieves all the CartographicBoundaryEntities along with their regions
+     *
+     * @return all the CartographicBoundaryEntities along with their regions
+     */
     @Transaction
     @Query("SELECT * FROM CartographicBoundary")
     abstract fun selectCartographicBoundariesWithRegions()
         : Flow<List<CartographicBoundaryWithRegions>>
 
-    @Query("SELECT * FROM Region")
-    abstract fun selectRegions(): Flow<List<RegionWithPolygonAndHoles>>
-
+    /**
+     * Update a [CartographicBoundaryEntity] into the database
+     *
+     * This method is intended for Room to handle basic update operations. For update a
+     * [CartographicBoundary], use `update(cartographicBoundary: CartographicBoundary)` instead.
+     */
     @Update
     abstract suspend fun update(cartographicBoundaryEntity: CartographicBoundaryEntity)
 
+    /**
+     * Update a [RegionEntity] in the database
+     *
+     * This method is intended for Room to handle basic insert operations. For update a
+     * [CartographicBoundary], use `update(cartographicBoundary: CartographicBoundary)` instead.
+     */
     @Update
     abstract suspend fun update(regionEntity: RegionEntity)
 
+    /**
+     * Update a [PolygonEntity] in the database
+     *
+     * This method is intended for Room to handle basic insert operations. For update a
+     * [CartographicBoundary], use `update(cartographicBoundary: CartographicBoundary)` instead.
+     */
     @Update
     abstract suspend fun update(polygonEntity: PolygonEntity)
 
+    /**
+     * Update the [GeoLocations] in the database
+     *
+     * This method is intended for Room to handle basic insert operations. For update a
+     * [CartographicBoundary], use `update(cartographicBoundary: CartographicBoundary)` instead.
+     */
     @Update
     abstract suspend fun updateGeoLocations(geoLocationEntities: List<GeoLocationEntity>)
 }

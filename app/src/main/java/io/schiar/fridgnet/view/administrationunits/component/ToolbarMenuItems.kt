@@ -17,6 +17,15 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import io.schiar.fridgnet.R
 
+/**
+ * A composable representing a menu with options displayed as a vertical ellipsis (...) button in
+ * the toolbar. When clicked, it expands to reveal a dropdown menu with options based on the
+ * provided string IDs.
+ *
+ * @param itemTitleIDs a list of string resource IDs for the titles of the options in the menu.
+ * @param onItemPressedAt an event fired when an option is selected. It sends the index of the
+ * selected option as a parameter.
+ */
 @Composable
 fun ToolbarMenuItems(itemTitleIDs: List<Int>, onItemPressedAt: (index: Int) -> Unit) {
     var expanded by remember { mutableStateOf(value = false) }
@@ -36,8 +45,6 @@ fun ToolbarMenuItems(itemTitleIDs: List<Int>, onItemPressedAt: (index: Int) -> U
                     onClick = {
                         expanded = false
                         onItemPressedAt(index)
-//                        viewModel.removeAllImages()
-//
                     }
                 )
             }

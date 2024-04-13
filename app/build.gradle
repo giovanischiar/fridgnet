@@ -3,6 +3,7 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'com.google.devtools.ksp'
     id 'com.google.dagger.hilt.android'
+    id 'org.jetbrains.dokka'
 }
 
 def apikeyPropertiesFile = rootProject.file("apikey.properties")
@@ -53,7 +54,6 @@ android {
 }
 
 dependencies {
-
     implementation 'androidx.core:core-ktx:1.12.0'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.11.0'
@@ -113,9 +113,25 @@ dependencies {
 task generateIcons(type: Exec) {
     dependsOn "mergeDebugResources"
     dependsOn "mapDebugSourceSetPaths"
+    dependsOn "mapReleaseSourceSetPaths"
+    dependsOn "mergeReleaseResources"
+    dependsOn "packageReleaseResources"
     inputs.file 'src/main/res/values/iconpalette.xml'
     inputs.dir '../scripts/IconCreator/Icon'
     outputs.file 'src/main/res/drawable/ic_launcher_background.xml'
     outputs.file 'src/main/res/drawable-v24/ic_launcher_foreground.xml'
     commandLine 'bash', '../scripts/IconCreator/Library/icon-creator.sh', 'android', '../..', '../Icon'
+}
+
+dokkaHtml {
+    dokkaSourceSets {
+        named("main") {
+            includeNonPublic.set(false)
+            skipEmptyPackages.set(true)
+            skipDeprecated.set(true)
+            reportUndocumented.set(true)
+            jdkVersion.set(8)
+            notCompatibleWithConfigurationCache("https://github.com/Kotlin/dokka/issues/2231")
+        }
+    }
 }

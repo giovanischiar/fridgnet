@@ -20,6 +20,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Collections
 
+/**
+ * The component responsible for maintaining and drawing all images that are currently visible on
+ * the map.
+ *
+ * @param images a list of data representing the visible images on the map. Each image data object
+ * typically contains (uri, byte array (format: e.g., JPEG), additional data, geolocation). See the
+ * documentation for [ImageViewData] for more details.
+ */
 @Composable
 fun ImagesDrawer(images: List<ImageViewData>) {
     val coroutineScope = rememberCoroutineScope()

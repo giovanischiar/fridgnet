@@ -15,6 +15,17 @@ import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.view.regionsandimages.RegionsAndImagesScreen
 import io.schiar.fridgnet.view.regionsfromcartographicboundary.RegionsFromCartographicBoundaryScreen
 
+/**
+ * This composable manages screen navigation within the application based on user actions. It
+ * utilizes a `NavHost` to handle screen transitions and provides callbacks for updating the toolbar
+ * information associated with each screen.
+ *
+ * @param navController the component used to navigate between screens.
+ * @param innerPadding the padding values typically provided by the scaffold function in the Home
+ * Screen.
+ * @param onChangeScreenInfo an event fired whenever the screen information (title, toolbar
+ * components) needs to be updated. This typically happens when switching screens.
+ */
 @Composable
 fun Navigation(
     navController: NavHostController,
@@ -31,7 +42,7 @@ fun Navigation(
                 onNavigateToAdministrativeUnit = {
                     navController.navigate(route = Route.ADMINISTRATIVE_UNIT.id)
                 },
-                info = onChangeScreenInfo
+                onSetToolbarInfo = onChangeScreenInfo
             )
         }
 
@@ -40,16 +51,16 @@ fun Navigation(
                 onNavigateToRegionsFromCartographicBoundary = {
                     navController.navigate(route = Route.REGIONS_FROM_CARTOGRAPHIC_BOUNDARY.id)
                 },
-                info = onChangeScreenInfo
+                onSetToolbarInfo = onChangeScreenInfo
             )
         }
 
         composable(route = Route.ADMINISTRATIVE_UNIT.id) {
-            AdministrativeUnitScreen(info = onChangeScreenInfo)
+            AdministrativeUnitScreen(onSetToolbarInfo = onChangeScreenInfo)
         }
 
         composable(route = Route.REGIONS_FROM_CARTOGRAPHIC_BOUNDARY.id) {
-            RegionsFromCartographicBoundaryScreen(info = onChangeScreenInfo)
+            RegionsFromCartographicBoundaryScreen(onSetToolbarInfo = onChangeScreenInfo)
         }
     }
 }

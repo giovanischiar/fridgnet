@@ -8,11 +8,22 @@ import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.Place
 import io.schiar.fridgnet.R
 
+/**
+ * The class used to encapsulate the data needed to display screen information in the bottom bar
+ * of the home screen.
+ *
+ * @property route the [Route] associated with the screen.
+ * @property resourceId the string resource ID of the screen's name in the bottom bar.
+ * @property icon the icon to be displayed for the screen (optional).
+ */
 sealed class BottomNavScreen(
     val route: Route,
     @StringRes val resourceId: Int,
     val icon: Icon? = null
 ) {
+    /**
+     * The object that represents the Administrative Units Screen's Bottom Menu Option.
+     */
     data object AdministrativeUnits : BottomNavScreen(
         route = Route.ADMINISTRATIVE_UNITS,
         resourceId = R.string.administrative_units_screen,
@@ -23,6 +34,9 @@ sealed class BottomNavScreen(
         )
     )
 
+    /**
+     * The object that represents the Regions And Images Screen's Bottom Menu Option.
+     */
     data object RegionsAndImages : BottomNavScreen(
         route = Route.REGIONS_AND_IMAGES,
         resourceId = R.string.regions_and_images_screen,

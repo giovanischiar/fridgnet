@@ -28,6 +28,24 @@ import io.schiar.fridgnet.view.shared.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.view.shared.viewdata.ImageViewData
 import io.schiar.fridgnet.view.shared.viewdata.RegionViewData
 
+/**
+ * The Map component displays the map along with its images and regions. It also handles zooming to
+ * fit all images, detects region presses, and fires events for camera movement and visible map area
+ * changes.
+ *
+ * @param modifier the modifier used for the internal [Box].
+ * @param visibleImages the list of images currently visible in the map area.
+ * @param visibleRegions the list of region data objects representing the visible regions.
+ * @param boundingBox the bounding box data used for zooming to fit images (see
+ * [BoundingBoxViewData] for details).
+ * @param zoomCameraToFitImages a boolean indicating whether to zoom the map to fit all visible
+ * images.
+ * @param onMoveFinished the event fired when the map camera finishes moving.
+ * @param regionPressedAt the event fired when a region is pressed, passing the index of the pressed
+ * region.
+ * @param onVisibleMapAreaChangeTo the event fired when the visible map area changes (e.g., user
+ * gesture or zoom).
+ */
 @Composable
 fun Map(
     modifier: Modifier,
@@ -37,7 +55,7 @@ fun Map(
     zoomCameraToFitImages: Boolean,
     onMoveFinished: () -> Unit,
     regionPressedAt: (index: Int) -> Unit,
-    onVisibleMapRegionChangeTo: (LatLngBounds) -> Unit,
+    onVisibleMapAreaChangeTo: (LatLngBounds) -> Unit,
 ) {
     var isMapLoaded by remember { mutableStateOf(value = false) }
     val coroutineScope = rememberCoroutineScope()
@@ -49,7 +67,7 @@ fun Map(
         if (projection != null) {
             val visibleRegion = projection.visibleRegion
             val latLngBounds = visibleRegion.latLngBounds
-            onVisibleMapRegionChangeTo(latLngBounds)
+            onVisibleMapAreaChangeTo(latLngBounds)
         }
     }
 

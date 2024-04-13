@@ -12,6 +12,13 @@ import androidx.compose.ui.unit.dp
 import io.schiar.fridgnet.view.shared.viewdata.RegionViewData
 import io.schiar.fridgnet.viewmodel.util.toBoundingBox
 
+/**
+ * Component used for debugging map rendering. It displays information about the visible
+ * regions and identifies any polygons that cross the antimeridian (180th longitude).
+ *
+ * @param modifier the modifier used for the internal [Column].
+ * @param visibleRegions the list of currently visible region data objects.
+ */
 @Composable
 fun MapPolygonInfo(modifier: Modifier, visibleRegions: List<RegionViewData>) {
     Column(

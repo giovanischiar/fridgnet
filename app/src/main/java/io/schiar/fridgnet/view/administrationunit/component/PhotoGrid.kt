@@ -11,6 +11,12 @@ import androidx.compose.ui.unit.dp
 import io.schiar.fridgnet.view.shared.util.toImageBitmap
 import io.schiar.fridgnet.view.shared.viewdata.ImageViewData
 
+/**
+ * The component that represents a grid of photos.
+ *
+ * @param modifier the modifier used in the internal [LazyVerticalGrid].
+ * @param images the list of image data objects to display.
+ */
 @Composable
 fun PhotoGrid(modifier: Modifier, images: List<ImageViewData>) {
     val sortedImages = images.sortedBy { it.date }.reversed()

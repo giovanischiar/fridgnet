@@ -15,6 +15,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
+/**
+ * The repository that exposes and manipulates regions from cartographic boundary screen's flows.
+ */
 class RegionsFromCartographicBoundaryRepository @Inject constructor(
     currentRegionDataSource: CurrentRegionDataSource,
     private val cartographicBoundaryDataSource: CartographicBoundaryDataSource
@@ -23,6 +26,11 @@ class RegionsFromCartographicBoundaryRepository @Inject constructor(
     private val currentCartographicBoundaryStateFlow = MutableStateFlow(
         value = currentCartographicBoundary
     )
+
+    /**
+     * Using the current region, the flow searches for the cartographic boundary that this region
+     * belongs to.
+     */
     @OptIn(ExperimentalCoroutinesApi::class)
     val currentCartographicBoundaryFlow = merge(
         currentRegionDataSource.retrieve()
@@ -37,6 +45,11 @@ class RegionsFromCartographicBoundaryRepository @Inject constructor(
         currentCartographicBoundaryStateFlow
     ).filterNotNull().distinctUntilChanged()
 
+    /**
+     * Switch the region in a specific index to visible or invisible.
+     *
+     * @param index the index of the region
+     */
     suspend fun switchRegionAt(index: Int) {
         val cartographicBoundary = currentCartographicBoundary ?: return
         val cartographicBoundaryWithRegionSwitched = cartographicBoundary.regionSwitchedAt(index)
@@ -48,6 +61,10 @@ class RegionsFromCartographicBoundaryRepository @Inject constructor(
         )
     }
 
+    /**
+     * Switch all the possible regions (excluding the main region) in a specific index to visible or
+     * invisible.
+     */
     suspend fun switchAll() {
         val cartographicBoundary = currentCartographicBoundary ?: return
         val cartographicBoundaryWithAllRegionsSwitched = cartographicBoundary.allRegionsSwitched()

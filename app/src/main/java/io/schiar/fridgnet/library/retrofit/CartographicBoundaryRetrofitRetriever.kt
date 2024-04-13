@@ -15,12 +15,40 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.sync.Mutex
 import javax.inject.Inject
 
+/**
+ * Fetches cartographic boundary information using the Nominatim API. This class retrieves
+ * boundaries based on provided administrative levels (e.g., city, state, country) and corresponding
+ * names. It operates asynchronously and emits successfully retrieved [CartographicBoundary] objects
+ * through a returned [Flow] of [CartographicBoundary].
+ *
+ * This class implements rate limiting with a one-second delay between Nominatim API requests to
+ * comply with usage guidelines. It also uses a mutex for thread-safe access during API calls.
+ *
+ * Note: This class assumes the provided `administrativeUnitLevelAndAdministrativeUnitNameList`
+ * contains valid combinations of `AdministrativeLevel` and `AdministrativeUnitName` objects.
+ */
 class CartographicBoundaryRetrofitRetriever @Inject constructor(
     private val nominatimAPI: NominatimAPI
 ) : CartographicBoundaryRetriever {
     private var fetchingPlaces: Set<String> = emptySet()
     private var mutex: Mutex = Mutex()
 
+    /**
+     * Retrieves a [Flow] of [CartographicBoundary] objects for a given list of
+     * [AdministrativeLevel] and [AdministrativeUnitName] pairs. This method is designed to retrieve
+     * boundaries for multiple locations at once.
+     *
+     * For each provided pair, the method attempts to fetch the corresponding cartographic boundary
+     * based on the administrative level and name. If successful, the retrieved boundary information
+     * is emitted through the returned [Flow].
+     *
+     * @param administrativeUnitLevelAndAdministrativeUnitNameList a list of pairs where the first
+     * element specifies the administrative level (e.g., [CITY], [STATE], [COUNTRY]) and the second
+     * element specifies the corresponding administrative unit name (e.g., "New York City",
+     * "California").
+     *
+     * @return a [Flow] that emits successfully retrieved [CartographicBoundary] objects.
+     */
     override fun retrieve(
         administrativeUnitLevelAndAdministrativeUnitNameList: List<
             Pair<AdministrativeLevel, AdministrativeUnitName>
@@ -66,13 +94,24 @@ class CartographicBoundaryRetrofitRetriever @Inject constructor(
         val administrativeUnitNameFullName = "$COUNTY " +
                 administrativeUnitName.toString(administrativeLevel = COUNTY)
         administrativeUnitName.subAdminArea ?: run {
-            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because subAdminArea field is null"); return null
+            log(msg = "Couldn't start retrieving cartographic boundary for " +
+                    "$administrativeUnitNameFullName because subAdminArea field is null"
+            )
+            return null
         }
         administrativeUnitName.adminArea ?: run {
-            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because adminArea field is null"); return null
+            log(
+                msg = "Couldn't start retrieving cartographic boundary for " +
+                        "$administrativeUnitNameFullName because adminArea field is null"
+            )
+            return null
         }
         administrativeUnitName.countryName ?: run {
-            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because countryName field is null"); return null
+            log(
+                msg = "Couldn't start retrieving cartographic boundary for " +
+                      "$administrativeUnitNameFullName because countryName field is null"
+            )
+            return null
         }
         val countyAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = COUNTY
@@ -91,10 +130,17 @@ class CartographicBoundaryRetrofitRetriever @Inject constructor(
         val administrativeUnitNameFullName = "$STATE " +
                 administrativeUnitName.toString(administrativeLevel = STATE)
         administrativeUnitName.adminArea ?: run {
-            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because adminArea field is null"); return null
+            log(
+                msg = "Couldn't start retrieving cartographic boundary for " +
+                    "$administrativeUnitNameFullName because adminArea field is null")
+            return null
         }
         administrativeUnitName.countryName ?: run {
-            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because countryName field is null"); return null
+            log(
+                msg = "Couldn't start retrieving cartographic boundary for " +
+                      "$administrativeUnitNameFullName because countryName field is null"
+            )
+            return null
         }
         val stateAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = STATE
@@ -113,7 +159,11 @@ class CartographicBoundaryRetrofitRetriever @Inject constructor(
         val administrativeUnitNameFullName = "$COUNTRY " +
                 administrativeUnitName.toString(administrativeLevel = COUNTRY)
         administrativeUnitName.countryName ?: run {
-            log(msg = "Couldn't start retrieving cartographic boundary for $administrativeUnitNameFullName because countryName field is null"); return null
+            log(
+                msg = "Couldn't start retrieving cartographic boundary for " +
+                      "$administrativeUnitNameFullName because countryName field is null"
+            )
+            return null
         }
         val countryAdministrativeUnitNameString = administrativeUnitName.toString(
             administrativeLevel = COUNTRY
@@ -150,7 +200,7 @@ class CartographicBoundaryRetrofitRetriever @Inject constructor(
         val county = administrativeUnitName.subAdminArea ?: ""
         val state = administrativeUnitName.adminArea ?: ""
         val country = administrativeUnitName.countryName ?: ""
-        mutex.lock()
+        mutex.lock() // This is to ensure there is only one thread using the API per time
         val jsonResult = try {
             when (administrativeLevel) {
                 CITY -> {
@@ -180,7 +230,7 @@ class CartographicBoundaryRetrofitRetriever @Inject constructor(
             Log.d("API Result", "error: $exception")
             null
         }
-        delay(1000) //Requests to Nominatim API should be limit to one per second
+        delay(1000) // Requests to Nominatim API should be limit to one per second.
         mutex.unlock()
         val administrativeUnitNameFullName = "$administrativeLevel " +
                 administrativeUnitName.toString(administrativeLevel = administrativeLevel)
@@ -212,13 +262,17 @@ class CartographicBoundaryRetrofitRetriever @Inject constructor(
 
         if (type == "Polygon") {
             if (jsonResults.size == 1) return jsonFirstResult
+            // Check if there are second result that contains a MultiPolygon.
             val jsonSecondResult = jsonResults[1]
             if (
                 jsonSecondResult.displayName == jsonFirstResult.displayName &&
                 jsonSecondResult.type == "administrative"
             ) {
                 if (jsonSecondResult.geoJSON.type == "MultiPolygon") {
-                    log(msg = "The second API result's geoJSON type is MultiPolygon, returning this one instead")
+                    log(
+                        msg = "The second API result's geoJSON type is MultiPolygon, returning " +
+                              "this one instead"
+                    )
                     return jsonSecondResult
                 }
             }
@@ -226,6 +280,8 @@ class CartographicBoundaryRetrofitRetriever @Inject constructor(
 
         if (type == "Point") {
             if (jsonResults.size == 1) {
+                // Point is not a valid Cartographic Boundary, using the q param provided for the
+                // API.
                 log(msg = "The API geoJSON type is a point, trying to using the q instead")
                 return nominatimAPI.getResults(q = "$city, $state, $country")[0]
             }
@@ -234,7 +290,11 @@ class CartographicBoundaryRetrofitRetriever @Inject constructor(
                 jsonSecondResult.displayName == jsonFirstResult.displayName &&
                 jsonSecondResult.type == "administrative"
             ) {
-                log(msg = "The second API result's type is administrative, returning this one instead")
+                // There are a second result with type administrative.
+                log(
+                    msg = "The second API result's type is administrative, " +
+                           "returning this one instead"
+                )
                 return jsonSecondResult
             }
             return nominatimAPI.getResults(q = "$city, $state, $country")[0]
