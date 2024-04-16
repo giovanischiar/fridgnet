@@ -30,13 +30,13 @@
   - [Composition With Pair of Set](#composition-with-pair-of-set)
 - [Diagrams](#diagrams)
   - [Whole Project](#whole-project)
-  - [Package `view` and `viewmodel`](#package-view-with-viewmodel`)
+  - [Package `view` and `viewmodel`](#package-view-and-viewmodel`)
   - [Package `view.viewdata`](#package-viewviewdata)
-  - [Package `viewmodel` and `view.viewdata`](#package-viewmodel-with-viewviewdata`)
-  - [Package `viewmodel` and `model.repository`](#package-viewmodel-with-modelrepository)
+  - [Package `viewmodel` and `view.viewdata`](#package-viewmodel-and-viewviewdata`)
+  - [Package `viewmodel` and `model.repository`](#package-viewmodel-and-modelrepository)
   - [Package `model`](#package-model)
-  - [Package `model.repository` and `model`](package-modelrepository-with-model`)
-  - [Package `model.repository` and `model.datasource`](package-modelrepository-with-modeldatasource`)
+  - [Package `model.repository` and `model`](#package-modelrepository-and-model`)
+  - [Package `model.repository` and `model.datasource`](#package-modelrepository-and-modeldatasource`)
 - [Future Tasks](#future-tasks)
 
 ## Documentation
