@@ -46,7 +46,7 @@ class AdministrativeUnitsViewModel @Inject constructor(
      *
      * @param index the index of the selected administrative unit
      */
-    fun selectCartographicBoundaryGeoLocationAt(index: Int) = viewModelScope.launch {
+    fun selectCartographicBoundaryGeoLocationAt(index: Int) {
         Log.d(
             tag = "Select Image Feature",
             msg ="Select cartographic boundary geo location at $index"
