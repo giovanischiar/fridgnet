@@ -18,7 +18,9 @@ class AdministrativeUnitViewModel @Inject constructor(
     /**
      * The stream (Flow) of Administrative Unit converted into UI object
      */
-    val administrativeUnitFlow = administrativeUnitRepository.administrativeUnitFlow.map {
-        administrativeUnit -> administrativeUnit.toAdministrativeUnitViewData()
+    val administrativeUnitFlow by lazy {
+        administrativeUnitRepository.administrativeUnitFlow.map { administrativeUnit ->
+            administrativeUnit.toAdministrativeUnitViewData()
+        }
     }
 }

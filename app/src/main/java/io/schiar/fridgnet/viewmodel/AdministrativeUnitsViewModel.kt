@@ -24,21 +24,27 @@ class AdministrativeUnitsViewModel @Inject constructor(
     /**
      * The stream (Flow) of Administrative Units converted into UI objects
      */
-    val administrativeUnitsFlow = administrativeUnitsRepository.administrativeUnitsFlow
-        .map { administrativeUnits -> administrativeUnits.toAdministrativeUnitViewDataList() }
+    val administrativeUnitsFlow by lazy {
+        administrativeUnitsRepository.administrativeUnitsFlow
+            .map { administrativeUnits -> administrativeUnits.toAdministrativeUnitViewDataList() }
+    }
 
     /**
      * The stream (Flow) of Administrative Levels converted into UI objects
      */
-    val administrativeLevelsFlow = administrativeUnitsRepository.administrativeLevelsFlow
-        .map { administrativeLevels -> administrativeLevels.toAdministrativeLevelViewDataList() }
+    val administrativeLevelsFlow by lazy {
+        administrativeUnitsRepository.administrativeLevelsFlow
+            .map { administrativeLevels -> administrativeLevels.toAdministrativeLevelViewDataList() }
+    }
 
     /**
      * The stream (Flow) of the current Administrative Level converted into UI object
      */
-    val currentAdministrativeLevelFlow = administrativeUnitsRepository
-        .currentAdministrativeLevelFlow
-        .map { administrativeLevel -> administrativeLevel.toAdministrativeUnitLevelViewData() }
+    val currentAdministrativeLevelFlow by lazy {
+        administrativeUnitsRepository
+            .currentAdministrativeLevelFlow
+            .map { administrativeLevel -> administrativeLevel.toAdministrativeUnitLevelViewData() }
+    }
 
     /**
      * Delegates the Repository to update the selected administrative unit in the model based on the

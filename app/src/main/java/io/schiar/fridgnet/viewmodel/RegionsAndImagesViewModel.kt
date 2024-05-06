@@ -22,20 +22,26 @@ class RegionsAndImagesViewModel @Inject constructor(
     /**
      * The stream (Flow) of visible Images converted into UI objects.
      */
-    val visibleImagesFlow = mapRepository.imagesWithinCurrentBoundingBoxFlow
-        .map { it.toImageViewDataList() }
+    val visibleImagesFlow by lazy {
+        mapRepository.imagesWithinCurrentBoundingBoxFlow
+            .map { it.toImageViewDataList() }
+    }
 
     /**
      * The stream (Flow) of visible Regions converted into UI objects.
      */
-    val visibleRegionsFlow = mapRepository.activeRegionsWithinCurrentBoundingBoxFlow
-        .map { it.toRegionViewDataList() }
+    val visibleRegionsFlow by lazy {
+        mapRepository.activeRegionsWithinCurrentBoundingBoxFlow
+            .map { it.toRegionViewDataList() }
+    }
 
     /**
      * The stream (Flow) of bounding box of the visible Images converted into UI objects.
      */
-    val boundingBoxImagesFlow = mapRepository.boundingBoxImagesFlow
-        .map { it?.toBoundingBoxViewData() }
+    val boundingBoxImagesFlow by lazy {
+        mapRepository.boundingBoxImagesFlow
+            .map { it?.toBoundingBoxViewData() }
+    }
 
     /**
      * Delegates the repository to update the current region in the model. It creates a coroutine to

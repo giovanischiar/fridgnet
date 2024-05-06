@@ -20,9 +20,11 @@ class RegionsFromCartographicBoundaryViewModel @Inject constructor(
     /**
      * The stream (Flow) of the current cartographic boundary converted into UI object.
      */
-    val currentCartographicBoundaryFlow = regionsFromCartographicBoundaryRepository
-        .currentCartographicBoundaryFlow
-        .map { it.toCartographicBoundaryViewData() }
+    val currentCartographicBoundaryFlow by lazy {
+        regionsFromCartographicBoundaryRepository
+            .currentCartographicBoundaryFlow
+            .map { it.toCartographicBoundaryViewData() }
+    }
 
     /**
      * Delegates the repository to update the current cartographic boundary's region in the model.
