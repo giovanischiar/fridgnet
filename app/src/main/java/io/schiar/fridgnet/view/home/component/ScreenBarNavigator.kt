@@ -6,7 +6,6 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -14,34 +13,35 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import io.schiar.fridgnet.R
-import io.schiar.fridgnet.view.home.util.BottomNavScreen
+import io.schiar.fridgnet.view.home.util.Screen
 
 /**
- * This component is responsible for defining the screens that will be displayed at the bottom bar
+ * This component is responsible for defining the screens that will be displayed at a bar
  * of all screens.
  *
- * @param navController the object used to navigate from one screen to another
+ * @param screens The screens considered to be used on the bar.
+ * @param navController The object used to navigate from one screen to another
  */
 @Composable
-fun BottomBar(navController: NavHostController) {
-    val bottomNavScreens = remember {
-        listOf(BottomNavScreen.AdministrativeUnits, BottomNavScreen.RegionsAndImages)
-    }
+fun ScreenBarNavigator(
+    screens: List<Screen>,
+    navController: NavHostController
+) {
     NavigationBar(containerColor = colorResource(id = R.color.indigo_dye_500)) {
         val navBackStackEntry by navController.currentBackStackEntryAsState()
         val currentDestination = navBackStackEntry?.destination
-        bottomNavScreens.forEach { bottomNavScreen ->
+        screens.forEach { screen ->
             val selected = currentDestination?.hierarchy?.any {
-                it.route == bottomNavScreen.route.id
+                it.route == screen.route.id
             } == true
 
             NavigationBarItem(
                 icon = {
-                    bottomNavScreen.icon?.chooseWhether(isSelected = selected)?.let { imageVector ->
+                    screen.icon?.chooseWhether(isSelected = selected)?.let { imageVector ->
                         Icon(
                             imageVector = imageVector,
                             contentDescription = stringResource(
-                                id = bottomNavScreen.icon.contentDescriptionStringID
+                                id = screen.icon.contentDescriptionStringID
                             ),
                             tint = colorResource(id = R.color.white)
                         )
@@ -49,13 +49,13 @@ fun BottomBar(navController: NavHostController) {
                 },
                 label = {
                     Text(
-                        stringResource(bottomNavScreen.resourceId),
+                        stringResource(screen.resourceId),
                         color = colorResource(id = R.color.white)
                     )
                 },
                 selected = selected,
                 onClick = {
-                    navController.navigate(bottomNavScreen.route.id) {
+                    navController.navigate(screen.route.id) {
                         // Pop up to the start destination of the graph to
                         // avoid building up a large stack of destinations
                         // on the back stack as users select items

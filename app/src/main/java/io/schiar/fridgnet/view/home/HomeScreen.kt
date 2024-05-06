@@ -9,12 +9,13 @@ import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import io.schiar.fridgnet.view.home.component.BottomBar
+import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.home.component.FloatingActionButton
 import io.schiar.fridgnet.view.home.component.Navigation
 import io.schiar.fridgnet.view.home.component.PhotoPicker
+import io.schiar.fridgnet.view.home.component.ScreenBarNavigator
 import io.schiar.fridgnet.view.home.component.TopBar
-import io.schiar.fridgnet.view.home.util.BottomNavScreen
+import io.schiar.fridgnet.view.home.util.Screen
 import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.viewmodel.HomeViewModel
 
@@ -33,15 +34,25 @@ fun HomeScreen(
     viewModel: HomeViewModel = hiltViewModel(),
     navController: NavHostController = rememberNavController()
 ) {
+    val screens = remember {
+        listOf(Screen.AdministrativeUnits, Screen.RegionsAndImages)
+    }
     var currentScreenInfo by remember { mutableStateOf(
-        ScreenInfo(BottomNavScreen.AdministrativeUnits.route.id))
+        ScreenInfo(Screen.AdministrativeUnits.route.id))
     }
     var isPhotoPickerShowing by remember { mutableStateOf(false) }
 
     Scaffold(
         topBar = { TopBar(navController = navController, screenInfo = currentScreenInfo) },
-        floatingActionButton = { FloatingActionButton { isPhotoPickerShowing = true } },
-        bottomBar = { BottomBar(navController = navController) }
+        floatingActionButton = {
+            FloatingActionButton(
+                iconDrawableID = R.drawable.ic_add_photo,
+                contentDescriptionStringID = R.string.add_image
+            ) {
+                isPhotoPickerShowing = true
+            }
+        },
+        bottomBar = { ScreenBarNavigator(screens = screens, navController = navController) }
     ) { innerPadding ->
         Navigation(
             navController = navController,

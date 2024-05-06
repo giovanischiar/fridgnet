@@ -9,7 +9,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import io.schiar.fridgnet.view.administrationunit.AdministrativeUnitScreen
 import io.schiar.fridgnet.view.administrationunits.AdministrativeUnitsScreen
-import io.schiar.fridgnet.view.home.util.BottomNavScreen
+import io.schiar.fridgnet.view.home.util.Screen
 import io.schiar.fridgnet.view.home.util.Route
 import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.view.regionsandimages.RegionsAndImagesScreen
@@ -35,9 +35,9 @@ fun Navigation(
     NavHost(
         modifier = Modifier.padding(innerPadding),
         navController = navController,
-        startDestination = BottomNavScreen.AdministrativeUnits.route.id
+        startDestination = Screen.AdministrativeUnits.route.id
     ) {
-        composable(route = BottomNavScreen.AdministrativeUnits.route.id) {
+        composable(route = Screen.AdministrativeUnits.route.id) {
             AdministrativeUnitsScreen(
                 onNavigateToAdministrativeUnit = {
                     navController.navigate(route = Route.ADMINISTRATIVE_UNIT.id)
@@ -46,7 +46,7 @@ fun Navigation(
             )
         }
 
-        composable(route = BottomNavScreen.RegionsAndImages.route.id) {
+        composable(route = Screen.RegionsAndImages.route.id) {
             RegionsAndImagesScreen(
                 onNavigateToRegionsFromCartographicBoundary = {
                     navController.navigate(route = Route.REGIONS_FROM_CARTOGRAPHIC_BOUNDARY.id)

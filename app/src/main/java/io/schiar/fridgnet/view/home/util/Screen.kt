@@ -16,7 +16,7 @@ import io.schiar.fridgnet.R
  * @property resourceId the string resource ID of the screen's name in the bottom bar.
  * @property icon the icon to be displayed for the screen (optional).
  */
-sealed class BottomNavScreen(
+sealed class Screen(
     val route: Route,
     @StringRes val resourceId: Int,
     val icon: Icon? = null
@@ -24,7 +24,7 @@ sealed class BottomNavScreen(
     /**
      * The object that represents the Administrative Units Screen's Bottom Menu Option.
      */
-    data object AdministrativeUnits : BottomNavScreen(
+    data object AdministrativeUnits : Screen(
         route = Route.ADMINISTRATIVE_UNITS,
         resourceId = R.string.administrative_units_screen,
         icon = Icon(
@@ -37,7 +37,7 @@ sealed class BottomNavScreen(
     /**
      * The object that represents the Regions And Images Screen's Bottom Menu Option.
      */
-    data object RegionsAndImages : BottomNavScreen(
+    data object RegionsAndImages : Screen(
         route = Route.REGIONS_AND_IMAGES,
         resourceId = R.string.regions_and_images_screen,
         icon = Icon(
