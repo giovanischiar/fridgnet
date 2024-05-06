@@ -10,6 +10,7 @@
 
 ## Contents
 
+- [Build & run](#build--run)
 - [Documentation](#documentation)
 - [Use Cases](#use-cases)
   - [Add Photos](#add-photos)
@@ -38,6 +39,35 @@
   - [Package `model.repository` and `model`](#package-modelrepository-and-model`)
   - [Package `model.repository` and `model.datasource`](#package-modelrepository-and-modeldatasource`)
 - [Future Tasks](#future-tasks)
+
+## Build & Run
+
+- This project contains a submodule library. Clone this project using the `--recurse-submodules` param in order to clone together with the library:
+
+```bash
+git clone --recurse-submodules git@github.com:giovanischiar/fridgnet.git
+```
+or
+
+```bash
+git clone --recurse-submodules https://github.com/giovanischiar/fridgnet.git
+```
+
+- If the project was already cloned, run this command:
+
+```bash
+git submodule update --init
+```
+
+- Go to Google Maps library and get a map API key. Go [here](https://developers.google.com/maps/documentation/embed/get-api-key) to learn how to create a API maps key.
+
+- Create an `apikey.properties` file on the root of the project containing:
+
+```
+MAPS_API_KEY=/* Your Google Maps API key. */
+```
+
+- Open the project using [Android Studio](https://developer.android.com/studio).
 
 ## Documentation
 
