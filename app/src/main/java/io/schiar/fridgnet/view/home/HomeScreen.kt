@@ -62,9 +62,10 @@ fun HomeScreen(
     }
 
     if (isPhotoPickerShowing) {
-        PhotoPicker { uris ->
+        PhotoPicker(onURIsSelected = { uris ->
             viewModel.addURIs(uris = uris)
             isPhotoPickerShowing = false
-        }
+
+        })
     }
 }

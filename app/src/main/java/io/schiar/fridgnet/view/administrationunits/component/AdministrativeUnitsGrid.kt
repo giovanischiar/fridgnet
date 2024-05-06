@@ -32,10 +32,11 @@ fun AdministrativeUnitsGrid(
             AdministrativeUnitView(
                 modifier = Modifier.size(viewSizeInDP),
                 administrativeUnit = administrativeUnits[index],
-                areImagesShowing = false
-            ) {
-                onAdministrativeUnitPressedAt(index)
-            }
+                areImagesShowing = false,
+                onPress = {
+                    onAdministrativeUnitPressedAt(index)
+                }
+            )
         }
     }
 }
