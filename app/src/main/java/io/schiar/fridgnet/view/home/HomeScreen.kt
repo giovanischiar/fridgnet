@@ -11,12 +11,12 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.home.component.FloatingActionButton
-import io.schiar.fridgnet.view.home.component.Navigation
 import io.schiar.fridgnet.view.home.component.PhotoPicker
 import io.schiar.fridgnet.view.home.component.ScreenBarNavigator
 import io.schiar.fridgnet.view.home.component.TopBar
 import io.schiar.fridgnet.view.home.util.Screen
 import io.schiar.fridgnet.view.home.util.ScreenInfo
+import io.schiar.fridgnet.view.navigation.Navigation
 import io.schiar.fridgnet.viewmodel.HomeViewModel
 
 /**

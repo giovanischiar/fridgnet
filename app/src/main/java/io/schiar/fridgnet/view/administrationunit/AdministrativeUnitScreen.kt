@@ -2,43 +2,58 @@ package io.schiar.fridgnet.view.administrationunit
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.maps.android.compose.MapUiSettings
 import io.schiar.fridgnet.view.administrationunit.component.PhotoGrid
 import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.view.shared.component.AdministrativeUnitView
-import io.schiar.fridgnet.viewmodel.AdministrativeUnitViewModel
+import io.schiar.fridgnet.view.shared.viewdata.AdministrativeUnitViewData
 
 /**
  * The composable representing the Administrative Unit Screen. It displays a Google Map component
  * with all images pinned to their locations, along with a grid of all images ordered by date below
  * the map.
  *
- * @param viewModel the corresponding AdministrativeUnitViewModel providing access to data for
- * populating the screen and methods to interact with it.
+ * @param uiState The current UI state that provides access to administrative unit data
+ * and encapsulates the possible states of the screen (loading, loaded).
  * @param onSetToolbarInfo a function to set information for the parent composable's toolbar,
  * such as title and components.
  */
 @Composable
 fun AdministrativeUnitScreen(
-    viewModel: AdministrativeUnitViewModel = hiltViewModel(),
+    uiState: AdministrativeUnitUiState,
     onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
 ) {
-    val optionalAdministrativeUnit by viewModel.administrativeUnitFlow.collectAsState(
-        initial = null
-    )
-    val administrativeUnit = optionalAdministrativeUnit ?: return
+    when (uiState) {
+        is AdministrativeUnitUiState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is AdministrativeUnitUiState.AdministrativeUnitLoaded -> {
+            AdministrativeUnitScreenLoaded(
+                administrativeUnit = uiState.administrativeUnit,
+                onSetToolbarInfo = onSetToolbarInfo
+            )
+        }
+    }
+}
+
+@Composable
+private fun AdministrativeUnitScreenLoaded(
+    administrativeUnit: AdministrativeUnitViewData,
+    onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
+) {
     val (name, _, _, _, images, _) = administrativeUnit
     val weight = remember { 0.65f }
     onSetToolbarInfo(ScreenInfo(title = name))
     Column {
         AdministrativeUnitView(
-            modifier = Modifier.fillMaxWidth().weight(weight),
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(weight),
             administrativeUnit = administrativeUnit,
             mapUISettings = MapUiSettings(zoomControlsEnabled = false),
             areImagesSizeShowing = false,

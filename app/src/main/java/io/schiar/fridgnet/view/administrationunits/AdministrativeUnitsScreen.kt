@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.administrationunits.component.AdministrativeLevelDropdown
 import io.schiar.fridgnet.view.administrationunits.component.AdministrativeUnitsGrid
@@ -32,7 +31,7 @@ import io.schiar.fridgnet.viewmodel.AdministrativeUnitsViewModel
  */
 @Composable
 fun AdministrativeUnitsScreen(
-    viewModel: AdministrativeUnitsViewModel = hiltViewModel(),
+    viewModel: AdministrativeUnitsViewModel,
     onNavigateToAdministrativeUnit: () -> Unit,
     onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
 ) {
