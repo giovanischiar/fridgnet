@@ -2,7 +2,6 @@ package io.schiar.fridgnet.view.administrationunit
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -10,6 +9,7 @@ import com.google.maps.android.compose.MapUiSettings
 import io.schiar.fridgnet.view.administrationunit.component.PhotoGrid
 import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.view.shared.component.AdministrativeUnitView
+import io.schiar.fridgnet.view.shared.component.Loading
 import io.schiar.fridgnet.view.shared.viewdata.AdministrativeUnitViewData
 
 /**
@@ -28,9 +28,7 @@ fun AdministrativeUnitScreen(
     onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
 ) {
     when (uiState) {
-        is AdministrativeUnitUiState.Loading -> {
-            CircularProgressIndicator()
-        }
+        is AdministrativeUnitUiState.Loading -> Loading()
 
         is AdministrativeUnitUiState.AdministrativeUnitLoaded -> {
             AdministrativeUnitScreenLoaded(

@@ -5,11 +5,16 @@ import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.schiar.fridgnet.Log
 import io.schiar.fridgnet.model.repository.AdministrativeUnitsRepository
+import io.schiar.fridgnet.view.administrationunits.uistate.AdministrativeLevelsUiState
+import io.schiar.fridgnet.view.administrationunits.uistate.AdministrativeUnitsUiState
+import io.schiar.fridgnet.view.administrationunits.uistate.CurrentAdministrativeLevelUiState
 import io.schiar.fridgnet.viewmodel.util.toAdministrativeLevelViewDataList
 import io.schiar.fridgnet.viewmodel.util.toAdministrativeUnitLevelViewData
 import io.schiar.fridgnet.viewmodel.util.toAdministrativeUnitViewDataList
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -21,29 +26,52 @@ import javax.inject.Inject
 class AdministrativeUnitsViewModel @Inject constructor(
     private val administrativeUnitsRepository: AdministrativeUnitsRepository
 ) : ViewModel() {
+
     /**
      * The stream (Flow) of Administrative Units converted into UI objects
      */
-    val administrativeUnitsFlow by lazy {
+    val administrativeUnitsUiStateFlow by lazy {
         administrativeUnitsRepository.administrativeUnitsFlow
-            .map { administrativeUnits -> administrativeUnits.toAdministrativeUnitViewDataList() }
+            .map { administrativeUnits ->
+                AdministrativeUnitsUiState.AdministrativeUnitsLoaded(
+                    administrativeUnits.toAdministrativeUnitViewDataList()
+                )
+            }
     }
 
     /**
      * The stream (Flow) of Administrative Levels converted into UI objects
      */
-    val administrativeLevelsFlow by lazy {
+    val administrativeLevelsUiStateFlow by lazy {
         administrativeUnitsRepository.administrativeLevelsFlow
-            .map { administrativeLevels -> administrativeLevels.toAdministrativeLevelViewDataList() }
+            .map { administrativeLevels ->
+                AdministrativeLevelsUiState.AdministrativeLevelsLoaded(
+                    administrativeLevels.toAdministrativeLevelViewDataList()
+                )
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                AdministrativeLevelsUiState.Loading
+            )
     }
 
     /**
      * The stream (Flow) of the current Administrative Level converted into UI object
      */
-    val currentAdministrativeLevelFlow by lazy {
+    val currentAdministrativeLevelUiStateFlow by lazy {
         administrativeUnitsRepository
             .currentAdministrativeLevelFlow
-            .map { administrativeLevel -> administrativeLevel.toAdministrativeUnitLevelViewData() }
+            .map { administrativeLevel ->
+                CurrentAdministrativeLevelUiState.CurrentAdministrativeLevelLoaded(
+                    administrativeLevel.toAdministrativeUnitLevelViewData()
+                )
+            }
+            .stateIn(
+                viewModelScope,
+                SharingStarted.Eagerly,
+                CurrentAdministrativeLevelUiState.Loading
+            )
     }
 
     /**
