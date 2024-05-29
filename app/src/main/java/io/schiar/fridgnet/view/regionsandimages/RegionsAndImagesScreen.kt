@@ -2,43 +2,62 @@ package io.schiar.fridgnet.view.regionsandimages
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import io.schiar.fridgnet.R
 import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.view.regionsandimages.component.Map
 import io.schiar.fridgnet.view.regionsandimages.component.TopAppBarActionButton
+import io.schiar.fridgnet.view.regionsandimages.uistate.BoundingBoxImagesUiState
+import io.schiar.fridgnet.view.regionsandimages.uistate.VisibleImagesUiState
+import io.schiar.fridgnet.view.regionsandimages.uistate.VisibleRegionsUiState
 import io.schiar.fridgnet.view.shared.util.toBoundingBoxViewData
-import io.schiar.fridgnet.viewmodel.RegionsAndImagesViewModel
+import io.schiar.fridgnet.view.shared.viewdata.BoundingBoxViewData
 
 /**
  * The component representing the Regions and Images Screen. It displays a map with plotted images
  * and regions, and allows zooming functionality.
  *
- * @param viewModel the corresponding viewModel that provides access to data and methods for
- * manipulating the screen.
- * @param onNavigateToRegionsFromCartographicBoundary the event fired to navigate to the Regions
+ * @param visibleRegionsUiState The UI state for visible regions, which can be either loading or
+ * loaded.
+ * @param visibleImagesUiState The UI state for visible images, which can be either loading or
+ * loaded.
+ * @param boundingBoxImagesUiState The UI state for the images within the current bounding box.
+ * @param selectRegionAt A callback function to be invoked when a region is selected, with the index
+ * of the selected region.
+ * @param visibleAreaChanged A callback function to be invoked when the visible area of the map
+ * changes, passing the new bounding box data.
+ * @param onNavigateToRegionsFromCartographicBoundary The event fired to navigate to the Regions
  * From Cartographic Boundary screen.
- * @param onSetToolbarInfo a function to set information for the parent composable's toolbar.
+ * @param onChangeToolbarInfo A function to set information for the parent composable's toolbar.
  */
 @Composable
 fun RegionsAndImagesScreen(
-    viewModel: RegionsAndImagesViewModel = hiltViewModel(),
+    visibleRegionsUiState: VisibleRegionsUiState,
+    visibleImagesUiState: VisibleImagesUiState,
+    boundingBoxImagesUiState: BoundingBoxImagesUiState,
+    selectRegionAt: (index: Int) -> Unit,
+    visibleAreaChanged: (boundingBoxViewData: BoundingBoxViewData) -> Unit,
     onNavigateToRegionsFromCartographicBoundary: () -> Unit,
-    onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
+    onChangeToolbarInfo: (screenInfo: ScreenInfo) -> Unit
 ) {
     var zoomCameraToFitImages by remember { mutableStateOf(false) }
-    val visibleImages by viewModel.visibleImagesFlow.collectAsState(initial = emptyList())
-    val visibleRegions by viewModel.visibleRegionsFlow.collectAsState(initial = emptyList())
-    val boundingBoxImages by viewModel.boundingBoxImagesFlow.collectAsState(initial = null)
 
-    onSetToolbarInfo(
+    val visibleRegions = when (visibleRegionsUiState) {
+        is VisibleRegionsUiState.Loading -> emptyList()
+        is VisibleRegionsUiState.VisibleRegionsLoaded -> visibleRegionsUiState.visibleRegions
+    }
+
+    val visibleImages = when (visibleImagesUiState) {
+        is VisibleImagesUiState.Loading -> emptyList()
+        is VisibleImagesUiState.VisibleImagesLoaded -> visibleImagesUiState.visibleImages
+    }
+
+    onChangeToolbarInfo(
         ScreenInfo(
             title = stringResource(id = R.string.regions_and_images_screen),
             actions = {
@@ -57,16 +76,16 @@ fun RegionsAndImagesScreen(
         modifier = Modifier.fillMaxSize(),
         visibleImages = visibleImages,
         visibleRegions = visibleRegions,
-        boundingBox = boundingBoxImages,
+        boundingBoxImagesUiState = boundingBoxImagesUiState,
         zoomCameraToFitImages = zoomCameraToFitImages,
         onMoveFinished = { zoomCameraToFitImages = false },
         regionPressedAt = { index ->
-            viewModel.selectRegionAt(index = index)
+            selectRegionAt(index)
             onNavigateToRegionsFromCartographicBoundary()
         },
         onVisibleMapAreaChangeTo = { latLngBounds ->
-            val bounds = latLngBounds.toBoundingBoxViewData()
-            viewModel.visibleAreaChanged(boundingBoxViewData = bounds)
+            val boundingBox = latLngBounds.toBoundingBoxViewData()
+            visibleAreaChanged(boundingBox)
         }
     )
 }

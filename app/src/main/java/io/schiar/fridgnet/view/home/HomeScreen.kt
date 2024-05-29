@@ -57,7 +57,7 @@ fun HomeScreen(
         Navigation(
             navController = navController,
             innerPadding = innerPadding,
-            onChangeScreenInfo = { screenInfo -> currentScreenInfo = screenInfo }
+            onChangeToolbarInfo = { screenInfo -> currentScreenInfo = screenInfo }
         )
     }
 

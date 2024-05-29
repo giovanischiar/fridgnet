@@ -3,6 +3,9 @@ package io.schiar.fridgnet.viewmodel
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.schiar.fridgnet.model.repository.RegionsAndImagesRepository
+import io.schiar.fridgnet.view.regionsandimages.uistate.BoundingBoxImagesUiState
+import io.schiar.fridgnet.view.regionsandimages.uistate.VisibleImagesUiState
+import io.schiar.fridgnet.view.regionsandimages.uistate.VisibleRegionsUiState
 import io.schiar.fridgnet.view.shared.viewdata.BoundingBoxViewData
 import io.schiar.fridgnet.viewmodel.util.toBoundingBox
 import io.schiar.fridgnet.viewmodel.util.toBoundingBoxViewData
@@ -20,27 +23,34 @@ class RegionsAndImagesViewModel @Inject constructor(
     private val mapRepository: RegionsAndImagesRepository
 ) : ViewModel() {
     /**
-     * The stream (Flow) of visible Images converted into UI objects.
+     * The stream (Flow) of ui state of visible Images converted into UI objects.
      */
-    val visibleImagesFlow by lazy {
+    val visibleImagesUiStateFlow by lazy {
         mapRepository.imagesWithinCurrentBoundingBoxFlow
-            .map { it.toImageViewDataList() }
+            .map { VisibleImagesUiState.VisibleImagesLoaded(it.toImageViewDataList()) }
     }
 
     /**
-     * The stream (Flow) of visible Regions converted into UI objects.
+     * The stream (Flow) of ui state of visible Regions converted into UI objects.
      */
-    val visibleRegionsFlow by lazy {
+    val visibleRegionsUiStateFlow by lazy {
         mapRepository.activeRegionsWithinCurrentBoundingBoxFlow
-            .map { it.toRegionViewDataList() }
+            .map { VisibleRegionsUiState.VisibleRegionsLoaded(it.toRegionViewDataList()) }
     }
 
     /**
-     * The stream (Flow) of bounding box of the visible Images converted into UI objects.
+     * The stream (Flow) of ui state of bounding box of the visible Images converted into UI
+     * objects.
      */
-    val boundingBoxImagesFlow by lazy {
+    val boundingBoxImagesUiStateFlow by lazy {
         mapRepository.boundingBoxImagesFlow
-            .map { it?.toBoundingBoxViewData() }
+            .map {
+                if (it == null) {
+                    BoundingBoxImagesUiState.Loading
+                } else {
+                    BoundingBoxImagesUiState.BoundingBoxImagesLoaded(it.toBoundingBoxViewData())
+                }
+            }
     }
 
     /**

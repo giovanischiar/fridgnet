@@ -17,6 +17,7 @@ import com.google.android.gms.maps.model.LatLngBounds
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.MapUiSettings
 import com.google.maps.android.compose.rememberCameraPositionState
+import io.schiar.fridgnet.view.regionsandimages.uistate.BoundingBoxImagesUiState
 import io.schiar.fridgnet.view.shared.component.RegionDrawer
 import io.schiar.fridgnet.view.shared.component.ZoomControls
 import io.schiar.fridgnet.view.shared.component.debug.MapPolygonInfo
@@ -51,7 +52,7 @@ fun Map(
     modifier: Modifier,
     visibleImages: List<ImageViewData>,
     visibleRegions: List<RegionViewData>,
-    boundingBox: BoundingBoxViewData?,
+    boundingBoxImagesUiState: BoundingBoxImagesUiState,
     zoomCameraToFitImages: Boolean,
     onMoveFinished: () -> Unit,
     regionPressedAt: (index: Int) -> Unit,
@@ -72,15 +73,17 @@ fun Map(
     }
 
     fun zoomToFitImages() {
-        cameraPositionState.updateCameraPositionTo(
-            boundingBox = boundingBox,
-            coroutineScope = coroutineScope,
-            animate = true,
-            onMoveFinished = onMoveFinished
-        )
+        if (boundingBoxImagesUiState is BoundingBoxImagesUiState.BoundingBoxImagesLoaded) {
+            cameraPositionState.updateCameraPositionTo(
+                boundingBox = boundingBoxImagesUiState.boundingBoxImages,
+                coroutineScope = coroutineScope,
+                animate = true,
+                onMoveFinished = onMoveFinished
+            )
+        }
     }
 
-    LaunchedEffect(boundingBox) { zoomToFitImages() }
+    LaunchedEffect(boundingBoxImagesUiState) { zoomToFitImages() }
 
     LaunchedEffect(cameraPositionState.isMoving) { handleVisibleMapRegionChange() }
 
