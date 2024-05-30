@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.schiar.fridgnet.model.repository.RegionsFromCartographicBoundaryRepository
+import io.schiar.fridgnet.view.regionsfromcartographicboundary.uiState.CartographicBoundaryUiState
 import io.schiar.fridgnet.viewmodel.util.toCartographicBoundaryViewData
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
@@ -20,10 +21,12 @@ class RegionsFromCartographicBoundaryViewModel @Inject constructor(
     /**
      * The stream (Flow) of the current cartographic boundary converted into UI object.
      */
-    val currentCartographicBoundaryFlow by lazy {
+    val currentCartographicBoundaryUiStateFlow by lazy {
         regionsFromCartographicBoundaryRepository
             .currentCartographicBoundaryFlow
-            .map { it.toCartographicBoundaryViewData() }
+            .map { CartographicBoundaryUiState.CartographicBoundaryLoaded(
+                it.toCartographicBoundaryViewData()
+            )}
     }
 
     /**

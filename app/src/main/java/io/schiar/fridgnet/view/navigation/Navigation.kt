@@ -6,14 +6,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import io.schiar.fridgnet.view.administrationunit.administrativeUnitScreen
 import io.schiar.fridgnet.view.administrationunits.administrativeUnitsScreen
 import io.schiar.fridgnet.view.home.util.Route
 import io.schiar.fridgnet.view.home.util.Screen
 import io.schiar.fridgnet.view.home.util.ScreenInfo
 import io.schiar.fridgnet.view.regionsandimages.regionsAndImagesScreen
-import io.schiar.fridgnet.view.regionsfromcartographicboundary.RegionsFromCartographicBoundaryScreen
+import io.schiar.fridgnet.view.regionsfromcartographicboundary.regionsFromCartographicBoundaryScreen
 
 /**
  * This composable manages screen navigation within the application based on user actions. It
@@ -53,8 +52,6 @@ fun Navigation(
 
         administrativeUnitScreen(onChangeScreenInfo = onChangeToolbarInfo)
 
-        composable(route = Route.REGIONS_FROM_CARTOGRAPHIC_BOUNDARY.id) {
-            RegionsFromCartographicBoundaryScreen(onSetToolbarInfo = onChangeToolbarInfo)
-        }
+        regionsFromCartographicBoundaryScreen(onChangeToolbarInfo = onChangeToolbarInfo)
     }
 }
