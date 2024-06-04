@@ -353,8 +353,8 @@ class MainRepository {
   View Models serve the `view` with objects made from `view.viewdata` classes, collections, or primitive objects encapsulated by State Flows. This diagram represents all the associations among the classes in `viewmodel` and `view.viewdata`.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewmodel-diagram-1.dark.svg">
-  <img alt="ViewModel Diagram 1" src="./readme-res/diagrams/viewmodel-diagram-1.light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewmodel-viewdata-diagram.dark.svg">
+  <img alt="ViewModel Diagram 1" src="./readme-res/diagrams/viewmodel-viewdata-diagram.light.svg">
 </picture>
 
 ### Package `viewmodel` and `model.repository`
