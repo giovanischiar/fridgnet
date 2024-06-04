@@ -31,13 +31,13 @@
   - [Composition With Pair of Set](#composition-with-pair-of-set)
 - [Diagrams](#diagrams)
   - [Package `io.schiar.fridgnet`](#package-ioschiarfridgnet)
-  - [Package `view` and `viewmodel`](#package-view-and-viewmodel`)
+  - [Package `view` and `viewmodel`](#package-view-and-viewmodel)
   - [Package `view.viewdata`](#package-viewviewdata)
-  - [Package `viewmodel` and `view.viewdata`](#package-viewmodel-and-viewviewdata`)
+  - [Package `viewmodel` and `view.viewdata`](#package-viewmodel-and-viewviewdata)
   - [Package `viewmodel` and `model.repository`](#package-viewmodel-and-modelrepository)
   - [Package `model`](#package-model)
-  - [Package `model.repository` and `model`](#package-modelrepository-and-model`)
-  - [Package `model.repository` and `model.datasource`](#package-modelrepository-and-modeldatasource`)
+  - [Package `model.repository` and `model`](#package-modelrepository-and-model)
+  - [Package `model.repository` and `model.datasource`](#package-modelrepository-and-modeldatasource)
 - [Future Tasks](#future-tasks)
 
 ## Build & Run
