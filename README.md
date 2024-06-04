@@ -30,7 +30,7 @@
   - [Composition With Mutable Map](#composition-with-list)
   - [Composition With Pair of Set](#composition-with-pair-of-set)
 - [Diagrams](#diagrams)
-  - [Whole Project](#whole-project)
+  - [Package `io.schiar.fridgnet`](#package-ioschiarfridgnet)
   - [Package `view` and `viewmodel`](#package-view-and-viewmodel`)
   - [Package `view.viewdata`](#package-viewviewdata)
   - [Package `viewmodel` and `view.viewdata`](#package-viewmodel-and-viewviewdata`)
@@ -164,14 +164,14 @@ The documentation for the whole project (public artifacts 100% documented) is av
 
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./readme-res/clipping-challenge/dark/clipping-visual-tests.dark.svg">
-    <img alt="Clipping of polygons Diagram" src="./readme-res/clipping-challenge/light/clipping-visual-tests.light.svg">
+    <img alt="Clipping of polygons Diagram" src="./readme-res/clipping-challenge/clipping-visual-tests.light.svg">
   </picture>
 
   As you can see, the big rectangle at the center is the visible area of the map at the moment; I call it `bounds`. To simplify, instead of comparing each coordinate of each polygon against the coordinates of `bounds`, I compare its `southeast` and `northeast` coordinates. Let's take a closer look at what those rectangles mean.
 
   <picture>
     <source media="(prefers-color-scheme: dark)" srcset="./readme-res/clipping-challenge/dark/clipping-test-legend.dark.svg">
-    <img alt="Clipping Visual Tests Diagram" src="./readme-res/clipping-challenge/light/clipping-test-legend.light.svg">
+    <img alt="Clipping Visual Tests Diagram" src="./readme-res/clipping-challenge/clipping-test-legend.light.svg">
   </picture>
 
   ```kotlin
@@ -220,13 +220,13 @@ Before presenting the diagrams, I will introduce the notation I used to create t
 ### Diagram Elements
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/structure/dark/diagram-elements.dark.svg">
-  <img alt="Diagram Elements Diagram" src="./readme-res/structure/light/diagram-elements.light.svg">
+  <img alt="Diagram Elements Diagram" src="./readme-res/structure/diagram-elements.light.svg">
 </picture>
 
 ### Method Calling
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/structure/dark/method-calling.dark.svg">
-  <img alt="Method Calling Diagram Diagram" src="./readme-res/structure/light/method-calling.light.svg">
+  <img alt="Method Calling Diagram Diagram" src="./readme-res/structure/method-calling.light.svg">
 </picture>
 
 ```kotlin
@@ -241,7 +241,7 @@ class AppViewModel(private val repository: AppRepository) : ViewModel {
 ### Screen/ViewModel Relationship
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/structure/dark/screen-viewmodel-relationship.dark.svg">
-  <img alt="Screen ViewModel Relationship" src="./readme-res/structure/light/screen-viewmodel-relationship.light.svg">
+  <img alt="Screen ViewModel Relationship" src="./readme-res/structure/screen-viewmodel-relationship.light.svg">
 </picture>
 
 ```kotlin
@@ -257,7 +257,7 @@ fun HomeScreen(viewModel: HomeViewModel, /*...*/) {
 ### Implementation
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/structure/dark/implementation.dark.svg">
-  <img alt="Implementation Diagram" src="./readme-res/structure/light/implementation.light.svg">
+  <img alt="Implementation Diagram" src="./readme-res/structure/implementation.light.svg">
 </picture>
 
 ```kotlin
@@ -267,7 +267,7 @@ class MainRepository : HomeRepository { /*...*/ }
 ### Aggregation
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/structure/dark/aggregation.dark.svg">
-  <img alt="Aggregation Diagram" src="./readme-res/structure/light/aggregation.light.svg">
+  <img alt="Aggregation Diagram" src="./readme-res/structure/aggregation.light.svg">
 </picture>
 
 ```kotlin
@@ -279,7 +279,7 @@ data class Region(
 ### Composition
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/structure/dark/composition.dark.svg">
-  <img alt="Composition Diagram" src="./readme-res/structure/light/composition.light.svg">
+  <img alt="Composition Diagram" src="./readme-res/structure/composition.light.svg">
 </picture>
 
 ```kotlin
@@ -291,7 +291,7 @@ data class Address(
 ### Aggregation With List
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/structure/dark/aggregation-list.dark.svg">
-  <img alt="Aggregation With List Diagram" src="./readme-res/structure/light/aggregation-list.light.svg">
+  <img alt="Aggregation With List Diagram" src="./readme-res/structure/aggregation-list.light.svg">
 </picture>
 
 ```kotlin
@@ -303,7 +303,7 @@ data class Region(
 ### Composition With Mutable Map
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/structure/dark/composition-mutable-map.dark.svg">
-  <img alt="Composition With Mutable Map Diagram" src="./readme-res/structure/light/composition-mutable-map.light.svg">
+  <img alt="Composition With Mutable Map Diagram" src="./readme-res/structure/composition-mutable-map.light.svg">
 </picture>
 
 ```kotlin
@@ -315,7 +315,7 @@ class MainRepository {
 ### Composition With Pair of Set
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/structure/dark/composition-pair-set.dark.svg">
-  <img alt="Composition With Pair of Set Diagram" src="./readme-res/structure/light/composition-pair-set.light.svg">
+  <img alt="Composition With Pair of Set Diagram" src="./readme-res/structure/composition-pair-set.light.svg">
 </picture>
 
 ```kotlin
@@ -325,12 +325,12 @@ class MainRepository {
 ```
 
 ## Diagrams
-### Whole Project
+### Package `io.schiar.fridgnet`
   This diagram shows all the packages the application has, along with their structures. Some packages are simplified, while others are more detailed.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/project-structure-diagram.dark.svg">
-  <img alt="Whole Project Diagram" src="./readme-res/diagrams/light/project-structure-diagram.light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/io-schiar-fridgnet-structure-diagram.dark.svg">
+  <img alt="Whole Project Diagram" src="./readme-res/diagrams/io-schiar-fridgnet-structure-diagram.light.svg">
 </picture>
 
 ### Package `view` and `viewmodel`
@@ -338,7 +338,7 @@ class MainRepository {
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/view-view-model-diagram.dark.svg">
-  <img alt="View/ViewModel Relationship Diagram" src="./readme-res/diagrams/light/view-view-model-diagram.light.svg">
+  <img alt="View/ViewModel Relationship Diagram" src="./readme-res/diagrams/view-view-model-diagram.light.svg">
 </picture>
 
 ### Package `view.viewdata`
@@ -346,7 +346,7 @@ class MainRepository {
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewdata-diagram.dark.svg">
-  <img alt="ViewData Diagram" src="./readme-res/diagrams/light/viewdata-diagram.light.svg">
+  <img alt="ViewData Diagram" src="./readme-res/diagrams/viewdata-diagram.light.svg">
 </picture>
 
 ### Package `viewmodel` and `view.viewdata`
@@ -354,7 +354,7 @@ class MainRepository {
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewmodel-diagram-1.dark.svg">
-  <img alt="ViewModel Diagram 1" src="./readme-res/diagrams/light/viewmodel-diagram-1.light.svg">
+  <img alt="ViewModel Diagram 1" src="./readme-res/diagrams/viewmodel-diagram-1.light.svg">
 </picture>
 
 ### Package `viewmodel` and `model.repository`
@@ -362,7 +362,7 @@ class MainRepository {
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewmodel-repository-diagram.dark.svg">
-  <img alt="ViewModel/Repository Relationship Diagram" src="./readme-res/diagrams/light/viewmodel-repository-diagram.light.svg">
+  <img alt="ViewModel/Repository Relationship Diagram" src="./readme-res/diagrams/viewmodel-repository-diagram.light.svg">
 </picture>
 
 ### Package `model`
@@ -370,7 +370,7 @@ class MainRepository {
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/model-diagram.dark.svg">
-  <img alt="Model Diagram" src="./readme-res/diagrams/light/model-diagram.light.svg">
+  <img alt="Model Diagram" src="./readme-res/diagrams/model-diagram.light.svg">
 </picture>
 
 ### Package `model.repository` and `model`
@@ -378,19 +378,19 @@ class MainRepository {
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-model-diagram.dark.svg">
-  <img alt="Repository Model Diagram" src="./readme-res/diagrams/light/repository-model-diagram.light.svg">
+  <img alt="Repository Model Diagram" src="./readme-res/diagrams/repository-model-diagram.light.svg">
 </picture>
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/address-geocoder-db-repository-diagram.dark.svg">
-  <img alt="Address Geocoder DB Repository Diagram" src="./readme-res/diagrams/light/address-geocoder-db-repository-diagram.light.svg">
+  <img alt="Address Geocoder DB Repository Diagram" src="./readme-res/diagrams/address-geocoder-db-repository-diagram.light.svg">
 </picture>
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/image-android-db-repository-diagram.dark.svg">
-  <img alt="Image Android DB Repository Diagram" src="./readme-res/diagrams/light/image-android-db-repository-diagram.light.svg">
+  <img alt="Image Android DB Repository Diagram" src="./readme-res/diagrams/image-android-db-repository-diagram.light.svg">
 </picture>
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/location-api-db-repository-diagram.dark.svg">
-  <img alt="Location API DB Repository Diagram" src="./readme-res/diagrams/light/location-api-db-repository-diagram.light.svg">
+  <img alt="Location API DB Repository Diagram" src="./readme-res/diagrams/location-api-db-repository-diagram.light.svg">
 </picture>
 
 ### Package `model.repository` and `model.datasource`
@@ -398,7 +398,7 @@ class MainRepository {
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-diagram.dark.svg">
-  <img alt="Main Repository Diagram 1" src="./readme-res/diagrams/light/repository-diagram.light.svg">
+  <img alt="Main Repository Diagram 1" src="./readme-res/diagrams/repository-diagram.light.svg">
 </picture>
 
 ## Future Tasks
