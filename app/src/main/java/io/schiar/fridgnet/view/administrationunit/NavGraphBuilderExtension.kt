@@ -24,10 +24,13 @@ fun NavGraphBuilder.administrativeUnitScreen(
 ) {
     composable(route = Route.ADMINISTRATIVE_UNIT.id) {
         val viewModel = hiltViewModel<AdministrativeUnitViewModel>()
-        val uiState by viewModel.uiState.collectAsState(initial = AdministrativeUnitUiState.Loading)
+        val administrativeUnitUiState by viewModel
+            .administrativeUnitUiStateFlow
+            .collectAsState(initial = AdministrativeUnitUiState.Loading)
         AdministrativeUnitScreen(
             onSetToolbarInfo = onChangeScreenInfo,
-            uiState = uiState
+            administrativeUnitUiState = administrativeUnitUiState
+
         )
     }
 }

@@ -17,22 +17,22 @@ import io.schiar.fridgnet.view.shared.viewdata.AdministrativeUnitViewData
  * with all images pinned to their locations, along with a grid of all images ordered by date below
  * the map.
  *
- * @param uiState The current UI state that provides access to administrative unit data
+ * @param administrativeUnitUiState The current UI state that provides access to administrative unit data
  * and encapsulates the possible states of the screen (loading, loaded).
  * @param onSetToolbarInfo a function to set information for the parent composable's toolbar,
  * such as title and components.
  */
 @Composable
 fun AdministrativeUnitScreen(
-    uiState: AdministrativeUnitUiState,
+    administrativeUnitUiState: AdministrativeUnitUiState,
     onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
 ) {
-    when (uiState) {
+    when (administrativeUnitUiState) {
         is AdministrativeUnitUiState.Loading -> Loading()
 
         is AdministrativeUnitUiState.AdministrativeUnitLoaded -> {
             AdministrativeUnitScreenLoaded(
-                administrativeUnit = uiState.administrativeUnit,
+                administrativeUnit = administrativeUnitUiState.administrativeUnit,
                 onSetToolbarInfo = onSetToolbarInfo
             )
         }

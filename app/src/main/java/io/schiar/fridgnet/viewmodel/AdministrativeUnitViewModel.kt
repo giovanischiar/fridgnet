@@ -19,7 +19,7 @@ class AdministrativeUnitViewModel @Inject constructor(
     /**
      * The stream (Flow) of UI state that contains the Administrative Unit.
      */
-    val uiState = administrativeUnitRepository.administrativeUnitFlow
+    val administrativeUnitUiStateFlow = administrativeUnitRepository.administrativeUnitFlow
         .map { administrativeUnit ->
             AdministrativeUnitUiState.AdministrativeUnitLoaded(
                 administrativeUnit = administrativeUnit.toAdministrativeUnitViewData()
