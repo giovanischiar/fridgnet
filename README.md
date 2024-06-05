@@ -380,18 +380,6 @@ class MainRepository {
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-model-diagram.dark.svg">
   <img alt="Repository Model Diagram" src="./readme-res/diagrams/repository-model-diagram.light.svg">
 </picture>
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/address-geocoder-db-repository-diagram.dark.svg">
-  <img alt="Address Geocoder DB Repository Diagram" src="./readme-res/diagrams/address-geocoder-db-repository-diagram.light.svg">
-</picture>
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/image-android-db-repository-diagram.dark.svg">
-  <img alt="Image Android DB Repository Diagram" src="./readme-res/diagrams/image-android-db-repository-diagram.light.svg">
-</picture>
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/location-api-db-repository-diagram.dark.svg">
-  <img alt="Location API DB Repository Diagram" src="./readme-res/diagrams/location-api-db-repository-diagram.light.svg">
-</picture>
 
 ### Package `model.repository`, `model.datasource`, and `library`
   Data Sources provide their repositories with all the needed data for the application. They contain modules that make requests to the Nominatim API and consult the database. This diagram represents all the associations among the classes in `model.repository`, `model.datasource`, and `library`.
