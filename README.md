@@ -37,7 +37,7 @@
   - [Package `viewmodel` and `model.repository`](#package-viewmodel-and-modelrepository)
   - [Package `model`](#package-model)
   - [Package `model.repository` and `model`](#package-modelrepository-and-model)
-  - [Package `model.repository` and `model.datasource`](#package-modelrepository-and-modeldatasource)
+  - [Package `model.repository`, `model.datasource` and `library`](#package-modelrepository-modeldatasource-and-library)
 - [Future Tasks](#future-tasks)
 
 ## Build & Run
@@ -393,12 +393,12 @@ class MainRepository {
   <img alt="Location API DB Repository Diagram" src="./readme-res/diagrams/location-api-db-repository-diagram.light.svg">
 </picture>
 
-### Package `model.repository` and `model.datasource`
-  Data Sources provide `MainRepository` with all the needed data for the application. They contain modules that make requests to the Nominatim API and consult the database. This diagram represents all the associations among the classes in `model.repository` and `model.datasource`.
+### Package `model.repository`, `model.datasource`, and `library`
+  Data Sources provide their repositories with all the needed data for the application. They contain modules that make requests to the Nominatim API and consult the database. This diagram represents all the associations among the classes in `model.repository`, `model.datasource`, and `library`.
 
 <picture>
-  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-diagram.dark.svg">
-  <img alt="Main Repository Diagram 1" src="./readme-res/diagrams/repository-diagram.light.svg">
+  <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/repository-datasource-library-diagram.dark.svg">
+  <img alt="Main Repository Diagram 1" src="./readme-res/diagrams/repository-datasource-library-diagram.light.svg">
 </picture>
 
 ## Future Tasks
