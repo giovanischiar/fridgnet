@@ -358,7 +358,7 @@ class MainRepository {
 </picture>
 
 ### Package `viewmodel` and `model.repository`
-  View Models also serve as a [façade](https://en.wikipedia.org/wiki/Facade_pattern), triggering methods in `model.repository` classes. This diagram shows that each View Model has its own interface to `MainRepository` and illustrates all methods each View Model calls, represented by arrows from View Models to Repositories. It also demonstrates that all interfaces are implemented by `MainRepository`.
+  View Models also serve as a [façade](https://en.wikipedia.org/wiki/Facade_pattern), triggering methods in `model.repository` classes. This diagram shows that each View Model has its own repository class and illustrates all methods each View Model calls, represented by arrows from View Models to Repositories.
 
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset="./readme-res/diagrams/dark/viewmodel-repository-diagram.dark.svg">
