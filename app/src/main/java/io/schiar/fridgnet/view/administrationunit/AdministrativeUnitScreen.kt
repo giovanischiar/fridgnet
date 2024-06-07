@@ -24,13 +24,13 @@ import io.schiar.fridgnet.view.shared.viewdata.AdministrativeUnitViewData
  */
 @Composable
 fun AdministrativeUnitScreen(
-    administrativeUnitUiState: AdministrativeUnitUiState,
+    administrativeUnitUiState: CurrentAdministrativeUnitUiState,
     onSetToolbarInfo: (screenInfo: ScreenInfo) -> Unit
 ) {
     when (administrativeUnitUiState) {
-        is AdministrativeUnitUiState.Loading -> Loading()
+        is CurrentAdministrativeUnitUiState.Loading -> Loading()
 
-        is AdministrativeUnitUiState.AdministrativeUnitLoaded -> {
+        is CurrentAdministrativeUnitUiState.CurrentAdministrativeUnitLoaded -> {
             AdministrativeUnitScreenLoaded(
                 administrativeUnit = administrativeUnitUiState.administrativeUnit,
                 onSetToolbarInfo = onSetToolbarInfo

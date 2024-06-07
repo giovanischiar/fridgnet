@@ -25,8 +25,8 @@ fun NavGraphBuilder.administrativeUnitScreen(
     composable(route = Route.ADMINISTRATIVE_UNIT.id) {
         val viewModel = hiltViewModel<AdministrativeUnitViewModel>()
         val administrativeUnitUiState by viewModel
-            .administrativeUnitUiStateFlow
-            .collectAsState(initial = AdministrativeUnitUiState.Loading)
+            .currentAdministrativeUnitUiStateFlow
+            .collectAsState(initial = CurrentAdministrativeUnitUiState.Loading)
         AdministrativeUnitScreen(
             onSetToolbarInfo = onChangeScreenInfo,
             administrativeUnitUiState = administrativeUnitUiState

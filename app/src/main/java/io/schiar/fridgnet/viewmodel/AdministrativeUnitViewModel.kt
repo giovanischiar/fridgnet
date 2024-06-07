@@ -3,7 +3,7 @@ package io.schiar.fridgnet.viewmodel
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import io.schiar.fridgnet.model.repository.AdministrativeUnitRepository
-import io.schiar.fridgnet.view.administrationunit.AdministrativeUnitUiState
+import io.schiar.fridgnet.view.administrationunit.CurrentAdministrativeUnitUiState
 import io.schiar.fridgnet.viewmodel.util.toAdministrativeUnitViewData
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -19,9 +19,9 @@ class AdministrativeUnitViewModel @Inject constructor(
     /**
      * The stream (Flow) of UI state that contains the Administrative Unit.
      */
-    val administrativeUnitUiStateFlow = administrativeUnitRepository.administrativeUnitFlow
+    val currentAdministrativeUnitUiStateFlow = administrativeUnitRepository.administrativeUnitFlow
         .map { administrativeUnit ->
-            AdministrativeUnitUiState.AdministrativeUnitLoaded(
+            CurrentAdministrativeUnitUiState.CurrentAdministrativeUnitLoaded(
                 administrativeUnit = administrativeUnit.toAdministrativeUnitViewData()
             )
         }
